@@ -11,7 +11,7 @@ interface WeekCalendarHeaderProps {
 
 export default function WeekCalendarHeader({ days }: WeekCalendarHeaderProps) {
   return (
-    <div className="calendar-grid sticky top-0 bg-surface z-20 border-b border-subtle">
+    <div className="calendar-grid sticky top-0 bg-surface z-19 border-b border-subtle">
       {/* Time Column Header */}
       <div className="h-16 flex items-center justify-center border-r border-subtle">
         <span className="material-icon text-subtitle text-xl">schedule</span>

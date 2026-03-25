@@ -1,14 +1,18 @@
-// AgendaView.tsx
 import React, { useState } from 'react';
 import AgendaHeader from '../../components/agenda/AgendaHeader';
 import AgendaContent from './AgendaDayView';
 import AgendaWeekContent from './AgendaWeekView';
 import NewAppointmentModal from '../../components/agenda/NewAppointmentModal';
+import type { FilterOptions } from '../../components/agenda/AgendaFilterDropdown';
 import { patients } from '../../data/PatientsData';
 
 export default function AgendaView() {
   const [selectedView, setSelectedView] = useState<'dia' | 'semana'>('dia');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeFilters, setActiveFilters] = useState<FilterOptions>({ types: [] });
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const activeFiltersCount = activeFilters.types.length;
 
   const handleViewChange = (view: 'dia' | 'semana') => {
     setSelectedView(view);
@@ -24,8 +28,20 @@ export default function AgendaView() {
 
   const handleSaveAppointment = (appointmentData: any) => {
     console.log('Nova consulta:', appointmentData);
-    // Lógica para salvar
     setIsModalOpen(false);
+  };
+
+  // Handler do filtro
+  const handleFilterChange = (filters: FilterOptions) => {
+    console.log('🎯 Filtros aplicados:', filters);
+    setActiveFilters(filters);
+    // TODO: Integrar com back-end quando disponível
+  };
+
+  const handleSearch = (query: string) => {
+    console.log('🔍 Busca:', query);
+    setSearchQuery(query);
+    // TODO: Integrar com back-end quando disponível
   };
 
   return (
@@ -34,8 +50,10 @@ export default function AgendaView() {
         selectedView={selectedView}
         onViewChange={handleViewChange}
         onNewAppointment={handleNewAppointment}
-        onSearch={() => console.log('Buscar')}
-        onFilter={() => console.log('Filtrar')}
+        onSearch={handleSearch}
+        onFilter={handleFilterChange}
+        activeFiltersCount={activeFiltersCount}
+        currentFilters={activeFilters}
       />
 
       {selectedView === 'dia' ? (
