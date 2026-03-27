@@ -1,35 +1,28 @@
+import React from 'react';
+
 interface InsightCardProps {
-  title?: string;
-  icon?: string;
   description: string;
-  reference?: string;
   onViewMore?: () => void;
 }
 
-export default function InsightCard({
-  title = 'Weekly Insights',
-  icon = 'lightbulb',
-  description,
-  reference = 'Bio-Feedback AI',
-  onViewMore,
-}: InsightCardProps) {
+export default function InsightCard({ description, onViewMore }: InsightCardProps) {
   return (
-    <div className="bg-primary p-6 rounded-xl shadow-lg text-white">
-      <div className="flex items-center gap-3 mb-4">
-        <span className="material-icon p-2 bg-white/20 rounded-lg">{icon}</span>
-        <h3 className="text-heading-3">{title}</h3>
+    <div className="insight-panel p-10 flex flex-col bg-white/95 dark:bg-insight-panel backdrop-blur-xl rounded-[2.5rem] border border-white dark:border-white/10 shadow-sm">
+      <div className="flex items-center gap-2 mb-8">
+        <span className="text-[10px] font-bold text-[var(--medical-navy)] dark:text-slate-400 uppercase tracking-[0.2em]">
+          Weekly Insights
+        </span>
       </div>
-      <p className="text-blue-100 text-body-sm leading-relaxed">{description}</p>
-      <div className="mt-4 pt-4 border-t border-white/20 flex justify-between items-center">
-        <span className="text-caption text-blue-200">Ref: {reference}</span>
-        {onViewMore && (
-          <button
-            className="bg-white text-primary px-4 py-1.5 rounded-lg text-caption-bold"
-            onClick={onViewMore}
-          >
-            Ver mais
-          </button>
-        )}
+      <p className="text-slate-600 dark:text-slate-400 text-[15px] leading-relaxed font-light mb-12">
+        {description}
+      </p>
+      <div className="mt-auto">
+        <button
+          onClick={onViewMore}
+          className="w-full py-4 border border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 hover:bg-white dark:hover:bg-white/10 hover:border-slate-200 dark:hover:border-white/20 transition-all duration-300 rounded-2xl text-[10px] font-bold text-[var(--medical-navy)] dark:text-slate-300 tracking-[0.15em] uppercase shadow-sm hover:shadow-md hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+        >
+          Abrir Relatório Completo
+        </button>
       </div>
     </div>
   );

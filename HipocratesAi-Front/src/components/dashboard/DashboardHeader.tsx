@@ -1,18 +1,12 @@
 import React, { useState } from 'react';
 
 interface DashboardHeaderProps {
-  userName?: string;
-  title?: string;
-  subtitle?: string;
   onSearch?: (query: string) => void;
   notificationCount?: number;
   onNotificationClick?: () => void;
 }
 
 export default function DashboardHeader({
-  userName = 'Dr. Hipócrates',
-  title = 'Main Dashboard',
-  subtitle = 'Bem-vindo, Dr. Hipócrates. Veja o que temos para hoje.',
   onSearch,
   notificationCount = 0,
   onNotificationClick,
@@ -27,37 +21,42 @@ export default function DashboardHeader({
   };
 
   return (
-    <header className="flex items-center justify-between px-8 py-6 top-0 bg-background-light/80 z-10 border-b border-light">
-      <div>
-        <h1 className="text-heading-1 text-title tracking-tight">{title}</h1>
-        <p className="text-subtitle text-body-sm">{subtitle}</p>
+    <header className="flex items-center justify-between px-8 py-6 bg-transparent">
+      <div className="flex items-center gap-4">
+        <span className="logo-text text-xl font-bold text-[var(--medical-navy)] dark:text-white tracking-tight">
+          Hipócrates.ai
+        </span>
+        <span className="h-4 w-px bg-slate-200 dark:bg-white/10"></span>
+        <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">
+          Clinical Hub
+        </span>
       </div>
 
-      <div className="flex items-center gap-4">
-        {/* Search Bar */}
-        <form onSubmit={handleSearch} className="relative">
-          <span className="material-icon absolute left-3 top-1/2 -translate-y-1/2 text-subtitle">
+      <div className="flex items-center gap-6">
+        <form onSubmit={handleSearch} className="flex items-center gap-3 px-5 py-2 rounded-2xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm w-80 group transition-all hover:shadow-md dark:hover:bg-white/10">
+          <span className="material-icon text-slate-300 dark:text-slate-500 text-lg group-hover:text-[var(--electric-cyan)] dark:group-hover:text-[var(--electric-cyan)] transition-colors">
             search
           </span>
           <input
-            className="pl-10 pr-4 py-2 bg-surface border-none rounded-lg text-body-sm w-72 focus:ring-2 focus:ring-primary shadow-sm"
-            placeholder="Pesquisar prontuário, CID ou paciente..."
             type="text"
             value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="text-sm text-slate-600 dark:text-slate-300 bg-transparent border-none outline-none focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none p-0 w-full"
+            placeholder="Procurar paciente..."
           />
         </form>
 
-        {/* Notifications Button */}
-        <button
-          className="relative p-2 text-subtitle bg-surface rounded-lg shadow-sm"
-          onClick={onNotificationClick}
-        >
-          <span className="material-icon">notifications</span>
-          {notificationCount > 0 && (
-            <span className="absolute top-2 right-2 size-2 bg-red-500 border-2 border-white rounded-full"></span>
-          )}
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onNotificationClick}
+            className="relative size-10 flex items-center justify-center bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl text-slate-400 dark:text-slate-500 hover:text-[var(--medical-navy)] dark:hover:text-white shadow-sm transition-colors"
+          >
+            <span className="material-icon text-[20px]">notifications</span>
+            {notificationCount > 0 && (
+              <span className="absolute top-1 right-1 size-2 bg-red-500 rounded-full"></span>
+            )}
+          </button>
+        </div>
       </div>
     </header>
   );

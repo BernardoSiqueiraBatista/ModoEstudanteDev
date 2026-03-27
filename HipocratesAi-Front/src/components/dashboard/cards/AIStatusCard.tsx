@@ -1,37 +1,27 @@
 import React from 'react';
 
-interface AIStatusCardProps {
-  isOnline?: boolean;
-  title?: string;
-  description?: string;
-  statusLabel?: string;
-}
-
-export default function AIStatusCard({
-  isOnline = true,
-  title = 'Análise em Tempo Real',
-  description = 'Processando prontuários da manhã para identificação de padrões de risco.',
-  statusLabel = 'Hipócrates AI Online',
-}: AIStatusCardProps) {
+export default function AIStatusCard() {
   return (
-    <div className="bg-slate-900 p-5 rounded-xl border border-slate-700 shadow-xl overflow-hidden relative">
-      {/* Background Icon */}
-      <div className="absolute -right-4 -top-4 opacity-20">
-        <span className="material-icon text-[100px] text-primary">neurology</span>
+    <div className="p-8 rounded-[2.5rem] bg-[var(--medical-navy)] dark:bg-ai-active-core text-white shadow-2xl relative overflow-hidden border border-white/10 dark:border-electric-cyan/30">
+      <div className="absolute top-0 right-0 p-8">
+        <span className="text-[8px] font-bold text-white/30 dark:text-white/20 tracking-widest uppercase">
+          Encrypted
+        </span>
       </div>
-
-      {/* Content */}
       <div className="relative z-10">
-        <div className="flex items-center gap-2 mb-2">
-          <div
-            className={`size-2 ${
-              isOnline ? 'bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]' : 'bg-slate-500'
-            } rounded-full`}
-          ></div>
-          <span className="text-caption-bold text-slate-400">{statusLabel}</span>
+        <div className="flex items-center gap-2 mb-6">
+          <div className="size-2 bg-[var(--electric-cyan)] rounded-full animate-pulse shadow-[0_0_8px_rgba(0,209,255,0.5)]"></div>
+          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+            AI Active Core
+          </span>
         </div>
-        <h4 className="text-white text-heading-3 mb-1">{title}</h4>
-        <p className="text-slate-400 text-caption leading-relaxed">{description}</p>
+        <h4 className="text-base font-semibold mb-4">Monitoramento de Risco</h4>
+        <p className="text-white/50 dark:text-slate-400 text-[11px] font-light leading-relaxed mb-8">
+          Analisando 1.2k pontos de dados para predição de eventos cardiovasculares.
+        </p>
+        <div className="w-full bg-white/10 dark:bg-white/5 h-1 rounded-full overflow-hidden">
+          <div className="bg-[var(--electric-cyan)] h-full w-[72%] rounded-full shadow-[0_0_10px_rgba(0,209,255,0.5)]"></div>
+        </div>
       </div>
     </div>
   );
