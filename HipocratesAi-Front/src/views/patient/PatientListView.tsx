@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import PatientsHeader from '../../components/patients/PatientsHeader';
 import PatientsTable from '../../components/patients/PatientsTable';
 import StatsFooter from '../../components/patients/PatientsFooter';
@@ -7,19 +7,62 @@ import { patients as initialPatients } from '../../data/PatientsData';
 import { statsData } from '../../data/PatientsStats';
 import type { Patient } from '../../types/PatientTypes';
 
+const ITEMS_PER_PAGE = 4;
+
 export default function PatientsContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [patientsList, setPatientsList] = useState(initialPatients);
 
-  const handlePatientClick = (patient: Patient) => {
-    console.log('Ver detalhes do paciente:', patient);
-  };
+  // Filtrar pacientes baseado na busca
+  const filteredPatients = useMemo(() => {
+    if (!searchQuery.trim()) return patientsList;
+    
+    const query = searchQuery.toLowerCase();
+    return patientsList.filter(patient => 
+      patient.name.toLowerCase().includes(query) ||
+      patient.recordNumber.toLowerCase().includes(query)
+    );
+  }, [patientsList, searchQuery]);
 
+  // Calcular total de páginas
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredPatients.length / ITEMS_PER_PAGE);
+  }, [filteredPatients]);
+
+  // Paginar os pacientes
+  const paginatedPatients = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredPatients.slice(startIndex, endIndex);
+  }, [filteredPatients, currentPage]);
+
+  // Resetar para primeira página quando a busca mudar
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    console.log('Buscar:', query);
+    setCurrentPage(1);
+  };
+
+  const handlePatientClick = (patient: Patient) => {
+    console.log('Ver detalhes do paciente:', patient);
+    // Navegar para página de detalhes
+    // navigate(`/pacientes/${patient.id}`);
+  };
+
+  const handleEditPatient = (patient: Patient) => {
+    console.log('✏️ Editar paciente:', patient);
+    // TODO: Abrir modal de edição com os dados do paciente
+    // setIsEditModalOpen(true);
+    // setSelectedPatient(patient);
+  };
+
+  const handleDeletePatient = (patient: Patient) => {
+    console.log('🗑️ Deletar paciente:', patient);
+    // TODO: Confirmar exclusão e deletar
+    // if (confirm(`Tem certeza que deseja deletar o paciente ${patient.name}?`)) {
+    //   setPatientsList(prev => prev.filter(p => p.id !== patient.id));
+    // }
   };
 
   const handleNewPatient = () => {
@@ -30,23 +73,19 @@ export default function PatientsContent() {
     setIsModalOpen(false);
   };
 
-  const handleSavePatient = (patientData: Omit<Patient, 'id' | 'initials' | 'recordNumber' | 'lastConsultation'>) => {
-    // Gerar ID único
+  const handleSavePatient = (patientData: any) => {
     const newId = (patientsList.length + 1).toString();
     
-    // Gerar iniciais
     const initials = patientData.name
       .split(' ')
-      .map(n => n[0])
+      .map((n: string) => n[0])
       .slice(0, 2)
       .join('')
       .toUpperCase();
 
-    // Gerar número de prontuário
     const year = new Date().getFullYear();
-    const recordNumber = `#HP-${year}-${String(patientsList.length + 1).padStart(4, '0')}`;
+    const recordNumber = `P-${year}-${String(patientsList.length + 1).padStart(4, '0')}`;
 
-    // Criar novo paciente com os campos opcionais
     const newPatient: Patient = {
       id: newId,
       name: patientData.name,
@@ -55,22 +94,20 @@ export default function PatientsContent() {
       age: patientData.age,
       recordNumber,
       lastConsultation: {
-        date: 'Nunca',
-        doctor: 'Não realizada',
+        date: new Date().toLocaleDateString('pt-BR'),
+        doctor: 'Dr. Hipócrates',
       },
       status: 'ativo',
       mainDiagnosis: patientData.mainDiagnosis,
       observations: patientData.observations,
     };
 
-    // Adicionar à lista
-    //setPatientsList(prev => [newPatient, ...prev]);
+    setPatientsList(prev => [newPatient, ...prev]);
+    setCurrentPage(1);
     
     console.log('✅ NOVO PACIENTE CADASTRADO:', newPatient);
+    setIsModalOpen(false);
   };
-
-  const itemsPerPage = 10;
-  const totalPages = Math.ceil(patientsList.length / itemsPerPage);
 
   return (
     <main className="flex-1 px-16 pt-12 pb-24">
@@ -80,12 +117,14 @@ export default function PatientsContent() {
       />
 
       <PatientsTable
-        patients={patientsList}
+        patients={paginatedPatients}
         currentPage={currentPage}
         totalPages={totalPages}
-        totalPatients={patientsList.length}
+        totalPatients={filteredPatients.length}
         onPageChange={setCurrentPage}
         onPatientClick={handlePatientClick}
+        onEditPatient={handleEditPatient}
+        onDeletePatient={handleDeletePatient}
       />
 
       <StatsFooter stats={statsData} />
