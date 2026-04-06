@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import PatientsHeader from '../../components/patients/PatientsHeader';
-import PatientsTable from '../../components/patients/PatientsTable';
-import StatsFooter from '../../components/patients/PatientsFooter';
-import NewPatientModal from '../../components/patients/NewPatientModal';
+import PatientsHeader from '../../components/patients/patientList/PatientsHeader';
+import PatientsTable from '../../components/patients/patientList/PatientsTable';
+import StatsFooter from '../../components/patients/patientList/PatientsFooter';
+import NewPatientModal from '../../components/patients/patientList/NewPatientModal';
 import { patients as initialPatients } from '../../data/PatientsData';
 import { statsData } from '../../data/PatientsStats';
 import type { Patient } from '../../types/PatientTypes';

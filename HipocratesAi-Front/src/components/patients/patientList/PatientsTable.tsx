@@ -1,6 +1,6 @@
 import React from 'react';
 import PatientTableRow from './Patienttablerow';
-import type { Patient } from '../../types/PatientTypes';
+import type { Patient } from '../../../types/PatientTypes';
 
 interface PatientsTableProps {
   patients: Patient[];

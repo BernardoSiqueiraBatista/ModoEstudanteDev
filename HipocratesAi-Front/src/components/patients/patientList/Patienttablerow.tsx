@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { Patient } from '../../types/PatientTypes';
+import { useNavigate } from 'react-router-dom'; // <-- ADICIONE ESTA LINHA
+import type { Patient } from '../../../types/PatientTypes';
 
 interface PatientTableRowProps {
   patient: Patient;
@@ -14,6 +15,7 @@ export default function PatientTableRow({
   onEdit,
   onDelete,
 }: PatientTableRowProps) {
+  const navigate = useNavigate(); // <-- ADICIONE ESTA LINHA
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -54,6 +56,10 @@ export default function PatientTableRow({
     }
   };
 
+  const handleViewDetails = () => {
+    navigate(`/pacientes/${patient.id}`); // <-- ADICIONE ESTA FUNÇÃO
+  };
+
   const handleEdit = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDropdownOpen(false);
@@ -69,7 +75,7 @@ export default function PatientTableRow({
   return (
     <tr 
       className="group hover:scale-[1.005] transition-all duration-500 cursor-pointer"
-      onClick={onViewDetails}
+      onClick={handleViewDetails} // <-- MUDE PARA handleViewDetails
     >
       {/* Patient Info */}
       <td className="px-6 py-5 bg-white/40 group-hover:bg-white/80 rounded-l-card border-y border-l border-white/60 transition-colors">

@@ -52,7 +52,17 @@ export default function RouterView() {
               <MainLayout />
             </ProtectedRoute>
           }
+
         />
+        <Route
+          path="/pacientes/:id"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+        
         <Route
           path="/consulta/nova"
           element={
@@ -61,6 +71,7 @@ export default function RouterView() {
             </ProtectedRoute>
           }
         />
+        
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

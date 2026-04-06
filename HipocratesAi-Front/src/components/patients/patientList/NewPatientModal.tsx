@@ -3,7 +3,14 @@ import React from 'react';
 interface NewPatientModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onPatientCreated?: () => void;
+  onSave?: (patientData: {
+    name: string;
+    gender: string;
+    age: number;
+    status: 'ativo' | 'followup' | 'pendente';
+    mainDiagnosis?: string;
+    observations?: string;
+  }) => void;
 }
 
 type NewPatientFormData = {
@@ -37,7 +44,7 @@ const initialFormData: NewPatientFormData = {
 export default function NewPatientModal({
   isOpen,
   onClose,
-  onPatientCreated,
+  onSave,
 }: NewPatientModalProps) {
   const [formData, setFormData] = React.useState<NewPatientFormData>(initialFormData);
   const [isUploadExpanded, setIsUploadExpanded] = React.useState(false);
@@ -114,12 +121,28 @@ export default function NewPatientModal({
     try {
       setIsSaving(true);
 
-      // placeholder até ligarmos o backend
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      // Calcular idade a partir da data de nascimento
+      const birthDate = new Date(formData.birthDate);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const m = today.getMonth() - birthDate.getMonth();
+      if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
 
-      console.log('Payload novo paciente:', formData);
+      // Preparar dados no formato esperado pelo Patient
+      const patientData = {
+        name: formData.fullName,
+        gender: formData.sex === 'male' ? 'Masculino' : formData.sex === 'female' ? 'Feminino' : 'Outro',
+        age,
+        status: 'ativo' as const,
+        mainDiagnosis: formData.chiefComplaint || undefined,
+        observations: formData.notes || undefined,
+      };
 
-      onPatientCreated?.();
+      console.log('Novo paciente:', patientData);
+      onSave?.(patientData);
+      onClose();
     } catch (error) {
       console.error('Erro ao salvar paciente:', error);
       alert('Erro ao salvar paciente.');
