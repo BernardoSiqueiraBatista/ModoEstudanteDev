@@ -1,76 +1,18 @@
 @import 'tailwindcss';
 @import 'utilities.css';
-@import 'patients-clean.css';
-@import 'auth.css';
+@import 'theme.css';
+@import 'glass-effects.css';
+@import 'components.css';
+@import 'animations.css';
 @import 'material-icons/iconfont/material-icons.css';
 
-/* Estilos globais */
+/* ===== ESTILOS GLOBAIS ===== */
 body {
   font-family: 'Inter', sans-serif;
 }
 
 /* Transições suaves para dark mode */
 * {
-  transition:
-    background-color 0.2s ease,
-    border-color 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
-/* Gradiente fixo do rodapé */
-.footer-gradient {
-  background: linear-gradient(to right, rgba(23, 115, 207, 0.1), #1773cf, rgba(23, 115, 207, 0.1));
-  opacity: 0.3;
-}
-
-/* Animação para o modal */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fadeIn {
-  animation: fadeIn 0.2s ease-out;
-}
-
-/* Animação de spinner */
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
-/* ===== CALENDAR GRID ===== */
-.calendar-grid {
-  display: grid;
-  grid-template-columns: 60px repeat(7, 1fr);
-}
-
-.time-row {
-  height: 80px;
-}
-
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin-slow {
-  animation: spin-slow 3s linear infinite;
-}

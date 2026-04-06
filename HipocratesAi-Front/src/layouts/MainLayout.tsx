@@ -2,6 +2,7 @@ import Dashboard from '../views/dashboard/DashboardView';
 import Sidebar from '../components/Sidebar';
 import AgendaView from '../views/agenda/AgendaView';
 import PatientList from '../views/patient/PatientListView';
+import NewConsultationView from '../views/consulta/NewConsultationView';
 import { useLocation} from 'react-router-dom';
 
 
@@ -14,6 +15,7 @@ export default function MainLayout() {
       {location.pathname === '/dashboard' && <Dashboard />}
       {location.pathname === '/agenda' && <AgendaView />}
       {location.pathname === '/pacientes' && <PatientList />}
+      {location.pathname === '/consulta/nova' && <NewConsultationView />}
     </Sidebar>
   );
 }

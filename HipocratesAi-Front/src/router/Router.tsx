@@ -53,7 +53,14 @@ export default function RouterView() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/consulta/nova"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

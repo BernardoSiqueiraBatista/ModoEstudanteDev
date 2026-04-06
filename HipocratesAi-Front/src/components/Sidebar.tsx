@@ -17,7 +17,7 @@ const defaultNavItems: NavItem[] = [
   { icon: 'dashboard', label: 'Dashboard', path: '/dashboard' },
   { icon: 'calendar_today', label: 'Agenda', path: '/agenda' },
   { icon: 'group', label: 'Pacientes', path: '/pacientes' },
-  { icon: 'stethoscope', label: 'Consultas', path: '/consultas' },
+  { icon: 'stethoscope', label: 'Consultas', path: '/consulta/nova' },
   { icon: 'bar_chart', label: 'Relatórios', path: '/relatorios' },
 ];
 
