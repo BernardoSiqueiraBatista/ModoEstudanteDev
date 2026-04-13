@@ -21,19 +21,27 @@ export default function PatientProfileHeader({
 
   const getStatusLabel = () => {
     switch (patient.status) {
-      case 'ativo': return 'Prontuário Ativo';
-      case 'followup': return 'Em Acompanhamento';
-      case 'pendente': return 'Pendente';
-      default: return patient.status;
+      case 'ativo':
+        return 'Prontuário Ativo';
+      case 'followup':
+        return 'Em Acompanhamento';
+      case 'pendente':
+        return 'Pendente';
+      default:
+        return patient.status;
     }
   };
 
   const getStatusColor = () => {
     switch (patient.status) {
-      case 'ativo': return 'text-emerald-600';
-      case 'followup': return 'text-blue-600';
-      case 'pendente': return 'text-amber-600';
-      default: return 'text-gray-500';
+      case 'ativo':
+        return 'text-emerald-600';
+      case 'followup':
+        return 'text-blue-600';
+      case 'pendente':
+        return 'text-amber-600';
+      default:
+        return 'text-gray-500';
     }
   };
 
@@ -57,7 +65,9 @@ export default function PatientProfileHeader({
           </div>
           <h1 className="text-2xl font-light text-gray-800 tracking-tight">{patient.name}</h1>
           <div className="flex flex-wrap gap-4 mt-2 text-sm text-gray-500">
-            <span>{patient.gender}, {patient.age} anos</span>
+            <span>
+              {patient.gender}, {patient.age} anos
+            </span>
             <span>•</span>
             <span>Prontuário: {patient.recordNumber}</span>
             <span>•</span>
@@ -69,17 +79,16 @@ export default function PatientProfileHeader({
             </p>
           )}
           <p className="text-xs text-gray-400 mt-1">
-            Última consulta: {formatLastConsultationDate(patient.lastConsultation.date)} com {patient.lastConsultation.doctor}
+            Última consulta: {formatLastConsultationDate(patient.lastConsultation.date)} com{' '}
+            {patient.lastConsultation.doctor}
           </p>
           {patient.observations && (
-            <p className="text-xs text-gray-400 mt-1 italic">
-              Obs: {patient.observations}
-            </p>
+            <p className="text-xs text-gray-400 mt-1 italic">Obs: {patient.observations}</p>
           )}
         </div>
 
         <div className="flex items-center gap-6 text-[11px] font-medium text-gray-400 uppercase tracking-widest">
-          {tabs.map((tab) => (
+          {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}

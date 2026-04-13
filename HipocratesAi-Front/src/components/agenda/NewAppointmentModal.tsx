@@ -17,11 +17,11 @@ interface NewAppointmentModalProps {
   patients: Patient[]; // Lista de pacientes para selecionar
 }
 
-export default function NewAppointmentModal({ 
-  isOpen, 
-  onClose, 
+export default function NewAppointmentModal({
+  isOpen,
+  onClose,
   onSave,
-  patients 
+  patients,
 }: NewAppointmentModalProps) {
   const [formData, setFormData] = useState({
     patientId: '',
@@ -32,14 +32,16 @@ export default function NewAppointmentModal({
     description: '',
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     onSave({
       patientId: formData.patientId,
       date: formData.date,
@@ -48,7 +50,7 @@ export default function NewAppointmentModal({
       type: formData.type,
       description: formData.description || undefined,
     });
-    
+
     // Reset form
     setFormData({
       patientId: '',
@@ -66,20 +68,17 @@ export default function NewAppointmentModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Overlay */}
-      <div 
-        className="absolute inset-0 bg-black/20 backdrop-blur-sm"
-        onClick={onClose}
-      />
-      
+      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={onClose} />
+
       {/* Modal */}
       <div className="relative liquid-glass rounded-bubble max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="edge-refraction"></div>
-        
+
         <div className="p-10">
           {/* Header */}
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-heading-1 text-title">Nova Consulta</h2>
-            <button 
+            <button
               onClick={onClose}
               className="size-10 rounded-full flex items-center justify-center hover:bg-slate-100 transition-colors"
             >

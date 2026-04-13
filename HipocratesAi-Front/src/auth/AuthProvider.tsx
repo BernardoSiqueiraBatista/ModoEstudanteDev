@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "../lib/supabase";
+import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import type { Session, User } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabase';
 
 type DoctorProfile = {
   id: string;
@@ -23,17 +23,17 @@ type AuthContextValue = {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 async function fetchDoctorProfile(userId: string): Promise<DoctorProfile | null> {
-  console.log("[AuthProvider] fetchDoctorProfile:start", userId);
+  console.log('[AuthProvider] fetchDoctorProfile:start', userId);
 
   const { data, error } = await supabase
-    .schema("app")
-    .from("doctors")
-    .select("id, full_name, email, phone, specialty, crm")
-    .eq("id", userId)
+    .schema('app')
+    .from('doctors')
+    .select('id, full_name, email, phone, specialty, crm')
+    .eq('id', userId)
     .maybeSingle();
 
-  console.log("[AuthProvider] fetchDoctorProfile:data", data);
-  console.log("[AuthProvider] fetchDoctorProfile:error", error);
+  console.log('[AuthProvider] fetchDoctorProfile:data', data);
+  console.log('[AuthProvider] fetchDoctorProfile:error', error);
 
   if (error) {
     throw error;
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const doctorProfile = await fetchDoctorProfile(user.id);
       setDoctor(doctorProfile);
     } catch (error) {
-      console.error("[AuthProvider] refreshDoctor:error", error);
+      console.error('[AuthProvider] refreshDoctor:error', error);
       setDoctor(null);
     }
   }
@@ -75,14 +75,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async function bootstrap() {
       try {
-        console.log("[AuthProvider] bootstrap:start");
+        console.log('[AuthProvider] bootstrap:start');
 
         const { data, error } = await supabase.auth.getSession();
 
         if (!active) return;
 
         if (error) {
-          console.error("[AuthProvider] getSession:error", error);
+          console.error('[AuthProvider] getSession:error', error);
           setSession(null);
           setUser(null);
           setDoctor(null);
@@ -93,8 +93,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const currentSession = data.session ?? null;
         const currentUser = currentSession?.user ?? null;
 
-        console.log("[AuthProvider] bootstrap:session", currentSession);
-        console.log("[AuthProvider] bootstrap:user", currentUser);
+        console.log('[AuthProvider] bootstrap:session', currentSession);
+        console.log('[AuthProvider] bootstrap:user', currentUser);
 
         setSession(currentSession);
         setUser(currentUser);
@@ -105,13 +105,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         // perfil médico é complementar; não deve bloquear a agenda
         if (currentUser?.id) {
           fetchDoctorProfile(currentUser.id)
-            .then((doctorProfile) => {
+            .then(doctorProfile => {
               if (!active) return;
               setDoctor(doctorProfile);
             })
-            .catch((err) => {
+            .catch(err => {
               if (!active) return;
-              console.error("[AuthProvider] bootstrap:doctor:error", err);
+              console.error('[AuthProvider] bootstrap:doctor:error', err);
               setDoctor(null);
             });
         } else {
@@ -119,7 +119,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       } catch (err) {
         if (!active) return;
-        console.error("[AuthProvider] bootstrap:unexpected", err);
+        console.error('[AuthProvider] bootstrap:unexpected', err);
         setSession(null);
         setUser(null);
         setDoctor(null);
@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      console.log("[AuthProvider] onAuthStateChange", _event, newSession);
+      console.log('[AuthProvider] onAuthStateChange', _event, newSession);
 
       const newUser = newSession?.user ?? null;
 
@@ -142,13 +142,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (newUser?.id) {
         fetchDoctorProfile(newUser.id)
-          .then((doctorProfile) => {
+          .then(doctorProfile => {
             if (!active) return;
             setDoctor(doctorProfile);
           })
-          .catch((err) => {
+          .catch(err => {
             if (!active) return;
-            console.error("[AuthProvider] onAuthStateChange:doctor:error", err);
+            console.error('[AuthProvider] onAuthStateChange:doctor:error', err);
             setDoctor(null);
           });
       } else {
@@ -180,7 +180,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 export function useAuth() {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    throw new Error("useAuth must be used within AuthProvider");
+    throw new Error('useAuth must be used within AuthProvider');
   }
   return ctx;
 }

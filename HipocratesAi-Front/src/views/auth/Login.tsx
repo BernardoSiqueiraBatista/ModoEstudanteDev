@@ -1,8 +1,7 @@
-import HeaderAuthPremium from "../../components/auth/HeaderAuth.tsx";
-import LoginForm from "../../components/auth/LoginForm.tsx";
-import TestimonialCard from "../../components/auth/TestimonialCard.tsx";
-import "../../styles/auth.css";
-
+import HeaderAuthPremium from '../../components/auth/HeaderAuth.tsx';
+import LoginForm from '../../components/auth/LoginForm.tsx';
+import TestimonialCard from '../../components/auth/TestimonialCard.tsx';
+import '../../styles/auth.css';
 
 function Login() {
   return (
@@ -66,9 +65,7 @@ function Login() {
           <div className="text-navy-deep text-3xl font-extralight tracking-tighter leading-tight">
             Padrão <span className="font-black">Hospitalar</span>
             <br />
-            <span className="text-slate-400 italic text-2xl">
-              Minimalismo Digital
-            </span>
+            <span className="text-slate-400 italic text-2xl">Minimalismo Digital</span>
           </div>
         </div>
 

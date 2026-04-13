@@ -26,12 +26,12 @@ export default function PatientsTable({
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const maxVisible = 5;
-    
+
     if (totalPages === 0) {
       pages.push(1);
       return pages;
     }
-    
+
     if (totalPages <= maxVisible) {
       for (let i = 1; i <= totalPages; i++) pages.push(i);
     } else {
@@ -76,9 +76,7 @@ export default function PatientsTable({
         </div>
         <div className="flex items-center gap-3 text-subtitle">
           <span className="text-caption-bold uppercase tracking-widest">Filtrar por:</span>
-          <span className="material-icon text-lg cursor-pointer hover:text-title">
-            filter_list
-          </span>
+          <span className="material-icon text-lg cursor-pointer hover:text-title">filter_list</span>
         </div>
       </div>
 
@@ -95,7 +93,7 @@ export default function PatientsTable({
             </tr>
           </thead>
           <tbody className="text-body-sm">
-            {patients.map((patient) => (
+            {patients.map(patient => (
               <PatientTableRow
                 key={patient.id}
                 patient={patient}
@@ -115,7 +113,7 @@ export default function PatientsTable({
           <span className="font-semibold text-slate-700">{endIndex}</span> de{' '}
           <span className="font-semibold text-slate-700">{totalPatients}</span> pacientes
         </span>
-        
+
         <div className="flex items-center gap-1">
           <button
             className={`size-9 rounded-xl flex items-center justify-center transition-all duration-200 ${
@@ -128,19 +126,22 @@ export default function PatientsTable({
           >
             <span className="material-icon text-lg">chevron_left</span>
           </button>
-          
+
           {getPageNumbers().map((page, index) => {
             const isActive = page === currentPage;
             const isEllipsis = page === '...';
-            
+
             if (isEllipsis) {
               return (
-                <span key={index} className="size-9 rounded-xl flex items-center justify-center text-sm text-slate-400">
+                <span
+                  key={index}
+                  className="size-9 rounded-xl flex items-center justify-center text-sm text-slate-400"
+                >
                   ...
                 </span>
               );
             }
-            
+
             return (
               <button
                 key={index}

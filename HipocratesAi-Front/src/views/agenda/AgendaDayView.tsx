@@ -54,10 +54,7 @@ export default function AgendaContent() {
           <AuthDebugCard />
         </div>
 
-        <DateNavigator
-          selectedDate={selectedDate}
-          onDateChange={handleDateChange}
-        />
+        <DateNavigator selectedDate={selectedDate} onDateChange={handleDateChange} />
 
         <div className="relative pl-24 mt-8">
           <div

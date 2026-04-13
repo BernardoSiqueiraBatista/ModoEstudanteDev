@@ -3,12 +3,7 @@ import MainLayout from '../layouts/MainLayout';
 import Cadastro from '../views/auth/Cadastro';
 import ProtectedRoute from './ProtectedRoute';
 
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 
 export default function RouterView() {
   return (
@@ -52,7 +47,6 @@ export default function RouterView() {
               <MainLayout />
             </ProtectedRoute>
           }
-
         />
         <Route
           path="/pacientes/:id"
@@ -62,7 +56,7 @@ export default function RouterView() {
             </ProtectedRoute>
           }
         />
-        
+
         <Route
           path="/consulta/nova"
           element={
@@ -71,7 +65,16 @@ export default function RouterView() {
             </ProtectedRoute>
           }
         />
-        
+
+        <Route
+          path="/consulta/ativa/:id"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

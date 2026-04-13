@@ -4,9 +4,8 @@ import AgendaView from '../views/agenda/AgendaView';
 import PatientList from '../views/patient/PatientListView';
 import NewConsultationView from '../views/consulta/NewConsultationView';
 import PatientProfileView from '../views/patient/PatientProfileView';
-import { useLocation} from 'react-router-dom';
-
-
+import ActiveConsultationView from '../views/consulta/ActiveConsultationView';
+import { useLocation } from 'react-router-dom';
 
 export default function MainLayout() {
   const location = useLocation();
@@ -17,7 +16,10 @@ export default function MainLayout() {
       {location.pathname === '/agenda' && <AgendaView />}
       {location.pathname === '/pacientes' && <PatientList />}
       {location.pathname === '/consulta/nova' && <NewConsultationView />}
-      {location.pathname.startsWith('/pacientes/') && location.pathname !== '/pacientes' && <PatientProfileView />}
+      {location.pathname.startsWith('/pacientes/') && location.pathname !== '/pacientes' && (
+        <PatientProfileView />
+      )}
+      {location.pathname.startsWith('/consulta/ativa/') && <ActiveConsultationView />}
     </Sidebar>
   );
 }

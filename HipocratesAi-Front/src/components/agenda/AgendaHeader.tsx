@@ -52,7 +52,7 @@ export default function AgendaHeader({
       const target = event.target as Node;
       const isClickInsideButton = filterButtonRef.current?.contains(target);
       const isClickInsideDropdown = dropdownRef.current?.contains(target);
-      
+
       if (!isClickInsideButton && !isClickInsideDropdown && isFilterOpen) {
         setIsFilterOpen(false);
       }
@@ -68,11 +68,11 @@ export default function AgendaHeader({
 
   const handleViewChange = (view: 'dia' | 'semana') => {
     if (view === selectedView || isAnimating) return;
-    
+
     setIsAnimating(true);
     setSelectedView(view);
     onViewChange?.(view);
-    
+
     setTimeout(() => {
       setIsAnimating(false);
     }, 300);
@@ -111,12 +111,8 @@ export default function AgendaHeader({
       <header className="flex items-center justify-between px-10 py-6 border-b border-light bg-surface/50 backdrop-blur-md sticky top-0 z-10">
         {/* Left Section - Title */}
         <div>
-          <h1 className="text-heading-1 text-title transition-all duration-300">
-            Agenda Médica
-          </h1>
-          <p className="text-caption text-subtitle mt-1">
-            Sincronizado com Google Agenda
-          </p>
+          <h1 className="text-heading-1 text-title transition-all duration-300">Agenda Médica</h1>
+          <p className="text-caption text-subtitle mt-1">Sincronizado com Google Agenda</p>
         </div>
 
         {/* Right Section */}
@@ -162,12 +158,10 @@ export default function AgendaHeader({
                 left: selectedView === 'dia' ? '0.25rem' : 'calc(50% + 0.25rem)',
               }}
             />
-            
+
             <button
               className={`relative flex-1 px-4 py-1.5 text-caption-bold rounded-lg transition-all duration-200 ${
-                selectedView === 'dia' 
-                  ? 'text-title font-medium' 
-                  : 'text-subtitle hover:text-title'
+                selectedView === 'dia' ? 'text-title font-medium' : 'text-subtitle hover:text-title'
               } ${isAnimating ? 'pointer-events-none' : ''}`}
               onClick={() => handleViewChange('dia')}
               aria-pressed={selectedView === 'dia'}
@@ -177,8 +171,8 @@ export default function AgendaHeader({
             </button>
             <button
               className={`relative flex-1 px-4 py-1.5 text-caption-bold rounded-lg transition-all duration-200 ${
-                selectedView === 'semana' 
-                  ? 'text-title font-medium' 
+                selectedView === 'semana'
+                  ? 'text-title font-medium'
                   : 'text-subtitle hover:text-title'
               } ${isAnimating ? 'pointer-events-none' : ''}`}
               onClick={() => handleViewChange('semana')}
@@ -202,7 +196,7 @@ export default function AgendaHeader({
 
       {/* Dropdown - Fixed position */}
       {isFilterOpen && (
-        <div 
+        <div
           ref={dropdownRef}
           className="fixed z-[200]"
           style={{

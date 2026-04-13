@@ -19,16 +19,17 @@ export const anaMartinsTimeline: TimelineEvent[] = [
     hypotheses: [
       {
         id: 'h1',
-        patientId: patients[0].id,  
+        patientId: patients[0].id,
         title: 'Cefaleia Tensional',
-        description: 'Considerada devido ao padrão de pressão na nuca e histórico de estresse ocupacional.',
+        description:
+          'Considerada devido ao padrão de pressão na nuca e histórico de estresse ocupacional.',
         status: 'ativo',
         confidence: 85,
         createdAt: '2024-02-15',
       },
       {
         id: 'h2',
-        patientId: patients[0].id,  
+        patientId: patients[0].id,
         title: 'Crise Hipertensiva',
         description: 'Avaliada em tempo real após relato de tontura ao levantar.',
         status: 'investigando',
@@ -57,7 +58,8 @@ export const anaMartinsTimeline: TimelineEvent[] = [
     doctor: patients[0].lastConsultation.doctor,
     specialty: 'Consulta Inicial',
     type: 'consulta',
-    quote: '"Paciente apresenta níveis pressóricos elevados em medições repetidas. Iniciaremos tratamento com Losartana."',
+    quote:
+      '"Paciente apresenta níveis pressóricos elevados em medições repetidas. Iniciaremos tratamento com Losartana."',
   },
 ];
 
@@ -67,7 +69,8 @@ export const anaMartinsHypotheses: Hypothesis[] = [
     id: 'h1',
     patientId: patients[0].id,
     title: 'Cefaleia Tensional',
-    description: 'Padrão de dor compressiva bilateral na região frontal e occipital, associada a estresse ocupacional e tensão muscular na região cervical. Melhora com analgésicos comuns.',
+    description:
+      'Padrão de dor compressiva bilateral na região frontal e occipital, associada a estresse ocupacional e tensão muscular na região cervical. Melhora com analgésicos comuns.',
     status: 'ativo',
     confidence: 85,
     createdAt: '2024-02-15',
@@ -77,7 +80,8 @@ export const anaMartinsHypotheses: Hypothesis[] = [
     id: 'h2',
     patientId: patients[0].id,
     title: 'Crise Hipertensiva',
-    description: 'Episódios de elevação pressórica associados a tontura e cefaleia occipital, possivelmente relacionados a picos de estresse. Monitoramento domiciliar sugerido.',
+    description:
+      'Episódios de elevação pressórica associados a tontura e cefaleia occipital, possivelmente relacionados a picos de estresse. Monitoramento domiciliar sugerido.',
     status: 'investigando',
     confidence: 60,
     createdAt: '2024-02-15',
@@ -87,7 +91,8 @@ export const anaMartinsHypotheses: Hypothesis[] = [
     id: 'h3',
     patientId: patients[0].id,
     title: 'Efeito Colateral de Medicação',
-    description: 'Possibilidade de cefaleia como efeito adverso da medicação anti-hipertensiva. Descartada após ajuste de horário.',
+    description:
+      'Possibilidade de cefaleia como efeito adverso da medicação anti-hipertensiva. Descartada após ajuste de horário.',
     status: 'descartado',
     confidence: 15,
     createdAt: '2024-01-20',
@@ -126,13 +131,14 @@ export const anaMartinsTreatments: Treatment[] = [
 
 // Sumário Cognitivo - Ana Martins
 export const anaMartinsCognitiveSummary: CognitiveSummary = {
-  primaryFocus: 'Diferenciação entre cefaleia tensional e crise hipertensiva como causa da cefaleia atual.',
+  primaryFocus:
+    'Diferenciação entre cefaleia tensional e crise hipertensiva como causa da cefaleia atual.',
   resolvedPhase: 'Hipertensão controlada com medicação atual. Paciente aderente ao tratamento.',
   ruledOut: ['Efeito colateral de medicação', 'Enxaqueca Clássica', 'Problemas Oftalmológicos'],
-  longitudinalInsight: 'Picos de estresse no ambiente de trabalho correlacionam com 85% dos episódios de elevação pressórica registrados.',
+  longitudinalInsight:
+    'Picos de estresse no ambiente de trabalho correlacionam com 85% dos episódios de elevação pressórica registrados.',
   correlationPercentage: 85,
 };
-
 
 // ============================================
 // Dados clínicos do paciente João Silva (id: '2')
@@ -159,7 +165,8 @@ export const joaoSilvaTimeline: TimelineEvent[] = [
     doctor: patients[1].lastConsultation.doctor,
     specialty: 'Consulta Inicial',
     type: 'consulta',
-    quote: '"Paciente apresenta glicemia de jejum elevada e histórico familiar positivo. Iniciaremos Metformina e orientação nutricional."',
+    quote:
+      '"Paciente apresenta glicemia de jejum elevada e histórico familiar positivo. Iniciaremos Metformina e orientação nutricional."',
   },
 ];
 
@@ -169,7 +176,8 @@ export const joaoSilvaHypotheses: Hypothesis[] = [
     id: 'h4',
     patientId: patients[1].id,
     title: 'Resistência Insulínica',
-    description: 'Paciente apresenta histórico familiar de diabetes tipo 2 e necessidade de ajuste na medicação atual devido a picos glicêmicos pós-prandiais.',
+    description:
+      'Paciente apresenta histórico familiar de diabetes tipo 2 e necessidade de ajuste na medicação atual devido a picos glicêmicos pós-prandiais.',
     status: 'ativo',
     confidence: 75,
     createdAt: '2024-01-20',
@@ -179,7 +187,8 @@ export const joaoSilvaHypotheses: Hypothesis[] = [
     id: 'h5',
     patientId: patients[1].id,
     title: 'Neuropatia Diabética Inicial',
-    description: 'Paciente relata formigamento ocasional em membros inferiores. Investigação em andamento.',
+    description:
+      'Paciente relata formigamento ocasional em membros inferiores. Investigação em andamento.',
     status: 'investigando',
     confidence: 40,
     createdAt: '2024-01-20',
@@ -189,7 +198,8 @@ export const joaoSilvaHypotheses: Hypothesis[] = [
     id: 'h6',
     patientId: patients[1].id,
     title: 'Síndrome Metabólica',
-    description: 'Considerada inicialmente, mas paciente já apresenta controle de dislipidemia com dieta.',
+    description:
+      'Considerada inicialmente, mas paciente já apresenta controle de dislipidemia com dieta.',
     status: 'descartado',
     confidence: 20,
     createdAt: '2023-12-15',
@@ -237,13 +247,14 @@ export const joaoSilvaTreatments: Treatment[] = [
 
 // Sumário Cognitivo - João Silva
 export const joaoSilvaCognitiveSummary: CognitiveSummary = {
-  primaryFocus: 'Otimização do controle glicêmico e prevenção de complicações crônicas do diabetes.',
+  primaryFocus:
+    'Otimização do controle glicêmico e prevenção de complicações crônicas do diabetes.',
   resolvedPhase: 'Paciente atingiu metas iniciais de controle glicêmico com Metformina isolada.',
   ruledOut: ['Diabetes tipo 1', 'Hipertensão Arterial', 'Dislipidemia Grave'],
-  longitudinalInsight: 'Picos glicêmicos pós-prandiais correlacionam com 70% dos episódios de fadiga relatados pelo paciente.',
+  longitudinalInsight:
+    'Picos glicêmicos pós-prandiais correlacionam com 70% dos episódios de fadiga relatados pelo paciente.',
   correlationPercentage: 70,
 };
-
 
 // ============================================
 // Funções auxiliares para buscar dados por paciente

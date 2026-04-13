@@ -36,23 +36,11 @@ export default function PatientTableRow({
   const getStatusBadge = () => {
     switch (patient.status) {
       case 'ativo':
-        return (
-          <span className="status-badge status-ativo">
-            Ativo
-          </span>
-        );
+        return <span className="status-badge status-ativo">Ativo</span>;
       case 'followup':
-        return (
-          <span className="status-badge status-followup">
-            Follow-up
-          </span>
-        );
+        return <span className="status-badge status-followup">Follow-up</span>;
       case 'pendente':
-        return (
-          <span className="status-badge status-pendente">
-            Pendente
-          </span>
-        );
+        return <span className="status-badge status-pendente">Pendente</span>;
     }
   };
 
@@ -73,7 +61,7 @@ export default function PatientTableRow({
   };
 
   return (
-    <tr 
+    <tr
       className="group hover:scale-[1.005] transition-all duration-500 cursor-pointer"
       onClick={handleViewDetails} // <-- MUDE PARA handleViewDetails
     >
@@ -113,7 +101,7 @@ export default function PatientTableRow({
         <div className="relative" ref={dropdownRef}>
           <button
             className="p-2 hover:bg-slate-100 rounded-full text-subtitle transition-colors"
-            onClick={(e) => {
+            onClick={e => {
               e.stopPropagation();
               setIsDropdownOpen(!isDropdownOpen);
             }}

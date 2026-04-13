@@ -23,30 +23,30 @@ export default function StatCard({
   const getBadgeStyles = (type: 'success' | 'danger' | 'neutral') => {
     switch (type) {
       case 'success':
-        return 'text-green-500 bg-green-50';
+        return 'text-emerald-500 bg-emerald-50';
       case 'danger':
         return 'text-red-500 bg-red-50';
       case 'neutral':
-        return 'text-subtitle';
+        return 'text-gray-400 bg-gray-50';
     }
   };
 
   return (
-    <div className="bg-surface p-6 rounded-xl border border-light shadow-sm">
-      <div className="flex justify-between items-start mb-4">
-        <span className={`p-2 ${iconBgColor} ${iconTextColor} rounded-lg material-icon`}>
-          {icon}
-        </span>
+    <div className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm">
+      <div className="flex justify-between items-start mb-3">
+        <div className={`p-2 ${iconBgColor} ${iconTextColor} rounded-lg`}>
+          <span className="material-icon text-lg">{icon}</span>
+        </div>
         {badge && (
           <span
-            className={`text-caption-bold px-2 py-1 rounded-full ${getBadgeStyles(badge.type)}`}
+            className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${getBadgeStyles(badge.type)}`}
           >
             {badge.text}
           </span>
         )}
       </div>
-      <p className="text-subtitle text-label-sm font-medium">{label}</p>
-      <p className="text-heading-1 mt-1 text-title">{value}</p>
+      <p className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">{label}</p>
+      <p className="text-2xl font-semibold text-gray-800 mt-1">{value}</p>
     </div>
   );
 }

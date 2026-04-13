@@ -2,11 +2,7 @@ import React from 'react';
 import type { Patient } from '../../../types/PatientTypes';
 import type { Apontamento } from '../../../data/WeekCalendarData';
 
-export type AppointmentStatus =
-  | 'confirmado'
-  | 'aguardando'
-  | 'nao-iniciado'
-  | 'video';
+export type AppointmentStatus = 'confirmado' | 'aguardando' | 'nao-iniciado' | 'video';
 
 interface AppointmentCardProps {
   apontamento: Apontamento;
@@ -22,7 +18,7 @@ export default function AppointmentCard({
   onOpenConsulta,
 }: AppointmentCardProps) {
   const { patient, startTime, type, description } = apontamento;
-  
+
   const specialty = description?.split('-')[1]?.trim() || 'Consulta Geral';
 
   const getStatusBadge = () => {
@@ -61,7 +57,9 @@ export default function AppointmentCard({
 
   return (
     <div className="relative mb-12 group">
-      <div className="absolute -left-24 top-2 text-body-sm font-bold text-subtitle">{startTime}</div>
+      <div className="absolute -left-24 top-2 text-body-sm font-bold text-subtitle">
+        {startTime}
+      </div>
       <div className="absolute left-[3rem] -translate-x-1/2 top-3 size-2.5 rounded-full border-2 border-white bg-slate-300 ring-4 ring-slate-50"></div>
 
       <div
@@ -70,11 +68,9 @@ export default function AppointmentCard({
         <div className="flex items-center gap-5">
           {/* Avatar com iniciais do paciente */}
           <div className="size-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="text-body-sm font-semibold text-slate-600">
-              {patient.initials}
-            </span>
+            <span className="text-body-sm font-semibold text-slate-600">{patient.initials}</span>
           </div>
-          
+
           <div>
             <h3 className="text-heading-3 text-title">{patient.name}</h3>
             <div className="flex items-center gap-3 mt-1">
@@ -88,13 +84,20 @@ export default function AppointmentCard({
               <span className="text-caption text-subtitle">
                 {patient.gender} • {patient.age} anos • {patient.recordNumber}
               </span>
-              <span className={`text-caption px-2 py-0.5 rounded-full ${
-                patient.status === 'ativo' ? 'bg-green-50 text-green-600' :
-                patient.status === 'followup' ? 'bg-blue-50 text-blue-600' :
-                'bg-yellow-50 text-yellow-600'
-              }`}>
-                {patient.status === 'ativo' ? 'Ativo' :
-                 patient.status === 'followup' ? 'Follow-up' : 'Pendente'}
+              <span
+                className={`text-caption px-2 py-0.5 rounded-full ${
+                  patient.status === 'ativo'
+                    ? 'bg-green-50 text-green-600'
+                    : patient.status === 'followup'
+                      ? 'bg-blue-50 text-blue-600'
+                      : 'bg-yellow-50 text-yellow-600'
+                }`}
+              >
+                {patient.status === 'ativo'
+                  ? 'Ativo'
+                  : patient.status === 'followup'
+                    ? 'Follow-up'
+                    : 'Pendente'}
               </span>
             </div>
           </div>

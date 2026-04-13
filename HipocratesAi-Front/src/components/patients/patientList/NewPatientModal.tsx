@@ -41,11 +41,7 @@ const initialFormData: NewPatientFormData = {
   notes: '',
 };
 
-export default function NewPatientModal({
-  isOpen,
-  onClose,
-  onSave,
-}: NewPatientModalProps) {
+export default function NewPatientModal({ isOpen, onClose, onSave }: NewPatientModalProps) {
   const [formData, setFormData] = React.useState<NewPatientFormData>(initialFormData);
   const [isUploadExpanded, setIsUploadExpanded] = React.useState(false);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
@@ -67,7 +63,7 @@ export default function NewPatientModal({
   if (!isOpen) return null;
 
   const updateField = (field: keyof NewPatientFormData, value: string) => {
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [field]: value,
     }));
@@ -95,9 +91,9 @@ export default function NewPatientModal({
       setExtractError(null);
 
       // placeholder até ligarmos o backend
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      await new Promise(resolve => setTimeout(resolve, 1200));
 
-      setFormData((prev) => ({
+      setFormData(prev => ({
         ...prev,
         fullName: prev.fullName || 'Nome extraído do PDF',
         chiefComplaint: prev.chiefComplaint || 'Informação importada da ficha clínica',
@@ -133,7 +129,8 @@ export default function NewPatientModal({
       // Preparar dados no formato esperado pelo Patient
       const patientData = {
         name: formData.fullName,
-        gender: formData.sex === 'male' ? 'Masculino' : formData.sex === 'female' ? 'Feminino' : 'Outro',
+        gender:
+          formData.sex === 'male' ? 'Masculino' : formData.sex === 'female' ? 'Feminino' : 'Outro',
         age,
         status: 'ativo' as const,
         mainDiagnosis: formData.chiefComplaint || undefined,
@@ -162,9 +159,7 @@ export default function NewPatientModal({
       >
         <div className="flex items-center justify-between px-10 pt-10 pb-6">
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-slate-900">
-              Novo Paciente
-            </h1>
+            <h1 className="text-3xl font-semibold tracking-tight text-slate-900">Novo Paciente</h1>
             <p className="mt-1 text-sm text-slate-500">
               Insira os dados cadastrais e clínicos do paciente.
             </p>
@@ -206,7 +201,7 @@ export default function NewPatientModal({
                   <input
                     type="text"
                     value={formData.fullName}
-                    onChange={(e) => updateField('fullName', e.target.value)}
+                    onChange={e => updateField('fullName', e.target.value)}
                     placeholder="Ex: João da Silva Santos"
                     className="h-12 w-full rounded-xl border border-black/5 bg-white/50 px-4 text-sm outline-none transition focus:border-black/20 focus:bg-white focus:ring-4 focus:ring-black/5"
                   />
@@ -219,7 +214,7 @@ export default function NewPatientModal({
                   <input
                     type="text"
                     value={formData.document}
-                    onChange={(e) => updateField('document', e.target.value)}
+                    onChange={e => updateField('document', e.target.value)}
                     placeholder="000.000.000-00"
                     className="h-12 w-full rounded-xl border border-black/5 bg-white/50 px-4 text-sm outline-none transition focus:border-black/20 focus:bg-white focus:ring-4 focus:ring-black/5"
                   />
@@ -232,7 +227,7 @@ export default function NewPatientModal({
                   <input
                     type="date"
                     value={formData.birthDate}
-                    onChange={(e) => updateField('birthDate', e.target.value)}
+                    onChange={e => updateField('birthDate', e.target.value)}
                     className="h-12 w-full rounded-xl border border-black/5 bg-white/50 px-4 text-sm outline-none transition focus:border-black/20 focus:bg-white focus:ring-4 focus:ring-black/5"
                   />
                 </div>
@@ -243,7 +238,7 @@ export default function NewPatientModal({
                   </label>
                   <select
                     value={formData.sex}
-                    onChange={(e) => updateField('sex', e.target.value)}
+                    onChange={e => updateField('sex', e.target.value)}
                     className="h-12 w-full rounded-xl border border-black/5 bg-white/50 px-4 text-sm outline-none transition focus:border-black/20 focus:bg-white focus:ring-4 focus:ring-black/5"
                   >
                     <option value="">Selecione</option>
@@ -260,7 +255,7 @@ export default function NewPatientModal({
                   <input
                     type="tel"
                     value={formData.phoneNumber}
-                    onChange={(e) => updateField('phoneNumber', e.target.value)}
+                    onChange={e => updateField('phoneNumber', e.target.value)}
                     placeholder="(11) 99999-9999"
                     className="h-12 w-full rounded-xl border border-black/5 bg-white/50 px-4 text-sm outline-none transition focus:border-black/20 focus:bg-white focus:ring-4 focus:ring-black/5"
                   />
@@ -271,7 +266,7 @@ export default function NewPatientModal({
             <section>
               <button
                 type="button"
-                onClick={() => setIsUploadExpanded((prev) => !prev)}
+                onClick={() => setIsUploadExpanded(prev => !prev)}
                 className="flex w-full items-center justify-between py-2 group"
               >
                 <div className="text-left">
@@ -323,9 +318,7 @@ export default function NewPatientModal({
                     </button>
                   </div>
 
-                  {extractError && (
-                    <p className="mt-3 text-sm text-red-600">{extractError}</p>
-                  )}
+                  {extractError && <p className="mt-3 text-sm text-red-600">{extractError}</p>}
                 </div>
               )}
             </section>
@@ -343,7 +336,7 @@ export default function NewPatientModal({
                   <input
                     type="text"
                     value={formData.insuranceProvider}
-                    onChange={(e) => updateField('insuranceProvider', e.target.value)}
+                    onChange={e => updateField('insuranceProvider', e.target.value)}
                     placeholder="Ex: Bradesco Saúde, Unimed..."
                     className="h-12 w-full rounded-xl border border-black/5 bg-white/50 px-4 text-sm outline-none transition focus:border-black/20 focus:bg-white focus:ring-4 focus:ring-black/5"
                   />
@@ -356,7 +349,7 @@ export default function NewPatientModal({
                   <input
                     type="text"
                     value={formData.insuranceNumber}
-                    onChange={(e) => updateField('insuranceNumber', e.target.value)}
+                    onChange={e => updateField('insuranceNumber', e.target.value)}
                     placeholder="Digitar número"
                     className="h-12 w-full rounded-xl border border-black/5 bg-white/50 px-4 text-sm outline-none transition focus:border-black/20 focus:bg-white focus:ring-4 focus:ring-black/5"
                   />
@@ -377,7 +370,7 @@ export default function NewPatientModal({
                   <input
                     type="text"
                     value={formData.chiefComplaint}
-                    onChange={(e) => updateField('chiefComplaint', e.target.value)}
+                    onChange={e => updateField('chiefComplaint', e.target.value)}
                     placeholder="Ex: Hipertensão, Dor lombar crônica..."
                     className="h-12 w-full rounded-xl border border-black/5 bg-white/50 px-4 text-sm outline-none transition focus:border-black/20 focus:bg-white focus:ring-4 focus:ring-black/5"
                   />
@@ -391,7 +384,7 @@ export default function NewPatientModal({
                     <input
                       type="text"
                       value={formData.allergies}
-                      onChange={(e) => updateField('allergies', e.target.value)}
+                      onChange={e => updateField('allergies', e.target.value)}
                       placeholder="Ex: Dipirona, Penicilina..."
                       className="h-12 w-full rounded-xl border border-black/5 bg-white/50 px-4 text-sm outline-none transition focus:border-black/20 focus:bg-white focus:ring-4 focus:ring-black/5"
                     />
@@ -404,7 +397,7 @@ export default function NewPatientModal({
                     <input
                       type="text"
                       value={formData.currentMedications}
-                      onChange={(e) => updateField('currentMedications', e.target.value)}
+                      onChange={e => updateField('currentMedications', e.target.value)}
                       placeholder="Ex: Losartana 50mg..."
                       className="h-12 w-full rounded-xl border border-black/5 bg-white/50 px-4 text-sm outline-none transition focus:border-black/20 focus:bg-white focus:ring-4 focus:ring-black/5"
                     />
@@ -418,7 +411,7 @@ export default function NewPatientModal({
                   <textarea
                     rows={3}
                     value={formData.notes}
-                    onChange={(e) => updateField('notes', e.target.value)}
+                    onChange={e => updateField('notes', e.target.value)}
                     placeholder="Informações relevantes sobre o histórico do paciente..."
                     className="w-full resize-none rounded-2xl border border-black/5 bg-white/50 p-4 text-sm outline-none transition focus:border-black/20 focus:bg-white focus:ring-4 focus:ring-black/5"
                   />

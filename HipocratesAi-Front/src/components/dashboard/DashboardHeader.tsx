@@ -33,14 +33,17 @@ export default function DashboardHeader({
       </div>
 
       <div className="flex items-center gap-6">
-        <form onSubmit={handleSearch} className="flex items-center gap-3 px-5 py-2 rounded-2xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm w-80 group transition-all hover:shadow-md dark:hover:bg-white/10">
+        <form
+          onSubmit={handleSearch}
+          className="flex items-center gap-3 px-5 py-2 rounded-2xl bg-white dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm w-80 group transition-all hover:shadow-md dark:hover:bg-white/10"
+        >
           <span className="material-icon text-slate-300 dark:text-slate-500 text-lg group-hover:text-[var(--electric-cyan)] dark:group-hover:text-[var(--electric-cyan)] transition-colors">
             search
           </span>
           <input
             type="text"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={e => setSearchQuery(e.target.value)}
             className="text-sm text-slate-600 dark:text-slate-300 bg-transparent border-none outline-none focus:outline-none focus:ring-0 focus:border-transparent focus:shadow-none p-0 w-full"
             placeholder="Procurar paciente..."
           />

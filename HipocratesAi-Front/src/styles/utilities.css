@@ -10,7 +10,11 @@
 /* Material Icons */
 .material-icon {
   font-family: 'Material Symbols Outlined';
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
 }
 
 /* ===== CORES DE TEXTO ===== */
@@ -192,3 +196,54 @@
   background: #b0b0b0;
 }
 
+/* Custom scrollbar para a timeline */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #b0b0b0;
+}
+
+/* Dark mode */
+.dark .custom-scrollbar::-webkit-scrollbar-track {
+  background: #2a2a2a;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #4a4a4a;
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #6a6a6a;
+}
+/* ===== NOVAS CLASSES PARA CONSULTA ATIVA ===== */
+.tracking-ultra {
+  letter-spacing: 0.15em;
+}
+
+.tracking-tightest {
+  letter-spacing: -0.04em;
+}
+
+.text-spacing-intellectual {
+  letter-spacing: 0.015em;
+  line-height: 1.8;
+}
+
+/* ===== ACTION BLUR ===== */
+.action-blur {
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(50px) saturate(200%);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}

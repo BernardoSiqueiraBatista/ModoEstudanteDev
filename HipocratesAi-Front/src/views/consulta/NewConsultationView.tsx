@@ -1,90 +1,159 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import NewConsultationHeader from '../../components/consulta/newConsulta/NewConsultationHeader';
 import PatientSearchInput from '../../components/consulta/newConsulta/PatientSearchInput';
 import PatientInfoCard from '../../components/consulta/newConsulta/PatientInfoCard';
 import ClinicalContext from '../../components/consulta/newConsulta/ClinicalContext';
 import StartConsultationButton from '../../components/consulta/newConsulta/StartConsultationButton';
 import SecurityFooter from '../../components/consulta/newConsulta/SecurityFooter';
-
-const mockPatient = {
-  id: '1',
-  name: 'Ana Beatriz Silveira',
-  initials: 'AS',
-  gender: 'Feminino',
-  age: 29,
-  recordNumber: 'P-2024-0891',
-  lastConsultation: {
-    date: '12 Out 2023',
-    doctor: 'Dr. Ricardo',
-  },
-  status: 'ativo' as const,
-};
+import { patients } from '../../data/PatientsData';
+import type { Patient } from '../../types/PatientTypes';
 
 export default function NewConsultationView() {
-  const [searchValue, setSearchValue] = useState('Ana Beatriz Silveira');
+  const navigate = useNavigate();
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedPatient, setSelectedPatient] = useState<Patient | null>(null);
+  const [searchResults, setSearchResults] = useState<Patient[]>([]);
+  const [showResults, setShowResults] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedPatient, setSelectedPatient] = useState(mockPatient);
 
-  const handleSearch = (value: string) => {
+  // Buscar pacientes baseado no termo de busca
+  useEffect(() => {
+    if (searchValue.trim().length === 0) {
+      setSearchResults([]);
+      setShowResults(false);
+      return;
+    }
+
+    const query = searchValue.toLowerCase();
+    const results = patients.filter(
+      patient =>
+        patient.name.toLowerCase().includes(query) ||
+        patient.recordNumber.toLowerCase().includes(query)
+    );
+
+    setSearchResults(results);
+    setShowResults(results.length > 0);
+  }, [searchValue]);
+
+  const handleSearchChange = (value: string) => {
     setSearchValue(value);
-    console.log('Buscando paciente:', value);
+    if (selectedPatient) {
+      setSelectedPatient(null);
+    }
   };
 
-  const handleNewPatient = () => {
-    console.log('Criar novo paciente');
+  const handleSelectPatient = (patient: Patient) => {
+    setSelectedPatient(patient);
+    setSearchValue(patient.name);
+    setShowResults(false);
+  };
+
+  const handlePatientClick = () => {
+    if (selectedPatient) {
+      navigate(`/pacientes/${selectedPatient.id}`);
+    }
   };
 
   const handleViewHistory = () => {
-    console.log('Ver histórico completo');
+    if (selectedPatient) {
+      navigate(`/pacientes/${selectedPatient.id}`);
+    }
   };
 
   const handleStartConsultation = () => {
+    if (!selectedPatient) {
+      alert('Selecione um paciente antes de iniciar a consulta.');
+      return;
+    }
+
     setIsLoading(true);
+
+    // Simular carregamento e navegar para consulta ativa
     setTimeout(() => {
       setIsLoading(false);
-      console.log('Iniciando consulta para:', selectedPatient.name);
+      navigate(`/consulta/ativa/${selectedPatient.id}`);
     }, 1500);
   };
 
-  const clinicalData = {
-    mainComplaint: 'Enxaqueca recorrente (3 dias) e fotofobia persistente.',
-    recentAttachments: [{ name: 'Hemograma_Set23.pdf', icon: 'description' }],
+  const getClinicalDataForPatient = () => {
+    if (!selectedPatient) {
+      return { mainComplaint: '', recentAttachments: [] };
+    }
+
+    const patientClinicalData: Record<string, any> = {
+      '1': {
+        mainComplaint:
+          'Hipertensão - Acompanhamento de rotina. Paciente relata episódios de cefaleia occipital.',
+        recentAttachments: [{ name: 'Exame_Hipertensao.pdf', icon: 'description' }],
+      },
+      '2': {
+        mainComplaint:
+          'Diabetes tipo 2 - Controle glicêmico. Paciente nega sintomas de hipoglicemia.',
+        recentAttachments: [{ name: 'Glicemia_Jan2024.pdf', icon: 'description' }],
+      },
+    };
+
+    return (
+      patientClinicalData[selectedPatient.id] || {
+        mainComplaint: `${selectedPatient.mainDiagnosis || 'Consulta geral'} - Paciente em acompanhamento.`,
+        recentAttachments: [],
+      }
+    );
   };
 
+  const patientClinicalData = getClinicalDataForPatient();
+
   return (
-    <main className="flex-1 flex flex-col items-center justify-center px-6 py-6 bg-elite-white h-full overflow-y-auto">
+    <main className="flex-1 flex flex-col items-center justify-start relative px-6 py-6 bg-white h-full overflow-y-auto">
       <NewConsultationHeader />
-      
-      {/* Card mais alto e espaçoso */}
-      <div className="w-full max-w-2xl bg-white/65 backdrop-blur-3xl border border-white/80 rounded-2xl p-8 flex flex-col gap-6 shadow-xl overflow-visible">
-        <div className="space-y-5">
+
+      <div className="w-full max-w-2xl bg-white/80 backdrop-blur-sm border border-gray-100 rounded-2xl p-6 flex flex-col gap-5 shadow-sm mb-6">
+        <div className="space-y-4">
           <PatientSearchInput
             value={searchValue}
-            onChange={handleSearch}
-            onNewPatient={handleNewPatient}
+            onChange={handleSearchChange}
+            searchResults={searchResults}
+            onSelectPatient={handleSelectPatient}
+            showResults={showResults}
           />
-          
-          <PatientInfoCard
-            name={selectedPatient.name}
-            initials={selectedPatient.initials}
-            gender={selectedPatient.gender}
-            age={selectedPatient.age}
-            recordNumber={selectedPatient.recordNumber}
-            lastAccess={selectedPatient.lastConsultation.date}
-            status="Prontuário Ativo"
-          />
+
+          {selectedPatient && (
+            <div
+              onClick={handlePatientClick}
+              className="cursor-pointer transition-opacity hover:opacity-80"
+            >
+              <PatientInfoCard
+                name={selectedPatient.name}
+                initials={selectedPatient.initials}
+                gender={selectedPatient.gender}
+                age={selectedPatient.age}
+                recordNumber={selectedPatient.recordNumber}
+                lastAccess={selectedPatient.lastConsultation.date}
+                status={
+                  selectedPatient.status === 'ativo'
+                    ? 'Prontuário Ativo'
+                    : selectedPatient.status === 'followup'
+                      ? 'Em Acompanhamento'
+                      : 'Pendente'
+                }
+                mainDiagnosis={selectedPatient.mainDiagnosis}
+              />
+            </div>
+          )}
         </div>
 
-        <ClinicalContext
-          mainComplaint={clinicalData.mainComplaint}
-          recentAttachments={clinicalData.recentAttachments}
-          onViewHistory={handleViewHistory}
-        />
+        {selectedPatient && (
+          <>
+            <ClinicalContext
+              mainComplaint={patientClinicalData.mainComplaint}
+              recentAttachments={patientClinicalData.recentAttachments}
+              onViewHistory={handleViewHistory}
+            />
 
-        <StartConsultationButton
-          onClick={handleStartConsultation}
-          isLoading={isLoading}
-        />
+            <StartConsultationButton onClick={handleStartConsultation} isLoading={isLoading} />
+          </>
+        )}
       </div>
 
       <SecurityFooter />

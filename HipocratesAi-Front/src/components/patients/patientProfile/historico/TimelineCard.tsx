@@ -12,7 +12,9 @@ export default function TimelineCard({ event, index }: TimelineCardProps) {
   const opacityClass = index === 0 ? 'opacity-100' : index === 1 ? 'opacity-60' : 'opacity-40';
 
   return (
-    <div className={`relative flex flex-col items-center ${opacityClass} hover:opacity-100 transition-opacity duration-500`}>
+    <div
+      className={`relative flex flex-col items-center ${opacityClass} hover:opacity-100 transition-opacity duration-500`}
+    >
       <div className="absolute top-0 -translate-y-1/2 bg-white px-5 py-1.5 rounded-full border border-elite-border text-[9px] font-semibold text-elite-gray uppercase tracking-[0.2em]">
         {event.date}
       </div>

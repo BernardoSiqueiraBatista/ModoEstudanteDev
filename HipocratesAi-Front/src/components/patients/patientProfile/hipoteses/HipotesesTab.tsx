@@ -8,7 +8,7 @@ interface HipotesesTabProps {
 
 export default function HipotesesTab({ patientId }: HipotesesTabProps) {
   const [filter, setFilter] = useState<'todas' | 'ativo' | 'investigando' | 'descartado'>('todas');
-  
+
   const patientHypotheses = getHypothesesByPatientId(patientId);
 
   const filteredHypotheses = patientHypotheses.filter(h => {
@@ -18,17 +18,23 @@ export default function HipotesesTab({ patientId }: HipotesesTabProps) {
 
   const getStatusColor = (status: Hypothesis['status']) => {
     switch (status) {
-      case 'ativo': return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-      case 'investigando': return 'bg-amber-50 text-amber-700 border-amber-200';
-      case 'descartado': return 'bg-gray-100 text-gray-500 border-gray-200';
+      case 'ativo':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case 'investigando':
+        return 'bg-amber-50 text-amber-700 border-amber-200';
+      case 'descartado':
+        return 'bg-gray-100 text-gray-500 border-gray-200';
     }
   };
 
   const getStatusLabel = (status: Hypothesis['status']) => {
     switch (status) {
-      case 'ativo': return 'Ativa';
-      case 'investigando': return 'Em Investigação';
-      case 'descartado': return 'Descartada';
+      case 'ativo':
+        return 'Ativa';
+      case 'investigando':
+        return 'Em Investigação';
+      case 'descartado':
+        return 'Descartada';
     }
   };
 
@@ -54,16 +60,10 @@ export default function HipotesesTab({ patientId }: HipotesesTabProps) {
     <div className="space-y-6">
       {/* Filtros - sempre visíveis */}
       <div className="flex flex-wrap gap-2 border-b border-gray-100 pb-4">
-        <button
-          onClick={() => setFilter('todas')}
-          className={getFilterButtonClass('todas')}
-        >
+        <button onClick={() => setFilter('todas')} className={getFilterButtonClass('todas')}>
           Todas
         </button>
-        <button
-          onClick={() => setFilter('ativo')}
-          className={getFilterButtonClass('ativo')}
-        >
+        <button onClick={() => setFilter('ativo')} className={getFilterButtonClass('ativo')}>
           Ativas
         </button>
         <button
@@ -87,11 +87,16 @@ export default function HipotesesTab({ patientId }: HipotesesTabProps) {
 
       {/* Lista de Hipóteses */}
       <div className="space-y-4">
-        {filteredHypotheses.map((hypothesis) => (
-          <div key={hypothesis.id} className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md transition-shadow">
+        {filteredHypotheses.map(hypothesis => (
+          <div
+            key={hypothesis.id}
+            className="bg-white rounded-xl border border-gray-100 p-5 hover:shadow-md transition-shadow"
+          >
             <div className="flex justify-between items-start mb-3">
               <h3 className="text-base font-medium text-gray-800">{hypothesis.title}</h3>
-              <span className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border ${getStatusColor(hypothesis.status)}`}>
+              <span
+                className={`text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider border ${getStatusColor(hypothesis.status)}`}
+              >
                 {getStatusLabel(hypothesis.status)}
               </span>
             </div>

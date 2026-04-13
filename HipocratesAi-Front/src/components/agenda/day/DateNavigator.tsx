@@ -1,13 +1,13 @@
 import React from 'react';
-import { 
-  monthNames, 
-  dayNames, 
-  dateToDayIndex, 
-  formatDate, 
+import {
+  monthNames,
+  dayNames,
+  dateToDayIndex,
+  formatDate,
   isToday,
   nomeMesAtual,
   diaAtual,
-  nomeDiaSemanaAtual 
+  nomeDiaSemanaAtual,
 } from '../../../data/Dates';
 import { getEventsByDay, computedWeekEvents } from '../../../data/WeekCalendarData';
 
@@ -20,7 +20,7 @@ interface DateNavigatorProps {
   showTodayButton?: boolean;
 }
 
-export default function DateNavigator({ 
+export default function DateNavigator({
   selectedDate: externalDate,
   onDateChange,
   onPrevious: externalOnPrevious,
@@ -30,7 +30,7 @@ export default function DateNavigator({
 }: DateNavigatorProps) {
   // Estado interno
   const [internalDate, setInternalDate] = React.useState(new Date());
-  
+
   // Usar data externa se fornecida
   const currentDate = externalDate || internalDate;
   const { month, day, weekDay, dayIndex } = formatDate(currentDate);
@@ -44,7 +44,7 @@ export default function DateNavigator({
   const handlePrevious = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(currentDate.getDate() - 1);
-    
+
     if (onDateChange) {
       onDateChange(newDate);
     } else {
@@ -56,7 +56,7 @@ export default function DateNavigator({
   const handleNext = () => {
     const newDate = new Date(currentDate);
     newDate.setDate(currentDate.getDate() + 1);
-    
+
     if (onDateChange) {
       onDateChange(newDate);
     } else {
@@ -67,7 +67,7 @@ export default function DateNavigator({
 
   const handleToday = () => {
     const today = new Date();
-    
+
     if (onDateChange) {
       onDateChange(today);
     } else {
@@ -89,7 +89,8 @@ export default function DateNavigator({
         <div>
           <h2 className="text-heading-2 text-title">{weekDay}</h2>
           <p className="text-subtitle text-body-sm">
-            {totalConsultas} consulta{totalConsultas !== 1 ? 's' : ''} agendada{totalConsultas !== 1 ? 's' : ''} 
+            {totalConsultas} consulta{totalConsultas !== 1 ? 's' : ''} agendada
+            {totalConsultas !== 1 ? 's' : ''}
             para {isCurrentDayToday ? 'hoje' : 'este dia'}
           </p>
         </div>
@@ -113,7 +114,7 @@ export default function DateNavigator({
         >
           <span className="material-icon text-lg">chevron_left</span>
         </button>
-        
+
         <button
           className="size-10 rounded-full border border-light flex items-center justify-center text-subtitle hover:bg-surface transition-all"
           onClick={handleNext}

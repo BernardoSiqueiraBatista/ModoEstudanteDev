@@ -73,7 +73,7 @@ export default function AgendaFilterDropdown({
 
       {/* Options */}
       <div className="p-2">
-        {EVENT_TYPES.map((type) => {
+        {EVENT_TYPES.map(type => {
           const isActive = selectedTypes.includes(type.value);
           return (
             <button
@@ -85,7 +85,9 @@ export default function AgendaFilterDropdown({
                   : 'text-slate-600 hover:bg-slate-50'
               }`}
             >
-              <span className={`material-icon text-lg ${isActive ? 'text-primary' : 'text-slate-400'}`}>
+              <span
+                className={`material-icon text-lg ${isActive ? 'text-primary' : 'text-slate-400'}`}
+              >
                 {type.icon}
               </span>
               <span className={`text-sm ${isActive ? 'font-semibold' : 'font-normal'}`}>

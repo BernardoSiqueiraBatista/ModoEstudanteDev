@@ -9,6 +9,7 @@ export interface Patient {
   gender: string;
   age: number;
   recordNumber: string;
+  cpf?: string;
   lastConsultation: {
     date: string;
     doctor: string;

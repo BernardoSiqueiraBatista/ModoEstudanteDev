@@ -49,7 +49,7 @@ export default function DayAgendaContainer({
 
   useEffect(() => {
     let active = true;
-  
+
     async function loadData() {
       if (!doctorUserId) {
         setAppointments([]);
@@ -57,23 +57,23 @@ export default function DayAgendaContainer({
         setLoading(false);
         return;
       }
-  
+
       try {
         setLoading(true);
         setError(null);
-  
+
         console.log('DayAgendaContainer date:', date);
         console.log('DayAgendaContainer doctorUserId:', doctorUserId);
-  
+
         const apiData = await fetchAppointmentsByDoctor({
           date,
           doctorUserId,
         });
-  
+
         if (!active) return;
-  
+
         console.log('DayAgendaContainer apiData:', apiData);
-  
+
         const mapped = mapApiAppointmentsToWeekEvents(apiData);
         setAppointments(mapped);
       } catch (err) {
@@ -83,9 +83,9 @@ export default function DayAgendaContainer({
         if (active) setLoading(false);
       }
     }
-  
+
     loadData();
-  
+
     return () => {
       active = false;
     };
@@ -117,9 +117,12 @@ export default function DayAgendaContainer({
 
   return (
     <div className="relative">
-      {appointments.map((apontamento) => (
+      {appointments.map(apontamento => (
         <AppointmentCard
-          key={apontamento.id ?? `${apontamento.patient.id}-${apontamento.startTime}-${apontamento.dayIndex}`}
+          key={
+            apontamento.id ??
+            `${apontamento.patient.id}-${apontamento.startTime}-${apontamento.dayIndex}`
+          }
           apontamento={apontamento}
           status={mapApontamentoStatus(apontamento)}
           onViewPatient={onViewPatient}

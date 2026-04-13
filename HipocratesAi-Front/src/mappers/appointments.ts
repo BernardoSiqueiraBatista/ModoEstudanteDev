@@ -56,7 +56,7 @@ function getInitials(name: string) {
     .split(' ')
     .filter(Boolean)
     .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase() ?? '')
+    .map(part => part[0]?.toUpperCase() ?? '')
     .join('');
 }
 
@@ -94,8 +94,8 @@ function mapGender(sex: string | null) {
 
 export function mapApiAppointmentsToWeekEvents(items: AppointmentApiItem[]): Apontamento[] {
   return items
-    .filter((item) => item.status !== 'canceled')
-    .map((item) => {
+    .filter(item => item.status !== 'canceled')
+    .map(item => {
       const startTime = formatTime(item.startAt);
       const endTime = formatTime(item.endAt);
 

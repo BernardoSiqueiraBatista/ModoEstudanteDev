@@ -1,6 +1,6 @@
-import "../../styles/auth.css";
-import HeaderAuthPremium from "../../components/auth/HeaderAuth";
-import SignupForm from "../../components/auth/SignUpForm";
+import '../../styles/auth.css';
+import HeaderAuthPremium from '../../components/auth/HeaderAuth';
+import SignupForm from '../../components/auth/SignUpForm';
 
 function Cadastro() {
   return (
@@ -27,14 +27,7 @@ function Cadastro() {
               strokeDasharray="10 5"
               strokeWidth="0.5"
             />
-            <circle
-              cx="400"
-              cy="400"
-              fill="none"
-              r="250"
-              stroke="currentColor"
-              strokeWidth="1"
-            />
+            <circle cx="400" cy="400" fill="none" r="250" stroke="currentColor" strokeWidth="1" />
             <path
               d="M400 100 Q 600 400 400 700 Q 200 400 400 100"
               fill="none"

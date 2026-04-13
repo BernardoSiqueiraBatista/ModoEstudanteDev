@@ -56,11 +56,7 @@ export default function AgendaView() {
         currentFilters={activeFilters}
       />
 
-      {selectedView === 'dia' ? (
-        <AgendaContent />
-      ) : (
-        <AgendaWeekContent />
-      )}
+      {selectedView === 'dia' ? <AgendaContent /> : <AgendaWeekContent />}
 
       <NewAppointmentModal
         isOpen={isModalOpen}

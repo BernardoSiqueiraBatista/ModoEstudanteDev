@@ -15,7 +15,7 @@ export interface Apontamento {
   height: number;
 }
 
-export const daysinceMonday = (jsDay: number) => (jsDay + 6) % 7; 
+export const daysinceMonday = (jsDay: number) => (jsDay + 6) % 7;
 
 export const weekDays = (() => {
   const today = new Date();
@@ -30,7 +30,10 @@ export const weekDays = (() => {
   return Array.from({ length: 7 }).map((_, i) => {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
-    const isToday = d.getFullYear() === today.getFullYear() && d.getMonth() === today.getMonth() && d.getDate() === today.getDate();
+    const isToday =
+      d.getFullYear() === today.getFullYear() &&
+      d.getMonth() === today.getMonth() &&
+      d.getDate() === today.getDate();
     const isWeekend = i === 5 || i === 6;
     return { dayName: dayNames[i], dayNumber: d.getDate(), isToday, isWeekend };
   });
@@ -94,7 +97,32 @@ const baseEvents = [
   },
 ];
 
-export const timeSlots = ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00'];
+export const timeSlots = [
+  '00:00',
+  '01:00',
+  '02:00',
+  '03:00',
+  '04:00',
+  '05:00',
+  '06:00',
+  '07:00',
+  '08:00',
+  '09:00',
+  '10:00',
+  '11:00',
+  '12:00',
+  '13:00',
+  '14:00',
+  '15:00',
+  '16:00',
+  '17:00',
+  '18:00',
+  '19:00',
+  '20:00',
+  '21:00',
+  '22:00',
+  '23:00',
+];
 
 // Helpers
 const CALENDAR_START = '00:00';
@@ -117,7 +145,7 @@ function timeToHeight(start: string, end: string) {
 }
 
 // Computed week events com top/height calculados
-export const computedWeekEvents: Apontamento[] = baseEvents.map((ev) => ({
+export const computedWeekEvents: Apontamento[] = baseEvents.map(ev => ({
   ...ev,
   top: timeToTop(ev.startTime),
   height: timeToHeight(ev.startTime, ev.endTime),

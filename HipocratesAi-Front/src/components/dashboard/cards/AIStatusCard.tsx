@@ -2,25 +2,27 @@ import React from 'react';
 
 export default function AIStatusCard() {
   return (
-    <div className="p-8 rounded-[2.5rem] bg-[var(--medical-navy)] dark:bg-ai-active-core text-white shadow-2xl relative overflow-hidden border border-white/10 dark:border-electric-cyan/30">
-      <div className="absolute top-0 right-0 p-8">
-        <span className="text-[8px] font-bold text-white/30 dark:text-white/20 tracking-widest uppercase">
+    <div className="p-5 rounded-xl bg-blue-900/10 dark:bg-ai-active-core text-white shadow-lg relative overflow-hidden border border-blue-200/30 dark:border-electric-cyan/30">
+      <div className="absolute top-0 right-0 p-4">
+        <span className="text-[7px] font-bold text-white/30 dark:text-white/20 tracking-widest uppercase">
           Encrypted
         </span>
       </div>
       <div className="relative z-10">
-        <div className="flex items-center gap-2 mb-6">
-          <div className="size-2 bg-[var(--electric-cyan)] rounded-full animate-pulse shadow-[0_0_8px_rgba(0,209,255,0.5)]"></div>
-          <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="size-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
+          <span className="text-[9px] font-bold text-gray-500 dark:text-slate-500 uppercase tracking-[0.2em]">
             AI Active Core
           </span>
         </div>
-        <h4 className="text-base font-semibold mb-4">Monitoramento de Risco</h4>
-        <p className="text-white/50 dark:text-slate-400 text-[11px] font-light leading-relaxed mb-8">
+        <h4 className="text-sm font-semibold mb-2 text-gray-800 dark:text-white">
+          Monitoramento de Risco
+        </h4>
+        <p className="text-gray-500 dark:text-slate-400 text-[10px] font-light leading-relaxed mb-4">
           Analisando 1.2k pontos de dados para predição de eventos cardiovasculares.
         </p>
-        <div className="w-full bg-white/10 dark:bg-white/5 h-1 rounded-full overflow-hidden">
-          <div className="bg-[var(--electric-cyan)] h-full w-[72%] rounded-full shadow-[0_0_10px_rgba(0,209,255,0.5)]"></div>
+        <div className="w-full bg-gray-200 dark:bg-white/10 h-1 rounded-full overflow-hidden">
+          <div className="bg-emerald-500 h-full w-[72%] rounded-full"></div>
         </div>
       </div>
     </div>

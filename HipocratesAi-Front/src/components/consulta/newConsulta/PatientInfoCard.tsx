@@ -8,6 +8,7 @@ interface PatientInfoCardProps {
   status?: string;
   gender?: string;
   recordNumber?: string;
+  mainDiagnosis?: string;
 }
 
 export default function PatientInfoCard({
@@ -18,46 +19,48 @@ export default function PatientInfoCard({
   status = 'Prontuário Ativo',
   gender,
   recordNumber,
+  mainDiagnosis,
 }: PatientInfoCardProps) {
   return (
-    <div className="flex items-center gap-6 py-4 border-b border-slate-100/50">
-      {/* Avatar maior */}
-      <div className="size-16 rounded-full overflow-hidden bg-primary/10 flex-shrink-0 ring-1 ring-slate-100 flex items-center justify-center">
-        <span className="text-xl font-medium text-primary">{initials}</span>
+    <div className="flex items-center gap-4 py-3 border-b border-gray-100">
+      <div className="size-12 rounded-full overflow-hidden bg-gray-100 flex-shrink-0 ring-1 ring-gray-200 flex items-center justify-center">
+        <span className="text-base font-medium text-gray-600">{initials}</span>
       </div>
-      
+
       <div className="flex-1">
-        {/* Nome e Status */}
-        <div className="flex items-baseline justify-between flex-wrap gap-2 mb-2">
-          <h2 className="text-xl font-medium text-slate-800 tracking-tight">{name}</h2>
-          <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-emerald-500/80 bg-emerald-50 px-2 py-0.5 rounded-full">
+        <div className="flex items-baseline justify-between flex-wrap gap-2">
+          <h2 className="text-base font-normal text-gray-800 tracking-tight">{name}</h2>
+          <span className="text-[9px] font-bold tracking-[0.2em] uppercase text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
             {status}
           </span>
         </div>
-        
-        {/* Informações em grid para melhor espaçamento */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-1.5 mt-1">
+        <div className="flex flex-wrap gap-3 mt-1 text-[10px] text-gray-500">
           {gender && (
-            <div className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-sm text-slate-400">person</span>
-              <span className="text-xs text-slate-600">{gender}</span>
-            </div>
+            <span className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-xs">person</span>
+              {gender}
+            </span>
           )}
-          <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-sm text-slate-400">cake</span>
-            <span className="text-xs text-slate-600">{age} anos</span>
-          </div>
+          <span className="flex items-center gap-1">
+            <span className="material-symbols-outlined text-xs">cake</span>
+            {age} anos
+          </span>
           {recordNumber && (
-            <div className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-sm text-slate-400">badge</span>
-              <span className="text-xs text-slate-600 font-mono">{recordNumber}</span>
-            </div>
+            <span className="flex items-center gap-1">
+              <span className="material-symbols-outlined text-xs">badge</span>
+              {recordNumber}
+            </span>
           )}
-          <div className="flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-sm text-slate-400">history</span>
-            <span className="text-xs text-slate-600">Último acesso: {lastAccess}</span>
-          </div>
+          <span className="flex items-center gap-1">
+            <span className="material-symbols-outlined text-xs">history</span>
+            Último acesso: {lastAccess}
+          </span>
         </div>
+        {mainDiagnosis && (
+          <p className="text-xs text-gray-500 mt-1">
+            <span className="font-medium">Diagnóstico:</span> {mainDiagnosis}
+          </p>
+        )}
       </div>
     </div>
   );

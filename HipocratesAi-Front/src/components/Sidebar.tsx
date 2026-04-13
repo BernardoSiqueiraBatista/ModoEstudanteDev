@@ -41,11 +41,18 @@ export default function Sidebar({
       {/* Sidebar */}
       <aside className="group fixed left-0 top-0 bottom-0 w-20 hover:w-64 py-6 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-50 transition-all duration-300 ease-out overflow-visible">
         {/* Logo */}
-        <div className="mb-10 pl-5 pr-3 overflow-hidden cursor-pointer"
-          onClick={() => navigate('/dashboard')}>
+        <div
+          className="mb-10 pl-5 pr-3 overflow-hidden cursor-pointer"
+          onClick={() => navigate('/dashboard')}
+        >
           <div className="flex items-center gap-3">
             <div className="size-10 bg-slate-800 dark:bg-slate-700 rounded-lg flex items-center justify-center text-white flex-shrink-0 shadow-lg">
-              <span className="material-icon text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>health_metrics</span>
+              <span
+                className="material-icon text-2xl"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                health_metrics
+              </span>
             </div>
             <h2 className="text-heading-3 text-title font-bold whitespace-nowrap transform translate-x-0 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-out">
               Hipócrates.ai
@@ -64,9 +71,10 @@ export default function Sidebar({
                 onClick={() => navigate(item.path)}
                 className={`
                   flex items-center gap-4 p-3 rounded-xl transition-all duration-200 cursor-pointer overflow-hidden w-full
-                  ${active 
-                    ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white' 
-                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                  ${
+                    active
+                      ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                      : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
                   }
                 `}
               >
@@ -85,9 +93,10 @@ export default function Sidebar({
             onClick={() => navigate('/configuracoes')}
             className={`
               flex items-center gap-4 p-3 rounded-xl transition-all duration-200 cursor-pointer overflow-hidden w-full
-              ${location.pathname === '/configuracoes'
-                ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
-                : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+              ${
+                location.pathname === '/configuracoes'
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                  : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
               }
             `}
           >
@@ -100,7 +109,11 @@ export default function Sidebar({
           <div className="flex items-center gap-3 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all duration-200 cursor-pointer overflow-visible">
             <div className="size-10 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden ring-2 ring-white dark:ring-slate-800 flex-shrink-0">
               {userAvatar ? (
-                <img className="w-full h-full object-cover grayscale-[0.2]" src={userAvatar} alt="User avatar" />
+                <img
+                  className="w-full h-full object-cover grayscale-[0.2]"
+                  src={userAvatar}
+                  alt="User avatar"
+                />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-subtitle">
                   <span className="material-icon">person</span>

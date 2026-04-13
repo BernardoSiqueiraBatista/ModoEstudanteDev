@@ -18,11 +18,12 @@ export default function PatientsContent() {
   // Filtrar pacientes baseado na busca
   const filteredPatients = useMemo(() => {
     if (!searchQuery.trim()) return patientsList;
-    
+
     const query = searchQuery.toLowerCase();
-    return patientsList.filter(patient => 
-      patient.name.toLowerCase().includes(query) ||
-      patient.recordNumber.toLowerCase().includes(query)
+    return patientsList.filter(
+      patient =>
+        patient.name.toLowerCase().includes(query) ||
+        patient.recordNumber.toLowerCase().includes(query)
     );
   }, [patientsList, searchQuery]);
 
@@ -75,7 +76,7 @@ export default function PatientsContent() {
 
   const handleSavePatient = (patientData: any) => {
     const newId = (patientsList.length + 1).toString();
-    
+
     const initials = patientData.name
       .split(' ')
       .map((n: string) => n[0])
@@ -104,17 +105,14 @@ export default function PatientsContent() {
 
     setPatientsList(prev => [newPatient, ...prev]);
     setCurrentPage(1);
-    
+
     console.log('✅ NOVO PACIENTE CADASTRADO:', newPatient);
     setIsModalOpen(false);
   };
 
   return (
     <main className="flex-1 px-16 pt-12 pb-24">
-      <PatientsHeader
-        onSearch={handleSearch}
-        onNewPatient={handleNewPatient}
-      />
+      <PatientsHeader onSearch={handleSearch} onNewPatient={handleNewPatient} />
 
       <PatientsTable
         patients={paginatedPatients}
@@ -129,11 +127,7 @@ export default function PatientsContent() {
 
       <StatsFooter stats={statsData} />
 
-      <NewPatientModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onSave={handleSavePatient}
-      />
+      <NewPatientModal isOpen={isModalOpen} onClose={handleCloseModal} onSave={handleSavePatient} />
     </main>
   );
 }
