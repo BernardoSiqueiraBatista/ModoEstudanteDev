@@ -1,3 +1,4 @@
+// components/clinicalReasoning/ClinicalReasoningPopup.tsx
 import React, { useState, useRef, useEffect } from 'react';
 import ClinicalReasoningHeader from './clinicalReasoning/ClinicalReasoningHeader';
 import ClinicalReasoningMessageList from './clinicalReasoning/ClinicalReasoningMessageList';
@@ -13,17 +14,27 @@ interface Message {
 interface ClinicalReasoningPopupProps {
   isOpen: boolean;
   isMinimized: boolean;
+  isMaximized: boolean;
+  patientName?: string;
+  duration?: string;
   onClose: () => void;
   onMinimize: () => void;
   onExpand: () => void;
+  onMaximize: () => void;
+  onBack?: () => void;
 }
 
-export default function ClinicalReasoningPopup({
-  isOpen,
+export default function ClinicalReasoningPopup({ 
+  isOpen, 
   isMinimized,
-  onClose,
-  onMinimize,
+  isMaximized,
+  patientName = '',
+  duration = '',
+  onClose, 
+  onMinimize, 
   onExpand,
+  onMaximize,
+  onBack
 }: ClinicalReasoningPopupProps) {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -44,7 +55,6 @@ export default function ClinicalReasoningPopup({
     const savedPosition = localStorage.getItem('clinicalReasoningPosition');
     if (savedPosition) {
       const { x, y } = JSON.parse(savedPosition);
-      // Verificar se a posição está dentro da tela
       const maxX = window.innerWidth - 420;
       const maxY = window.innerHeight - 600;
       setPosition({
@@ -82,19 +92,19 @@ export default function ClinicalReasoningPopup({
     if (isDragging && popupRef.current) {
       let newX = e.clientX - dragOffset.x;
       let newY = e.clientY - dragOffset.y;
-
+      
       const maxX = window.innerWidth - popupRef.current.offsetWidth;
       const maxY = window.innerHeight - popupRef.current.offsetHeight;
-
+      
       newX = Math.min(Math.max(0, newX), maxX);
       newY = Math.min(Math.max(0, newY), maxY);
-
+      
       setPosition({ x: newX, y: newY });
     }
   };
 
   const handleMouseUp = () => {
-    if (isDragging && popupRef.current) {
+    if (isDragging) {
       savePosition(position.x, position.y);
     }
     setIsDragging(false);
@@ -152,11 +162,40 @@ export default function ClinicalReasoningPopup({
   };
 
   if (!isOpen) return null;
+  
+  // Versão minimizada
+  if (isMinimized) {
+    return (
+      <div
+        ref={popupRef}
+        className="fixed z-[9999] w-[420px] rounded-[32px] overflow-hidden shadow-2xl"
+        style={{
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+          background: 'rgba(255, 255, 255, 0.98)',
+          backdropFilter: 'blur(20px) saturate(180%)',
+          border: '1px solid rgba(0, 0, 0, 0.1)',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+        }}
+      >
+        <ClinicalReasoningHeader 
+          onClose={onClose} 
+          onMinimize={onMinimize}
+          onExpand={onExpand}
+          onMaximize={onMaximize}
+          isMinimized={isMinimized}
+          isMaximized={false}
+          onMouseDown={handleMouseDown} 
+        />
+      </div>
+    );
+  }
 
+  // Versão normal (expandida)
   return (
     <div
       ref={popupRef}
-      className="fixed z-[9999] w-[420px] rounded-[32px] overflow-hidden flex flex-col shadow-2xl"
+      className="fixed z-[9999] w-[420px] max-h-[600px] rounded-[32px] overflow-hidden flex flex-col shadow-2xl"
       style={{
         left: `${position.x}px`,
         top: `${position.y}px`,
@@ -166,27 +205,24 @@ export default function ClinicalReasoningPopup({
         boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
       }}
     >
-      <ClinicalReasoningHeader
-        onClose={onClose}
+      <ClinicalReasoningHeader 
+        onClose={onClose} 
         onMinimize={onMinimize}
         onExpand={onExpand}
+        onMaximize={onMaximize}
         isMinimized={isMinimized}
-        onMouseDown={handleMouseDown}
+        isMaximized={false}
+        onMouseDown={handleMouseDown} 
       />
-
-      {/* Conteúdo só aparece quando NÃO está minimizado */}
-      {!isMinimized && (
-        <>
-          <ClinicalReasoningMessageList messages={messages} />
-          <ClinicalReasoningFooter
-            inputValue={inputValue}
-            onInputChange={setInputValue}
-            onSendMessage={handleSendMessage}
-            onKeyPress={handleKeyPress}
-            onQuickAction={handleQuickAction}
-          />
-        </>
-      )}
+      
+      <ClinicalReasoningMessageList messages={messages} />
+      <ClinicalReasoningFooter
+        inputValue={inputValue}
+        onInputChange={setInputValue}
+        onSendMessage={handleSendMessage}
+        onKeyPress={handleKeyPress}
+        onQuickAction={handleQuickAction}
+      />
     </div>
   );
 }

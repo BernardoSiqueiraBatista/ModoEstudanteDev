@@ -75,6 +75,24 @@ export default function RouterView() {
           }
         />
 
+        <Route
+          path="/consulta/raciocinio/:id"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+        path="/consulta/encerramento/:id"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </Router>

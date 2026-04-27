@@ -5,6 +5,8 @@ import PatientList from '../views/patient/PatientListView';
 import NewConsultationView from '../views/consulta/NewConsultationView';
 import PatientProfileView from '../views/patient/PatientProfileView';
 import ActiveConsultationView from '../views/consulta/ActiveConsultationView';
+import ClinicalReasoningMaximizedView from '../views/consulta/ClinicalReasoningMaximizedView';
+import ConsultationClosureView from '../views/consulta/ConsultationClosureView';
 import { useLocation } from 'react-router-dom';
 
 export default function MainLayout() {
@@ -20,6 +22,8 @@ export default function MainLayout() {
         <PatientProfileView />
       )}
       {location.pathname.startsWith('/consulta/ativa/') && <ActiveConsultationView />}
+      {location.pathname.startsWith('/consulta/raciocinio/') && <ClinicalReasoningMaximizedView />}
+      {location.pathname.startsWith('/consulta/encerramento/') && <ConsultationClosureView />}
     </Sidebar>
   );
 }

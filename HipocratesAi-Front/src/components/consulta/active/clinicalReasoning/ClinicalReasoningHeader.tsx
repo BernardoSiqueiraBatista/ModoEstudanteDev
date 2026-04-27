@@ -1,19 +1,24 @@
+// components/clinicalReasoning/ClinicalReasoningHeader.tsx
 import React from 'react';
 
 interface ClinicalReasoningHeaderProps {
   onClose: () => void;
   onMinimize: () => void;
   onExpand: () => void;
+  onMaximize: () => void;
   isMinimized: boolean;
+  isMaximized: boolean;
   onMouseDown: (e: React.MouseEvent) => void;
 }
 
-export default function ClinicalReasoningHeader({
-  onClose,
-  onMinimize,
-  onExpand,
-  isMinimized,
-  onMouseDown,
+export default function ClinicalReasoningHeader({ 
+  onClose, 
+  onMinimize, 
+  onExpand, 
+  onMaximize,
+  isMinimized, 
+  isMaximized,
+  onMouseDown 
 }: ClinicalReasoningHeaderProps) {
   return (
     <header
@@ -30,6 +35,21 @@ export default function ClinicalReasoningHeader({
         </span>
       </div>
       <div className="flex items-center gap-1">
+        {/* Botão Maximizar */}
+        {!isMaximized && (
+          <button
+            onClick={onMaximize}
+            className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
+            title="Maximizar"
+          >
+            <svg fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16">
+              <path d="M8 3H5a2 2 0 0 0-2 2v3" />
+              <path d="M21 8V5a2 2 0 0 0-2-2h-3" />
+              <path d="M3 16v3a2 2 0 0 0 2 2h3" />
+              <path d="M16 21h3a2 2 0 0 0 2-2v-3" />
+            </svg>
+          </button>
+        )}
         {/* Botão Minimizar/Expandir */}
         {!isMinimized ? (
           <button
@@ -37,16 +57,7 @@ export default function ClinicalReasoningHeader({
             className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
             title="Minimizar"
           >
-            <svg
-              fill="none"
-              height="16"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              width="16"
-            >
+            <svg fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16">
               <path d="m18 15-6-6-6 6" />
             </svg>
           </button>
@@ -56,16 +67,7 @@ export default function ClinicalReasoningHeader({
             className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
             title="Expandir"
           >
-            <svg
-              fill="none"
-              height="16"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              width="16"
-            >
+            <svg fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16">
               <path d="m6 9 6 6 6-6" />
             </svg>
           </button>
@@ -76,16 +78,7 @@ export default function ClinicalReasoningHeader({
           className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-full hover:bg-gray-100"
           title="Fechar"
         >
-          <svg
-            fill="none"
-            height="16"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            viewBox="0 0 24 24"
-            width="16"
-          >
+          <svg fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16">
             <path d="M18 6 6 18" />
             <path d="m6 6 12 12" />
           </svg>
