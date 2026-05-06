@@ -1,5 +1,9 @@
-import 'dotenv/config';
 import { Pool } from 'pg';
+
+import path from 'path';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: path.resolve(__dirname, '../../studentMode/.env') });
 
 const pool = new Pool({ 
   host: 'localhost',

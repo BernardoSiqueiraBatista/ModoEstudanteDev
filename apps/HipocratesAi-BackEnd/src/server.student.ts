@@ -2,7 +2,7 @@ import http from "http";
 import { app } from "./app.student";
 import { logger } from "./shared/logger/logger";
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 const server = http.createServer(app);
 
 server.listen(Number(PORT), '127.0.0.1', () => {
