@@ -1,12 +1,11 @@
 import 'dotenv/config';
-import { Pool } from 'pg'; // Supondo que você use o pacote 'pg'
+import { Pool } from 'pg';
 
-// Configuração do pool (deve estar em um arquivo separado de config)
 const pool = new Pool({ 
   host: 'localhost',
-  port: 4444, // Porta que definimos no Docker
+  port: 5432,
   user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
+  password: process.env.DB_PASS,
   database: process.env.DB_NAME,
 });
 
@@ -18,6 +17,13 @@ export interface IRawPerformanceData {
 
 export class PerformanceModel {
   public async getRawStatsByStudent(studentId: string): Promise<IRawPerformanceData | null> {
+
+    const studentCheck = await pool.query('SELECT id FROM student WHERE id = $1', [studentId]);
+    
+    if (studentCheck.rows.length === 0) {
+      return null;
+    }
+
     const query = `
       SELECT 
         COUNT(p.id) as total_resolvidas,
@@ -28,9 +34,6 @@ export class PerformanceModel {
     `;
 
     const result = await pool.query(query, [studentId]);
-    
-    if (result.rows.length === 0) return null;
-    
     return result.rows[0];
   }
 }
