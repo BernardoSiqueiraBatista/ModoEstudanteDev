@@ -1,6 +1,11 @@
 {
     "name": "hipocratesai-backend",
     "version": "1.0.0",
+    "description": "",
+    "license": "ISC",
+    "author": "",
+    "type": "commonjs",
+    "main": "eslint.config.js",
     "scripts": {
         "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
         "dev:api": "ts-node-dev --respawn --transpile-only src/server.ts",
