@@ -24,17 +24,22 @@ def seed_database():
         subjects = ['Anatomia', 'Fisiologia', 'Farmacologia', 'Patologia']
         question_ids = []
         
-        # 1. Criar Questões e Alternativas
+        # 1. Gerar Questões
         for i in range(20):
             q_id = str(uuid4())
+            # Agora question_subject é um INT entre 0 e 10
+            subject_id = random.randint(0, 10) 
+            level = random.randint(1, 3)
+            
             cur.execute(
                 "INSERT INTO question (id, question_text, question_level, question_subject) VALUES (%s, %s, %s, %s)",
-                (q_id, f"Questão {i} sobre {random.choice(subjects)}", random.randint(1, 3), random.choice(subjects))
+                (q_id, f"Questão de teste {i} sobre o assunto {subject_id}", level, subject_id)
             )
-            question_ids.append(q_id)
 
-            # Criar 4 alternativas para cada questão[cite: 13]
-            correct_index = random.randint(0, 3)
+            # 2. Criar 4 alternativas para cada questão (conforme sua solicitação)
+            # Sorteia qual índice (0 a 3) será o correto
+            correct_index = random.randint(0, 3) 
+            
             for idx in range(4):
                 is_correct = (idx == correct_index)
                 cur.execute(

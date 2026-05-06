@@ -13,14 +13,14 @@ export class PerformanceService {
     this.model = new PerformanceModel();
   }
 
-  public async getCalculatedPerformance(studentId: string): Promise<IStudentPerformance> {
-    const rawData = await this.model.getRawStatsByStudent(studentId);
+public async getCalculatedPerformance(studentId: string): Promise<IStudentPerformance> {
+  const rawData = await this.model.getRawStatsByStudent(studentId);
 
-    if (!rawData) {
-        const error = new Error('Student not Found!');
-        (error as any).statusCode = 404;
-        throw error;
-    }
+  if (!rawData) {
+      const error = new Error('Usuário não existe.');
+      (error as any).statusCode = 404;
+      throw error;
+  }
 
     const resolvidas = parseInt(rawData.total_resolvidas, 10);
     const acertos = parseInt(rawData.total_acertos, 10);

@@ -21,23 +21,31 @@ export interface IRawPerformanceData {
 
 export class PerformanceModel {
   public async getRawStatsByStudent(studentId: string): Promise<IRawPerformanceData | null> {
+    try {
+      const studentCheck = await pool.query('SELECT id FROM student WHERE id = $1', [studentId]);
+      
+      if (studentCheck.rows.length === 0) {
+        return null;
+      }
 
-    const studentCheck = await pool.query('SELECT id FROM student WHERE id = $1', [studentId]);
-    
-    if (studentCheck.rows.length === 0) {
-      return null;
+      const query = `
+        SELECT 
+          COUNT(p.id) as total_resolvidas,
+          COUNT(p.id) FILTER (WHERE p.correct_answer = true) as total_acertos,
+          (SELECT EXTRACT(EPOCH FROM study_time) FROM student WHERE id = $1) as segundos_estudo
+        FROM performance p
+        WHERE p.id_student = $1;
+      `;
+
+      const result = await pool.query(query, [studentId]);
+      return result.rows[0];
+
+    } catch (error: any) {
+      
+      if (error.code === '22P02') {
+        return null; 
+      }
+      throw error;
     }
-
-    const query = `
-      SELECT 
-        COUNT(p.id) as total_resolvidas,
-        COUNT(p.id) FILTER (WHERE p.correct_answer = true) as total_acertos,
-        (SELECT EXTRACT(EPOCH FROM study_time) FROM student WHERE id = $1) as segundos_estudo
-      FROM performance p
-      WHERE p.id_student = $1;
-    `;
-
-    const result = await pool.query(query, [studentId]);
-    return result.rows[0];
   }
 }

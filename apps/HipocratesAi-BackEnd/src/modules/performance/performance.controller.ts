@@ -19,15 +19,6 @@ export class PerformanceController {
           message: 'O campo ID do aluno é obrigatório.' 
         });
       }
-
-      // Verificar formato do UUID (finalidade: passar melhores instruções para o FrontEnd)
-      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      if (!uuidRegex.test(id)) {
-        return res.status(400).json({
-          status: 'error',
-          message: 'O ID fornecido possui um formato inválido. Certifique-se de usar um UUID válido.'
-        });
-      }
       
       const stats = await performanceService.getCalculatedPerformance(id);
       
