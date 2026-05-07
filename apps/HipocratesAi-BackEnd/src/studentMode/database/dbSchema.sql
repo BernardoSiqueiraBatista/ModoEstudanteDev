@@ -16,7 +16,6 @@ CREATE TABLE alternative (
     UNIQUE (order_index, id_question)
 );
 
-
 CREATE TABLE student (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(), --REFERENCES User(id) ON DELETE CASCADE,
     study_time        INTERVAL NOT NULL DEFAULT INTERVAL '0'
