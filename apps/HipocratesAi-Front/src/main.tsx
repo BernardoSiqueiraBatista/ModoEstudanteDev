@@ -9,7 +9,7 @@ import { queryClient } from './lib/queryClient';
 import { ToastProvider } from './components/ui/ToastProvider';
 import { ConfirmationProvider } from './components/ui/ConfirmationProvider';
 
-/*ReactDOM.createRoot(document.getElementById('root')!).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <ToastProvider>
@@ -20,22 +20,6 @@ import { ConfirmationProvider } from './components/ui/ConfirmationProvider';
         </ConfirmationProvider>
       </ToastProvider>
       {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
-    </QueryClientProvider>
-  </React.StrictMode>
-);*/
-
-// main.tsx
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      {/* Comment these out temporarily */}
-      {/* <ToastProvider> */}
-      {/* <ConfirmationProvider> */}
-      {/* <AuthProvider> */}
-            <App /> 
-      {/* </AuthProvider> */}
-      {/* </ConfirmationProvider> */}
-      {/* </ToastProvider> */}
     </QueryClientProvider>
   </React.StrictMode>
 );

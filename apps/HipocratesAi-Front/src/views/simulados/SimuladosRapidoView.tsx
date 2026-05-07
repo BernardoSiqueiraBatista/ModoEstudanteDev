@@ -47,7 +47,7 @@ export default function SimuladoRapido() {
     }).toString();
 
     // Navega para a rota da nova página (que você vai criar)
-    navigate(`/IniciarSimulado?${params}`);
+    navigate(`/simulados/iniciar?${params}`);
   };
 
   return (
@@ -56,39 +56,7 @@ export default function SimuladoRapido() {
       {/* Main Content */}
       <main className="pl-64 min-h-screen">
 
-        {/* TopAppBar */}
-        <header className="flex justify-between items-center w-full px-10 py-6 z-40 bg-transparent sticky top-0">
-          <div className="flex items-center gap-6">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">Shift Mode Study</span>
-            <nav className="hidden md:flex gap-8">
-              {['Simulations', 'Quiz Center', 'Flashcards', 'Exam Prep'].map((item, i) => (
-                <a
-                  key={item}
-                  href="#"
-                  className={`font-bold text-[10px] tracking-widest uppercase duration-300 ${
-                    i === 0 ? 'text-primary hover:text-secondary' : 'text-slate-400 hover:text-primary'
-                  }`}
-                >
-                  {item}
-                </a>
-              ))}
-            </nav>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-3 px-5 py-2 rounded-2xl bg-white border border-slate-100 shadow-sm w-64 group transition-all hover:shadow-md">
-              <span className="material-symbols-outlined text-slate-300 text-lg group-hover:text-secondary transition-colors">search</span>
-              <input
-                className="text-sm text-slate-600 bg-transparent border-none focus:ring-0 placeholder-slate-300 w-full p-0 outline-none"
-                placeholder="Search topics..."
-                type="text"
-              />
-            </div>
-            <button className="size-10 flex items-center justify-center bg-white border border-slate-100 rounded-xl text-slate-400 hover:text-primary shadow-sm transition-colors">
-              <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>notifications</span>
-            </button>
-          </div>
-        </header>
+        
 
         <div className="px-10 py-4 max-w-7xl mx-auto space-y-12">
 

@@ -14,10 +14,26 @@ interface Questao {
 
 const LEVEL_LABEL: Record<string, string> = { '1': 'Fácil', '2': 'Médio', '3': 'Difícil' }
 
-async function fetchQuestoes(limit: number, level: number, category: number) {
-  const res = await fetch(`/student/questions?limit=${limit}&level=${level}&category=${category}`)
+async function fetchQuestoes(
+  limit: number = 10,
+  level?: number,
+  category?: number
+): Promise<{ count: number; questions: Questao[] }> {
+  
+  if (limit < 1 || limit > 50) {
+    throw new Error('O limite deve ser entre 1 e 50 questões.')
+  }
+
+  const params = new URLSearchParams()
+  params.set('limit', String(limit))
+  if (level !== undefined) params.set('level', String(level))
+  if (category !== undefined) params.set('category', String(category))
+
+  const res = await fetch(`http://localhost:3333/student/questions?${params}`)
   if (!res.ok) throw new Error(`Erro ${res.status}: ${res.statusText}`)
-  return res.json() as Promise<{ count: number; questions: Questao[] }>
+
+  const data = await res.json()
+  return data as { count: number; questions: Questao[] }
 }
 
 export default function ExecucaoSimulado() {
@@ -40,7 +56,7 @@ export default function ExecucaoSimulado() {
     try {
       const data = await fetchQuestoes(Number(q), Number(nivel), Number(cat))
       // navega para a tela de execução passando as questões via state
-      navigate('/simulado/executar', { state: { questions: data.questions } })
+      navigate('/simulados/executar', { state: { questions: data.questions } })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Erro ao buscar questões.')
     } finally {

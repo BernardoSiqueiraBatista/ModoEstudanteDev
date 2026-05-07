@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -80,7 +79,7 @@ export default function ExecutarSimulado() {
       studentAnswer: answers[q.id_questao] ?? null,
     }))
     // Navega para a tela de encerramento — rota a ser preenchida depois
-    navigate('/simulado/encerramento', {
+    navigate('/simulados/resultado', {
       state: {
         answers: formattedAnswers,
         questions,
