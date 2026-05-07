@@ -1,5 +1,4 @@
 import { Pool } from 'pg';
-
 import path from 'path';
 import dotenv from 'dotenv';
 
