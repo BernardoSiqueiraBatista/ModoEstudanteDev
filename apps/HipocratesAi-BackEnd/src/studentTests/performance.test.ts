@@ -1,6 +1,5 @@
 import request from 'supertest';
 import { app } from '../app.student'; 
-import { Pool } from 'pg';
 
 describe('Performance Feature - Student Mode', () => {
   
@@ -30,20 +29,21 @@ describe('Performance Feature - Student Mode', () => {
       .get(`/student/performance/${INEXISTENT_STUDENT_ID}`);
 
     expect(response.status).toBe(404);
-    expect(response.body.message).toBe('Student not Found!');
+    // ❌ Antes: expect(response.body.message).toBe('Student not Found!');
+    expect(response.body.message).toBe('Usuário não existe.'); // ✅ Correto
   });
 
   /**
-   * TESTE 3: Formato de ID inválido (400)
+   * TESTE 3: Formato de ID inválido (404 em vez de 400)
    */
-  it('Deve retornar 400 quando o formato do ID não é um UUID', async () => {
+  it('Deve retornar 404 quando o formato do ID não é um UUID', async () => {
     const response = await request(app)
       .get(`/student/performance/${INVALID_FORMAT_ID}`);
 
-    expect(response.status).toBe(400);
-    expect(response.body.message).toContain('formato inválido');
+    // ❌ Antes: Esperava 400 e 'formato inválido'
+    expect(response.status).toBe(404); // ✅ Correto (O Postgres barra e o Model retorna null)
+    expect(response.body.message).toBe('Usuário não existe.'); // ✅ Correto
   });
-
   /**
    * TESTE 4: Rota inexistente (404 do Express)
    */

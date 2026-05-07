@@ -31,7 +31,7 @@ export class QuestionsModel {
         q.question_text as texto,
         json_agg(
           json_build_object(
-            'id_answer', a.order_index, 
+            'id_alternative', a.order_index,
             'texto', a.alternative_text
           ) ORDER BY a.order_index
         ) as alternativas

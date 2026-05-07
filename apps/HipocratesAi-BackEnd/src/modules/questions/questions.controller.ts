@@ -9,9 +9,13 @@ export class QuestionsController {
 
       const limit = parseInt(req.query.limit as string) || 10;
       const level = req.query.level ? parseInt(req.query.level as string) : undefined;
-      const category = req.query.category as string;
-
-      const result = await questionsService.getRandomQuestions(limit, level, category);
+      
+      
+      const categoryParam = req.query.category as string;
+      const parsedCategory = parseInt(categoryParam, 10);
+      const safeCategory = !isNaN(parsedCategory) ? parsedCategory : undefined;
+      
+      const result = await questionsService.getRandomQuestions(limit, level, safeCategory as any);
 
       return res.status(200).json({
         count: result.length,
