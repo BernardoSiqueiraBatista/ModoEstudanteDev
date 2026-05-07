@@ -3,15 +3,17 @@ services:
     image: postgres:16
     container_name: postgres-db
     restart: always
+    env_file:
+      - ../../.env
     environment:
       POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_PASSWORD: ${DB_PASS}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "4444:4444"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./database/dbSchema.sql:/docker-entrypoint-initdb.d/dbSchema.sql
 
 volumes:
   postgres_data:

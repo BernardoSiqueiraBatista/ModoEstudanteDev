@@ -3,7 +3,7 @@ CREATE TABLE question (
     question_text    TEXT NOT NULL,
     image_url        TEXT,
     question_level   INT NOT NULL CHECK (question_level BETWEEN 1 AND 3),
-    question_subject VARCHAR(100) NOT NULL
+    question_subject INT NOT NULL CHECK (question_subject BETWEEN 0 AND 10)
 );
 
 CREATE TABLE alternative (
@@ -15,7 +15,6 @@ CREATE TABLE alternative (
 
     UNIQUE (order_index, id_question)
 );
-
 
 CREATE TABLE student (
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(), --REFERENCES User(id) ON DELETE CASCADE,
