@@ -14,7 +14,7 @@ def seed_database():
             port=5432,
             database=os.getenv("DB_NAME"),
             user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASS") # Ajustado para bater com seu docker-compose[cite: 13]
+            password=os.getenv("DB_PASSWORD") # Ajustado para bater com seu docker-compose[cite: 13]
         )
         cur = conn.cursor()
 
