@@ -1,4 +1,5 @@
 import { PerformanceModel } from './performance.model';
+import { AppError } from '../../shared/errors/AppError';
 
 export interface IStudentPerformance {
   taxaAcertos: number;
@@ -17,9 +18,7 @@ public async getCalculatedPerformance(studentId: string): Promise<IStudentPerfor
   const rawData = await this.model.getRawStatsByStudent(studentId);
 
   if (!rawData) {
-      const error = new Error('Usuário não existe.');
-      (error as any).statusCode = 404;
-      throw error;
+      throw new AppError('Usuário não existe.', 404);
   }
 
     const resolvidas = parseInt(rawData.total_resolvidas, 10);

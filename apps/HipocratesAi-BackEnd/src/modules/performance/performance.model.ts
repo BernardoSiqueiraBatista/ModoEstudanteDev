@@ -1,16 +1,4 @@
-import { Pool } from 'pg';
-import path from 'path';
-import dotenv from 'dotenv';
-
-dotenv.config({ path: path.resolve(__dirname, '../../studentMode/.env') });
-
-const pool = new Pool({ 
-  host: 'localhost',
-  port: 5432,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-});
+import { pool } from '../../config/postgres_local';
 
 export interface IRawPerformanceData {
   total_resolvidas: string;
