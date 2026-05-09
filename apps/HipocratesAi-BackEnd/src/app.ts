@@ -23,6 +23,9 @@ import { searchRoutes } from './modules/search/search.routes';
 import { storageRoutes } from './modules/storage/storage.routes';
 import { consultationsRoutes } from './modules/consultations/consultations.routes';
 import { patientConsultationsRoutes } from './modules/consultations/patient-consultations.routes';
+import studentRouter from './modules/student/student.routes';
+
+
 import { env } from './config/env';
 
 export const app = express();
@@ -57,6 +60,9 @@ app.get('/health', healthCheckController);
 // is configured; otherwise open (dev). Should ALSO sit behind a reverse-proxy
 // ACL in production — not intended to be publicly exposed.
 app.get('/metrics', requireMetricsToken, getMetricsController);
+
+// Rotas students
+app.use("/student", studentRouter);
 
 // Protected routes (JWT required)
 app.use('/patients', authMiddleware, patientsRoutes);
