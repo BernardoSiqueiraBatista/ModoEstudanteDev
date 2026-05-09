@@ -38,11 +38,3 @@ CREATE INDEX idx_alternative_question ON alternative(id_question);
 CREATE INDEX idx_performance_student ON performance(id_student);
 CREATE INDEX idx_performance_question ON performance(id_question);
 
-/*
-CREATE TABLE achievement (
-    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    title           VARCHAR(255) NOT NULL,
-    generalInfo     TEXT,
-    achievementDate DATE NOT NULL DEFAULT CURRENT_DATE
-);
-*/
