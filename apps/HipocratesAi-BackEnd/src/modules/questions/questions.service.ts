@@ -8,8 +8,7 @@ export class QuestionsService {
   }
 
   public async getRandomQuestions(limit: number, level?: number, category?: string): Promise<IQuestionResponse[]> {
-    
-    const safeLimit = limit > 50 ? 50 : limit;
+    const safeLimit = limit > 100 ? 100 : limit;
 
     const questions = await this.model.getRandomQuestions(safeLimit, level, category);
 
