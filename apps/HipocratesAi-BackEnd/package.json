@@ -19,7 +19,12 @@
         "test:watch": "jest --watch",
         "test:coverage": "jest --coverage",
         "lint": "eslint src",
-        "test:student": "jest ./src/studentTests" 
+        "test:student": "jest ./src/studentTests",
+        "db:up": "docker compose up -d",
+        "db:down": "docker compose down",
+        "db:seed": "python3 scripts/students_table_artificial_seed.py",
+        "db:setup": "pnpm db:up && echo 'Aguardando o banco iniciar...' && sleep 5 && pnpm db:seed",
+        "db:reset": "docker compose down -v && pnpm db:setup"
     },
     "dependencies": {
         "@hipo/contracts": "workspace:*",
