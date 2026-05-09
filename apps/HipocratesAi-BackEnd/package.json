@@ -19,7 +19,7 @@
         "test:watch": "jest --watch",
         "test:coverage": "jest --coverage",
         "lint": "eslint src",
-        "test:student": "jest ./src/studentTests",
+        "test:student": "jest ./src/modules/exams ./src/modules/performance ./src/modules/questions",
         "db:up": "docker compose up -d",
         "db:down": "docker compose down",
         "db:seed": "python3 scripts/students_table_artificial_seed.py",
