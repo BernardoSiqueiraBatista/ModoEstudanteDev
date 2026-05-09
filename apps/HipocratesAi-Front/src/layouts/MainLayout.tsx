@@ -6,6 +6,12 @@ import PatientProfileView from '../views/patient/PatientProfileView';
 import ActiveConsultationView from '../views/consulta/ActiveConsultationView';
 import ClinicalReasoningMaximizedView from '../views/consulta/ClinicalReasoningMaximizedView';
 import ConsultationClosureView from '../views/consulta/ConsultationClosureView';
+import SimuladosDashboard from '../views/simulados/SimuladosDashboardView';
+import SimuladosResultado from '../views/simulados/SimuladosResultadoView';
+import SimuladosRapido from '../views/simulados/SimuladosRapidoView';
+import SimuladosIniciar from '../views/simulados/SimuladosIniciarView';
+import SimuladosExecutar from '../views/simulados/SimuladosExecutarView';
+
 import { useLocation } from 'react-router-dom';
 
 const PLACEHOLDER_LABELS: Record<string, string> = {
@@ -63,6 +69,19 @@ export default function MainLayout() {
         {location.pathname === '/pacientes' && <PatientList />}
         {location.pathname.startsWith('/pacientes/') && location.pathname !== '/pacientes' && (
           <PatientProfileView />
+        )}
+        {location.pathname === '/simulados' && <SimuladosDashboard />}
+        {location.pathname.startsWith('/simulados/rapido') && (
+          <SimuladosRapido />
+        )}
+        {location.pathname.startsWith('/simulados/resultado/') && (
+          <SimuladosResultado />
+        )}
+        {location.pathname.startsWith('/simulados/iniciar') && (
+          <SimuladosIniciar />
+        )}
+        {location.pathname.startsWith('/simulados/executar/') && (
+          <SimuladosExecutar />
         )}
         {placeholderLabel && <ComingSoon label={placeholderLabel} />}
       </main>
