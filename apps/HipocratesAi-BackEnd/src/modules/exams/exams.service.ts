@@ -1,4 +1,5 @@
 import { ExamsModel } from './exams.model';
+import { AppError } from '../../shared/errors/AppError';
 
 export interface IExamAnswer {
   question_id: string;
@@ -13,15 +14,17 @@ export class ExamsService {
   }
 
   public async processExamResults(studentId: string, answers: IExamAnswer[]) {
-    const questionIds = answers.map(a => a.question_id);
+    const studentExists = await this.model.checkStudentExists(studentId);
+    if (!studentExists) {
+      throw new AppError(`Estudante não encontrado.`, 404);
+    }
     
-    // 1. Busca os gabaritos no banco
+    const questionIds = answers.map(a => a.question_id);
     const correctAlternatives = await this.model.getCorrectAlternatives(questionIds);
 
     let correctCount = 0;
     const details = answers.map(userAns => {
       const correctAlt = correctAlternatives.find(ca => ca.id_question === userAns.question_id);
-      
       const isCorrect = correctAlt ? correctAlt.correct_order_index === userAns.id_answer : false;
       
       if (isCorrect) correctCount++;
@@ -29,21 +32,17 @@ export class ExamsService {
       return {
         question_id: userAns.question_id,
         correct: isCorrect,
-        // Se errou, informa qual era a correta (order_index)
         ...( !isCorrect && { correctAnswer: correctAlt?.correct_order_index } )
       };
     });
 
-    // 2. Prepara os dados para salvar na performance
     const performanceData = details.map(d => ({
       questionId: d.question_id,
       isCorrect: d.correct
     }));
 
-    // 3. Persiste no banco de dados
     await this.model.savePerformance(studentId, performanceData);
 
-    // 4. Retorna o objeto formatado conforme o contrato do front
     return {
       totalNumberQuestions: answers.length,
       correctAnswers: correctCount,
