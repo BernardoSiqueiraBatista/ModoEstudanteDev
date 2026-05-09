@@ -7,6 +7,22 @@ export interface ICorrectAlternative {
 
 export class ExamsModel {
 
+  // Esse método poderia ser genérico de uma rota /student
+  public async checkStudentExists(studentId: string): Promise<boolean> {
+    const query = 'SELECT 1 FROM student WHERE id = $1';
+    const result = await pool.query(query, [studentId]);
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+
+  // Esse método poderia ser genérico de uma rota /question
+  public async getExistingQuestionIds(questionIds: string[]): Promise<string[]> {
+    const query = 'SELECT id FROM question WHERE id = ANY($1)';
+    const result = await pool.query(query, [questionIds]);
+    
+    return result.rows.map(row => row.id);
+  }
+  
+  
   public async getCorrectAlternatives(questionIds: string[]): Promise<ICorrectAlternative[]> {
     const query = `
       SELECT id_question, order_index as correct_order_index
@@ -15,13 +31,6 @@ export class ExamsModel {
     `;
     const result = await pool.query(query, [questionIds]);
     return result.rows;
-  }
-
-
-  public async checkStudentExists(studentId: string): Promise<boolean> {
-    const query = 'SELECT 1 FROM student WHERE id = $1';
-    const result = await pool.query(query, [studentId]);
-    return result.rowCount !== null && result.rowCount > 0;
   }
 
 

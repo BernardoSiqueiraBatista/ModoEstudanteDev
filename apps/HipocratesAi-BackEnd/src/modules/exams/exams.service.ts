@@ -16,11 +16,19 @@ export class ExamsService {
   public async processExamResults(studentId: string, answers: IExamAnswer[]) {
     const studentExists = await this.model.checkStudentExists(studentId);
     if (!studentExists) {
-      throw new AppError(`Estudante não encontrado.`, 404);
+      throw new AppError(`Estudante com ID ${studentId} não encontrado.`, 404);
     }
     
     const questionIds = answers.map(a => a.question_id);
-    const correctAlternatives = await this.model.getCorrectAlternatives(questionIds);
+    const uniqueQuestionIds = [...new Set(questionIds)];
+
+    const existingQuestions = await this.model.getExistingQuestionIds(uniqueQuestionIds);
+    
+    if (existingQuestions.length !== uniqueQuestionIds.length) {
+      throw new AppError('Uma ou mais questões não foram encontradas.', 404);
+    }
+
+    const correctAlternatives = await this.model.getCorrectAlternatives(uniqueQuestionIds);
 
     let correctCount = 0;
     const details = answers.map(userAns => {
@@ -41,6 +49,7 @@ export class ExamsService {
       isCorrect: d.correct
     }));
 
+    // 5. Persistência
     await this.model.savePerformance(studentId, performanceData);
 
     return {
