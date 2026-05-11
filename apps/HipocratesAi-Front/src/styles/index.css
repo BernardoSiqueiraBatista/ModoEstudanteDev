@@ -1,0 +1,23 @@
+@import 'tailwindcss';
+@import 'utilities.css';
+@import 'theme.css';
+@import 'glass-effects.css';
+@import 'components.css';
+@import 'animations.css';
+@import 'material-icons/iconfont/material-icons.css';
+
+/* ===== ESTILOS GLOBAIS ===== */
+html {
+  /* Reserva o espaço da scrollbar em todas as rotas para o header fixo
+     (left-0 right-0) não deslocar lateralmente entre páginas com/sem overflow. */
+  scrollbar-gutter: stable;
+  overflow-y: scroll;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  /* Transição apenas no body para dark-mode global (escopada, não universal) */
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}

@@ -1,0 +1,49 @@
+version: '3.9'
+services:
+  backend:
+    build: ./HipocratesAi-BackEnd
+    ports:
+      - "3333:3333"
+    environment:
+      - NODE_ENV=production
+      - PORT=3333
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - CLINICAL_LLM_URL=http://clinical-llm:8010
+      - ENABLE_CLINICAL_LLM=${ENABLE_CLINICAL_LLM:-false}
+      - TZ_OFFSET=${TZ_OFFSET:--03:00}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:5173}
+      - CLINICAL_LLM_INTERNAL_TOKEN=${CLINICAL_LLM_INTERNAL_TOKEN}
+    depends_on:
+      clinical-llm:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3333/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  clinical-llm:
+    build: ./HipocratesAi-BackEnd/python_services/clinical_llm
+    # porta não exposta externamente — só o serviço backend acessa via rede
+    # interna do Compose (clinical-llm:8010). Em dev local, suba o FastAPI
+    # diretamente com: npm run dev:clinical-llm
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL_CLASSIFY=${OPENAI_MODEL_CLASSIFY:-gpt-4o-mini}
+      - OPENAI_MODEL_ANSWER=${OPENAI_MODEL_ANSWER:-gpt-4o-mini}
+      - OPENAI_MODEL_TRANSCRIBE=${OPENAI_MODEL_TRANSCRIBE:-whisper-1}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - EMBED_MODEL=${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      - MIN_SIMILARITY_SCORE=${MIN_SIMILARITY_SCORE:-0.55}
+      - REQUIRE_CITATIONS=${REQUIRE_CITATIONS:-true}
+      - CLINICAL_LLM_INTERNAL_TOKEN=${CLINICAL_LLM_INTERNAL_TOKEN}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8010/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3

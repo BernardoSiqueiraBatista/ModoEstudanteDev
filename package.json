@@ -1,0 +1,49 @@
+{
+  "name": "hipocratesai-monorepo",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Plataforma médica que transcreve e analisa consultas em tempo real, oferecendo suporte cognitivo ao médico durante o atendimento — transcrição streaming via WebSocket, raciocínio clínico assistido por IA, alertas (red flags), hipóteses diagnósticas e geração de prescrição/condutas.",
+  "homepage": "https://github.com/BernardoSiqueiraBatista/ModoEstudanteDev#readme",
+  "bugs": {
+    "url": "https://github.com/BernardoSiqueiraBatista/ModoEstudanteDev/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BernardoSiqueiraBatista/ModoEstudanteDev.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "build": "pnpm -r build",
+    "build:contracts": "pnpm --filter @hipo/contracts build",
+    "dev:contracts": "pnpm --filter @hipo/contracts dev",
+    "dev:web": "pnpm --filter hipocratesai-frontend dev",
+    "dev:api": "pnpm --filter hipocratesai-backend dev:api",
+    "typecheck": "pnpm -r --if-present typecheck",
+    "test": "pnpm -r --if-present test",
+    "lint": "pnpm -r --if-present lint"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "dependencies": {
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.6.0",
+    "@types/pg": "^8.20.0",
+    "@types/supertest": "^7.2.0",
+    "jest": "^30.3.0",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.4.9",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^6.0.3"
+  }
+}

@@ -1,0 +1,119 @@
+/* ===== CALENDAR GRID ===== */
+.calendar-grid {
+  display: grid;
+  grid-template-columns: 60px repeat(7, 1fr);
+}
+.time-row {
+  height: 80px;
+}
+
+/* ===== STATUS BADGES ===== */
+.status-badge {
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border: 1px solid;
+  transition: all 0.2s;
+}
+.status-ativo {
+  background: rgb(248 250 252);
+  color: rgb(71 85 105);
+  border-color: rgb(241 245 249);
+}
+.status-followup {
+  background: rgba(241, 245, 249, 0.5);
+  color: rgb(100 116 139);
+  border-color: rgba(226, 232, 240, 0.6);
+}
+.status-pendente {
+  background: rgb(249 250 251);
+  color: rgb(156 163 175);
+  border-color: rgb(243 244 246);
+}
+
+/* ===== ROUNDED CORNERS ===== */
+.rounded-bubble {
+  border-radius: 3rem;
+}
+.rounded-card {
+  border-radius: 1.5rem;
+}
+
+/* ===== CLEAN INPUT ===== */
+.clean-input {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+.clean-input:focus {
+  box-shadow: none !important;
+  border-bottom-color: #2563eb !important;
+}
+
+/* ===== BUTTONS ===== */
+.glass-button {
+  background: linear-gradient(135deg, #2563eb 0%, #0f52ba 100%);
+  box-shadow:
+    0 4px 15px rgba(37, 99, 235, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.glass-button:hover {
+  box-shadow:
+    0 8px 25px rgba(37, 99, 235, 0.3),
+    inset 0 1px 1px rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.premium-button {
+  background: var(--medical-navy, #0f172a);
+  color: white;
+  box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3);
+  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.premium-button:hover {
+  background: #1e293b;
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px -5px rgba(15, 23, 42, 0.4);
+}
+
+/* ===== SELECT DROPDOWN ===== */
+.select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%239CA3AF' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+  background-position: right 0.75rem center;
+  background-repeat: no-repeat;
+  background-size: 1.25rem;
+  appearance: none;
+  padding-right: 2.5rem;
+}
+
+.nav-indicator {
+  position: relative;
+}
+
+.nav-indicator::after {
+  content: '';
+  position: absolute;
+  right: -12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 3px;
+  background: currentColor;
+  border-radius: 50%;
+}
+
+/* Base styles */
+::selection {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
+
+::-moz-selection {
+  background-color: rgba(37, 99, 235, 0.1);
+  color: #2563eb;
+}
