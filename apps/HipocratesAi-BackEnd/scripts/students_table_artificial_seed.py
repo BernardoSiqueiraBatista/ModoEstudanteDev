@@ -26,7 +26,7 @@ def seed_database():
         cur = conn.cursor()
 
         print("🧹 Limpando dados antigos...")
-        cur.execute("TRUNCATE performance, alternative, student, question CASCADE;")
+        cur.execute("TRUNCATE performance_insights, performance, alternative, student, question CASCADE;")
 
         # ---------------------------------------------------------
         # 1. Gerar Estudantes (Sem coluna de nome)
@@ -93,6 +93,27 @@ def seed_database():
                     "INSERT INTO performance (id_student, id_question, correct_answer) VALUES (%s, %s, %s)",
                     (s_id, q_id, acertou)
                 )
+
+        # ---------------------------------------------------------
+        # 4. Gerar Insights Baseados na Nova Tabela JSONB
+        # ---------------------------------------------------------
+        print("💡 Gerando insights sintéticos...")
+        import json
+        for s_id in student_ids:
+            fortes = [
+                {"titulo": "Clínica Médica", "descricao_curta": "Bom índice de acertos.", "modulo_referencia": "Clínica Médica", "severidade": None},
+                {"titulo": "Constância", "descricao_curta": "Bom tempo médio de estudo.", "modulo_referencia": "Geral", "severidade": None},
+                {"titulo": "Cirurgia Básica", "descricao_curta": "Acertos acima da média.", "modulo_referencia": "Cirurgia", "severidade": None}
+            ]
+            atencao = [
+                {"titulo": "Ginecologia e Obstetrícia", "descricao_curta": "Abaixo da média.", "modulo_referencia": "GO", "severidade": "alta"},
+                {"titulo": "Pediatria Neonatal", "descricao_curta": "Confusão em marcos de desenvolvimento.", "modulo_referencia": "Pediatria", "severidade": "media"},
+                {"titulo": "Ortopedia", "descricao_curta": "Pequena dificuldade com fraturas.", "modulo_referencia": "Ortopedia", "severidade": "baixa"}
+            ]
+            cur.execute(
+                "INSERT INTO performance_insights (id_student, pontos_fortes, pontos_atencao) VALUES (%s, %s, %s)",
+                (s_id, json.dumps(fortes), json.dumps(atencao))
+            )
 
         conn.commit()
         print("✅ Seed finalizado com sucesso! Banco está pronto para os testes.")
