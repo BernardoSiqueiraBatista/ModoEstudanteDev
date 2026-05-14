@@ -3,6 +3,8 @@ import { AppError } from '../../shared/errors/AppError';
 import { InsightsModel, IInsightRecord } from './insights.model';
 import { zodResponseFormat } from 'openai/helpers/zod';
 import { z } from 'zod';
+import { logger } from '../../shared/logger/logger';
+import { getInsightsPrompt } from '../../prompts/insights.prompt';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -16,8 +18,8 @@ const InsightItemSchema = z.object({
 });
 
 const InsightSchema = z.object({
-  pontos_fortes: z.array(InsightItemSchema).length(3),
-  pontos_atencao: z.array(InsightItemSchema).length(3),
+  pontos_fortes: z.array(InsightItemSchema),
+  pontos_atencao: z.array(InsightItemSchema),
 });
 
 export class InsightsService {
@@ -51,32 +53,32 @@ export class InsightsService {
     const acertos = parseInt(stats.total_acertos, 10);
     const horas = Math.floor((parseFloat(stats.segundos_estudo) || 0) / 3600);
 
-    const promptText = `
-      Você é um mentor acadêmico de medicina avaliando um estudante.
-      O estudante tem as seguintes métricas globais:
-      - Questões resolvidas: ${resolvidas}
-      - Acertos: ${acertos}
-      - Tempo total de estudo: ${horas} horas
-
-      Instruções:
-      Forneça exatamente 3 pontos fortes e 3 pontos de atenção.
-      Para cada item, seja descritivo (titulo e descricao_curta).
-      Defina o modulo_referencia baseado nas disciplinas médicas reais (ex: Cardiologia, Neurologia, Farmacologia).
-      Para os pontos de atenção, defina a severidade (baixa, media, alta).
-      `.trim();
+    const promptText = getInsightsPrompt(resolvidas, acertos, horas);
 
     try {
+      const start = Date.now();
       const response = await openai.chat.completions.parse({
         model: process.env.OPENAI_MODEL || 'gpt-4o',
         messages: [{ role: 'user', content: promptText }],
+        // @ts-ignore: Conflito de tipos entre a versão do zod local e a do SDK da OpenAI
         response_format: zodResponseFormat(InsightSchema, 'insight_response'),
       });
+      const end = Date.now();
 
       const parsedData = response.choices[0].message.parsed;
 
       if (!parsedData) {
         throw new Error('Falha ao processar resposta do LLM.');
       }
+
+      logger.info({
+        event: 'llm_call',
+        module: 'insights',
+        latency_ms: end - start,
+        tokens: response.usage,
+        input: promptText,
+        output: parsedData,
+      }, 'Insights LLM generation successful');
 
       const savedInsight = await this.model.saveInsight(
         studentId,
@@ -87,7 +89,18 @@ export class InsightsService {
 
       return savedInsight;
     } catch (error: any) {
-      throw new AppError(`Erro ao gerar insights com a IA: ${error.message}`, 502);
+      logger.error({
+        event: 'llm_call_error',
+        module: 'insights',
+        error: error.message,
+      }, 'Erro na chamada ao LLM para geração de insights');
+
+      if (lastInsight) {
+        logger.warn({ studentId }, 'Retornando cache como fallback devido a erro no LLM');
+        return lastInsight;
+      }
+
+      throw new AppError(`Não foi possível gerar a análise com a IA: ${error.message}`, 502);
     }
   }
 }
