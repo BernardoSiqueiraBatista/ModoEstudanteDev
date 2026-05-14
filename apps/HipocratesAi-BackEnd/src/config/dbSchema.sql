@@ -18,10 +18,9 @@ CREATE TABLE alternative (
 );
 
 
-CREATE TABLE student (
+CREATE TABLE student (                         -- Trocar gen_random_uuid pela referência do user id quando integrar com o banco geral no supabase
     id                UUID PRIMARY KEY DEFAULT gen_random_uuid(), --REFERENCES User(id) ON DELETE CASCADE,
     study_time        INTERVAL NOT NULL DEFAULT INTERVAL '0'
-    --id_achievement  UUID REFERENCES achievement(id) ON DELETE SET NULL,
 );
 
 
@@ -34,7 +33,17 @@ CREATE TABLE performance (
     UNIQUE (id_student, id_question)
 );
 
+
+CREATE TABLE performance_insights (
+    id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    id_student    UUID        NOT NULL REFERENCES student(id) ON DELETE CASCADE,
+    gerado_em     TIMESTAMP   NOT NULL DEFAULT NOW(),
+    versao_prompt VARCHAR(64) NOT NULL DEFAULT 'v1',
+    pontos_fortes  JSONB      NOT NULL DEFAULT '[]',
+    pontos_atencao JSONB      NOT NULL DEFAULT '[]'
+);
+
 CREATE INDEX idx_alternative_question ON alternative(id_question);
 CREATE INDEX idx_performance_student ON performance(id_student);
 CREATE INDEX idx_performance_question ON performance(id_question);
-
+CREATE INDEX idx_pi_student_date ON performance_insights (id_student, gerado_em DESC);
