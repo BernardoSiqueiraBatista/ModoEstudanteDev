@@ -16,9 +16,6 @@ export interface IInsightRecord {
 }
 
 export class InsightsModel {
-  /**
-   * Busca o último insight persistido para o aluno
-   */
   async getLastInsight(studentId: string): Promise<IInsightRecord | null> {
     const query = `
       SELECT id, id_student, gerado_em, versao_prompt, pontos_fortes, pontos_atencao
@@ -31,14 +28,7 @@ export class InsightsModel {
     return result.rows[0] ?? null;
   }
 
-  /**
-   * Coleta as métricas dos últimos 30 dias do aluno na tabela de performance.
-   * O tempo de estudo total do aluno vem da tabela student.
-   */
   async getStatsLast30Days(studentId: string): Promise<IRawPerformanceStats | null> {
-    // Como a tabela performance atual não tem data (timestamp), 
-    // faremos uma contagem global para esta fase.
-    // Futuramente, se a tabela performance ganhar um timestamp, podemos adicionar um WHERE data >= NOW() - INTERVAL '30 days'.
     const query = `
       SELECT
         COUNT(p.id)::TEXT                                           AS total_resolvidas,
@@ -51,19 +41,16 @@ export class InsightsModel {
       WHERE p.id_student = $1;
     `;
     const result = await pool.query<IRawPerformanceStats>(query, [studentId]);
-    
+
     if (result.rows.length === 0 || !result.rows[0].total_resolvidas) {
-       return null;
+      return null;
     }
     return result.rows[0];
   }
 
-  /**
-   * Salva um novo insight no banco de dados.
-   */
   async saveInsight(
-    studentId: string, 
-    pontosFortes: string[], 
+    studentId: string,
+    pontosFortes: string[],
     pontosAtencao: string[],
     versaoPrompt: string = 'v1'
   ): Promise<IInsightRecord> {
@@ -73,9 +60,9 @@ export class InsightsModel {
       RETURNING id, id_student, gerado_em, versao_prompt, pontos_fortes, pontos_atencao;
     `;
     const result = await pool.query<IInsightRecord>(query, [
-      studentId, 
-      versaoPrompt, 
-      JSON.stringify(pontosFortes), 
+      studentId,
+      versaoPrompt,
+      JSON.stringify(pontosFortes),
       JSON.stringify(pontosAtencao)
     ]);
     return result.rows[0];
