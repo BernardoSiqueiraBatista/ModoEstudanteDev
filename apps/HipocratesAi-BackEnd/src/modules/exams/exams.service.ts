@@ -49,8 +49,8 @@ export class ExamsService {
       isCorrect: d.correct
     }));
 
-    // 5. Persistência
     await this.model.savePerformance(studentId, performanceData);
+    await this.model.saveExam(studentId, answers.length, correctCount);
 
     return {
       totalNumberQuestions: answers.length,

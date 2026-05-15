@@ -1,7 +1,7 @@
 import { pool } from '../../config/postgres_local';
 
 export interface IAlternativeResponse {
-  id_answer: number;
+  ordem: number;
   texto: string;
 }
 
@@ -19,7 +19,7 @@ export class QuestionsModel {
         q.question_text as texto,
         json_agg(
           json_build_object(
-            'id_alternative', a.order_index,
+            'ordem', a.order_index,
             'texto', a.alternative_text
           ) ORDER BY a.order_index
         ) as alternativas

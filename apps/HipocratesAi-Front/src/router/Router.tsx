@@ -112,7 +112,7 @@ export default function RouterView() {
         />
 
         <Route
-        path="/simulados/resultado/:id"
+        path="/simulados/resultado"
           element={
             <ProtectedRoute>
               <MainLayout />
@@ -121,7 +121,25 @@ export default function RouterView() {
         />
 
         <Route
-        path="/simulados/executar/:id"
+        path="/simulados/executar"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+       <Route
+          path="/plan"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/plan/calendario"
           element={
             <ProtectedRoute>
               <MainLayout />

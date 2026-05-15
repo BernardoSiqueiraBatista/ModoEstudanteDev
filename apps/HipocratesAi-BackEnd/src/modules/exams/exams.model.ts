@@ -42,7 +42,7 @@ export class ExamsModel {
       const query = `
         INSERT INTO performance (id_student, id_question, correct_answer)
         VALUES ($1, $2, $3)
-        ON CONFLICT (id_student, id_question) 
+        ON CONFLICT (id_student, id_question)
         DO UPDATE SET correct_answer = EXCLUDED.correct_answer;
       `;
 
@@ -50,13 +50,20 @@ export class ExamsModel {
         await client.query(query, [studentId, res.questionId, res.isCorrect]);
       }
       await client.query('COMMIT');
-    
+
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
-    
+
     } finally {
       client.release();
     }
+  }
+
+  public async saveExam(studentId: string, totalQuestions: number, correctAnswers: number): Promise<void> {
+    await pool.query(
+      'INSERT INTO exam (id_student, total_questions, correct_answers) VALUES ($1, $2, $3)',
+      [studentId, totalQuestions, correctAnswers]
+    );
   }
 }
