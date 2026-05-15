@@ -84,6 +84,51 @@ export default function RouterView() {
           }
         />
 
+        <Route
+        path="/simulados"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+        path="/simulados/rapido"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+        path="/simulados/iniciar"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+        path="/simulados/resultado/:id"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+        path="/simulados/executar/:id"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
         {[
           '/relatorios',
           '/vision',
