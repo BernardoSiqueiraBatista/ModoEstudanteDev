@@ -28,8 +28,7 @@ export default function AgendaView() {
   const [selectedView, setSelectedView] = useState<'dia' | 'semana'>('dia');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState<FilterOptions>({ types: [] });
-  const [openConsultaApontamento, setOpenConsultaApontamento] =
-    useState<Apontamento | null>(null);
+  const [openConsultaApontamento, setOpenConsultaApontamento] = useState<Apontamento | null>(null);
 
   const { data: patientsData } = usePatients({ limit: 100, page: 1, tab: 'all' });
   const createAppointment = useCreateAppointment();

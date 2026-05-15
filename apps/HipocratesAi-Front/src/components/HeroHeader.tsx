@@ -39,8 +39,12 @@ const navItems: NavItem[] = [
       p.startsWith('/questoes') ||
       p.startsWith('/consultas-simuladas') ||
       p.startsWith('/flashcards') ||
-      p.startsWith('/paper'),
+      p.startsWith('/paper') ||
+      p.startsWith('/plan') ||
+      p.startsWith('/simulados'),
     subItems: [
+      { name: 'Plano', href: '/plan' },
+      { name: 'Simulados', href: '/simulados' },
       { name: 'Questões', href: '/questoes' },
       { name: 'Consultas Simuladas', href: '/consultas-simuladas' },
       { name: 'Flashcards', href: '/flashcards' },

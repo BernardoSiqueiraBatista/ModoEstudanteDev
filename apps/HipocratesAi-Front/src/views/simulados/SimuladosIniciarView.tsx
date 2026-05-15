@@ -47,6 +47,13 @@ export default function ExecucaoSimulado() {
   const espec = searchParams.get('especialidade') ?? 'Geral'
   const cat   = searchParams.get('categoria')     ?? '1'
 
+  console.log('params brutos:', {
+  questoes: searchParams.get('questoes'),
+  nivel:    searchParams.get('nivel'),
+  categoria: searchParams.get('categoria'),
+})
+console.log('nivel resolvido:', nivel)
+
   const [loading, setLoading] = useState(false)
   const [error, setError]     = useState<string | null>(null)
 
@@ -54,7 +61,15 @@ export default function ExecucaoSimulado() {
     setError(null)
     setLoading(true)
     try {
-      const data = await fetchQuestoes(Number(q), Number(nivel), Number(cat))
+      const nivelNum = Number(nivel)
+      const catNum   = Number(cat)
+
+
+      const data = await fetchQuestoes(
+  Number(q),
+  isNaN(nivelNum) ? undefined : nivelNum,
+  isNaN(catNum)   ? undefined : catNum,
+)
       // navega para a tela de execução passando as questões via state
       navigate('/simulados/executar', { state: { questions: data.questions } })
     } catch (e) {

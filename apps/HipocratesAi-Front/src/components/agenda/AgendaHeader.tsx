@@ -110,7 +110,7 @@ export default function AgendaHeader({
   return (
     <>
       <header className="flex items-center justify-between px-10 py-6 border-b border-light bg-surface/50 backdrop-blur-md sticky top-0 z-10">
-        {/* Left Section - Title */}
+        {/* Left Section - Title */}q
         <div>
           <h1 className="text-4xl font-bold tracking-tight text-title transition-all duration-300">
             Agenda Médica

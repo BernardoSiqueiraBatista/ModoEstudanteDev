@@ -1,7 +1,32 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+const STUDENT_ID = 'd8cc8dd6-6737-4abd-8a51-8dcd13e58256';
+
+interface PerformanceData {
+  taxaAcertos: number;
+  questoesResolvidas: number;
+  tempoEstudo: number;
+}
+
+function formatStudyTime(seconds: number): string {
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  if (h === 0) return `${m}min`;
+  return `${h}h ${String(m).padStart(2, '0')}min`;
+}
 
 export default function SimuladosDashboardView() {
   const navigate = useNavigate();
+  const [perf, setPerf] = useState<PerformanceData | null>(null);
+
+  useEffect(() => {
+    fetch(`http://localhost:3333/student/performance/${STUDENT_ID}`)
+      .then(r => r.ok ? r.json() : null)
+      .then(json => { if (json?.data) setPerf(json.data); })
+      .catch(() => {});
+  }, []);
+
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-12">
 
@@ -30,11 +55,13 @@ export default function SimuladosDashboardView() {
             <p className="text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant">
               Questões Resolvidas
             </p>
-            <h3 className="text-4xl font-black">2,482</h3>
+            <h3 className="text-4xl font-black">
+              {perf ? perf.questoesResolvidas.toLocaleString('pt-BR') : '—'}
+            </h3>
           </div>
 
           <div className="text-[10px] px-3 py-1 bg-primary/10 text-primary rounded-full">
-            +12% vs última semana
+            Total acumulado
           </div>
         </div>
 
@@ -53,7 +80,9 @@ export default function SimuladosDashboardView() {
             <p className="text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant">
               Taxa de Acerto
             </p>
-            <h3 className="text-4xl font-black">76.4%</h3>
+            <h3 className="text-4xl font-black">
+              {perf ? `${(perf.taxaAcertos * 100).toFixed(1)}%` : '—'}
+            </h3>
           </div>
 
           <div className="flex gap-1">
@@ -76,11 +105,15 @@ export default function SimuladosDashboardView() {
             <p className="text-[0.65rem] font-bold uppercase tracking-widest text-on-surface-variant">
               Tempo em Estudo
             </p>
-            <h3 className="text-4xl font-black">42h 15m</h3>
+            <h3 className="text-4xl font-black">
+              {perf ? formatStudyTime(perf.tempoEstudo) : '—'}
+            </h3>
           </div>
 
           <p className="text-[10px] text-on-surface-variant">
-            Média de 52s por questão
+            {perf && perf.questoesResolvidas > 0
+              ? `Média de ${Math.round(perf.tempoEstudo / perf.questoesResolvidas)}s por questão`
+              : 'Sem dados ainda'}
           </p>
         </div>
 

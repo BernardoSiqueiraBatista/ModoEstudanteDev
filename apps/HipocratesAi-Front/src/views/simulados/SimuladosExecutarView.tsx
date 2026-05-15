@@ -30,15 +30,31 @@ export default function ExecutarSimulado() {
   const nivel = state?.nivel ?? '2'
   const especialidade = state?.especialidade ?? 'Geral'
 
-  // minutos estimados: 1.5 min por questão
   const totalSeconds = Math.floor(questions.length * 1.5 * 60)
 
   const [currentIndex, setCurrentIndex] = useState(0)
-  const [answers, setAnswers] = useState<Record<string, number | null>>({})
+  const [answers, setAnswers] = useState<Record<string, number>>({})
   const [marked, setMarked] = useState<Record<string, boolean>>({})
   const [timeLeft, setTimeLeft] = useState(totalSeconds)
   const [showConfirm, setShowConfirm] = useState(false)
+
+  // ✅ ref para evitar stale closure no timer
+  const answersRef = useRef<Record<string, number>>({})
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const handleFinalize = () => {
+    clearInterval(intervalRef.current!)
+
+    const formattedAnswers = questions.map((q) => ({
+      question_id: q.id_questao,
+      // ✅ usa a ref, que sempre tem o valor mais recente
+      id_answer: answersRef.current[q.id_questao] ?? null,
+    }))
+
+    navigate('/simulados/resultado', {
+      state: { answers: formattedAnswers, questions },
+    })
+  }
 
   // Timer
   useEffect(() => {
@@ -64,30 +80,20 @@ export default function ExecutarSimulado() {
 
   const current = questions[currentIndex]
 
-  const handleAnswer = (ordem: number) => {
-    setAnswers((prev) => ({ ...prev, [current.id_questao]: ordem }))
-  }
+const handleAnswer = (ordem: number) => {
+  console.log('clicou:', current.id_questao, '→ ordem:', ordem, typeof ordem)
+  const updated = { ...answersRef.current, [current.id_questao]: ordem }
+  answersRef.current = updated
+  setAnswers(updated)
+  console.log('answers após update:', answersRef.current)
+}
 
   const toggleMarked = () => {
     setMarked((prev) => ({ ...prev, [current.id_questao]: !prev[current.id_questao] }))
   }
 
-  const handleFinalize = () => {
-    clearInterval(intervalRef.current!)
-    const formattedAnswers = questions.map((q) => ({
-      questionID: q.id_questao,
-      studentAnswer: answers[q.id_questao] ?? null,
-    }))
-    // Navega para a tela de encerramento — rota a ser preenchida depois
-    navigate('/simulados/resultado', {
-      state: {
-        answers: formattedAnswers,
-        questions,
-      },
-    })
-  }
-
-  const answeredCount = Object.values(answers).filter((v) => v !== null).length
+  // ✅ corrigido: checa se a chave existe no objeto, não != null
+  const answeredCount = Object.keys(answers).length
   const markedCount = Object.values(marked).filter(Boolean).length
   const remaining = questions.length - answeredCount
   const progress = questions.length > 0 ? Math.round((answeredCount / questions.length) * 100) : 0
@@ -126,7 +132,7 @@ export default function ExecutarSimulado() {
               <span className="text-[10px] uppercase font-bold text-on-surface-variant tracking-widest leading-none">
                 Tempo Restante
               </span>
-              <span className={`text-lg font-mono font-bold tracking-tighter ${timeLeft < 300 ? 'text-tertiary' : 'text-on-surface'}`}>
+              <span className={`text-lg font-mono font-bold tracking-tighter ${timeLeft < 300 ? 'text-red-500' : 'text-on-surface'}`}>
                 {formatTime(timeLeft)}
               </span>
             </div>
@@ -200,7 +206,7 @@ export default function ExecutarSimulado() {
                   <div className={`h-10 w-10 flex-shrink-0 flex items-center justify-center rounded-full font-bold transition-colors ${
                     selected
                       ? 'bg-primary text-white'
-                      : 'border-2 border-outline-variant/30 text-on-surface-variant group-hover:border-primary group-hover:text-primary'
+                      : 'border-2 border-outline-variant/30 text-on-surface-variant'
                   }`}>
                     {LETRA[i]}
                   </div>
@@ -245,10 +251,11 @@ export default function ExecutarSimulado() {
                 {marked[current.id_questao] ? 'Marcada' : 'Revisar Depois'}
               </button>
 
+              {/* ✅ botão Próxima com estilo correto (bg-slate-800 em vez de bg-on-background) */}
               {currentIndex < questions.length - 1 ? (
                 <button
                   onClick={() => setCurrentIndex((i) => i + 1)}
-                  className="flex items-center gap-2 bg-on-background text-white font-bold px-10 py-2.5 rounded-full hover:opacity-90 shadow-lg transition-all active:scale-95"
+                  className="flex items-center gap-2 bg-slate-800 text-white font-bold px-10 py-2.5 rounded-full hover:bg-slate-700 shadow-lg transition-all active:scale-95"
                 >
                   Próxima
                   <span className="material-symbols-outlined">arrow_forward</span>
@@ -279,7 +286,7 @@ export default function ExecutarSimulado() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-2 mb-8">
               {[
-                { value: answeredCount, label: 'Feitas', color: 'text-primary' },
+                { value: answeredCount, label: 'Feitas',  color: 'text-primary' },
                 { value: markedCount,   label: 'Dúvidas', color: 'text-amber-500' },
                 { value: remaining,     label: 'Faltam',  color: 'text-on-surface' },
               ].map((s) => (
@@ -294,14 +301,15 @@ export default function ExecutarSimulado() {
             <div className="flex-1 overflow-y-auto no-scrollbar">
               <div className="grid grid-cols-5 gap-2">
                 {questions.map((q, i) => {
-                  const isAnswered = answers[q.id_questao] != null
+                  // ✅ corrigido: checa se a chave existe no objeto
+                  const isAnswered = q.id_questao in answers
                   const isMarked   = marked[q.id_questao]
                   const isCurrent  = i === currentIndex
 
-                  let cls = 'bg-white/40 border border-outline-variant/10 text-on-surface-variant hover:bg-white'
-                  if (isCurrent)  cls = 'border-2 border-primary bg-white text-primary font-black shadow-md ring-4 ring-primary/10'
-                  else if (isMarked)   cls = 'bg-amber-400 text-white shadow-sm'
-                  else if (isAnswered) cls = 'bg-primary text-white shadow-sm'
+                  let cls = 'bg-slate-100 text-slate-400 hover:bg-slate-200'
+                  if (isCurrent)       cls = 'border-2 border-blue-600 bg-blue-50 text-blue-700 font-black shadow-sm'
+                  else if (isMarked)   cls = 'bg-amber-400 text-white'
+                  else if (isAnswered) cls = 'bg-blue-600 text-white'
 
                   return (
                     <button
@@ -319,9 +327,9 @@ export default function ExecutarSimulado() {
             {/* Legenda */}
             <div className="mt-4 pt-4 border-t border-outline-variant/10 flex flex-col gap-2">
               {[
-                { color: 'bg-primary', label: 'Respondida' },
-                { color: 'bg-amber-400', label: 'Para revisar' },
-                { color: 'bg-white border border-outline-variant/20', label: 'Não respondida' },
+                { color: 'bg-blue-600',                   label: 'Respondida'     },
+                { color: 'bg-amber-400',                  label: 'Para revisar'   },
+                { color: 'bg-slate-100 border border-slate-200', label: 'Não respondida' },
               ].map((l) => (
                 <div key={l.label} className="flex items-center gap-2">
                   <div className={`w-3 h-3 rounded-sm ${l.color}`} />
@@ -335,7 +343,7 @@ export default function ExecutarSimulado() {
 
       {/* ── Modal de confirmação ── */}
       {showConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/30 backdrop-blur-sm" onClick={() => setShowConfirm(false)} />
           <div className="relative w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl flex flex-col items-center text-center">
             <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-6">
@@ -348,7 +356,7 @@ export default function ExecutarSimulado() {
               Você respondeu <span className="font-bold text-primary">{answeredCount}</span> de <span className="font-bold">{questions.length}</span> questões.
             </p>
             {remaining > 0 && (
-              <p className="text-sm text-tertiary font-semibold mb-6">
+              <p className="text-sm text-red-500 font-semibold mb-6">
                 ⚠ {remaining} questão{remaining > 1 ? 'ões' : ''} sem resposta.
               </p>
             )}

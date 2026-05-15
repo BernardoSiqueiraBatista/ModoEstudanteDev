@@ -11,6 +11,8 @@ import SimuladosResultado from '../views/simulados/SimuladosResultadoView';
 import SimuladosRapido from '../views/simulados/SimuladosRapidoView';
 import SimuladosIniciar from '../views/simulados/SimuladosIniciarView';
 import SimuladosExecutar from '../views/simulados/SimuladosExecutarView';
+import PlanView from '../views/plan/PlanView';
+import CalendarioView from '../views/plan/CalendarioView';
 
 import { useLocation } from 'react-router-dom';
 
@@ -42,19 +44,20 @@ export default function MainLayout() {
   const location = useLocation();
   const placeholderLabel = PLACEHOLDER_LABELS[location.pathname];
 
-  // Rotas de consulta usam tela cheia, sem o navbar global e sem o pt-24,
-  // para que o ConsultationHeader e a transcrição fiquem corretamente
-  // posicionados (área scrollável interna ao invés de scroll da página).
   const isConsultationRoute = location.pathname.startsWith('/consulta/');
+  const isSimuladoExecutar = location.pathname.startsWith('/simulados/executar');
 
-  if (isConsultationRoute) {
+  if (isConsultationRoute || isSimuladoExecutar) {
     return (
       <div className="h-screen w-full overflow-hidden bg-background-light dark:bg-slate-950">
-        {location.pathname.startsWith('/consulta/ativa/') && <ActiveConsultationView />}
-        {location.pathname.startsWith('/consulta/raciocinio/') && (
-          <ClinicalReasoningMaximizedView />
+        {isConsultationRoute && (
+          <>
+            {location.pathname.startsWith('/consulta/ativa/') && <ActiveConsultationView />}
+            {location.pathname.startsWith('/consulta/raciocinio/') && <ClinicalReasoningMaximizedView />}
+            {location.pathname.startsWith('/consulta/encerramento/') && <ConsultationClosureView />}
+          </>
         )}
-        {location.pathname.startsWith('/consulta/encerramento/') && <ConsultationClosureView />}
+        {isSimuladoExecutar && <SimuladosExecutar />}
       </div>
     );
   }
@@ -74,15 +77,14 @@ export default function MainLayout() {
         {location.pathname.startsWith('/simulados/rapido') && (
           <SimuladosRapido />
         )}
-        {location.pathname.startsWith('/simulados/resultado/') && (
+        {location.pathname.startsWith('/simulados/resultado') && (
           <SimuladosResultado />
         )}
-        {location.pathname.startsWith('/simulados/iniciar') && (
-          <SimuladosIniciar />
-        )}
-        {location.pathname.startsWith('/simulados/executar/') && (
+        {location.pathname.startsWith('/simulados/executar') && (
           <SimuladosExecutar />
         )}
+        {location.pathname === '/plan' && <PlanView />}
+        {location.pathname === '/plan/calendario' && <CalendarioView />}
         {placeholderLabel && <ComingSoon label={placeholderLabel} />}
       </main>
     </div>
