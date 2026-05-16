@@ -15,6 +15,6 @@ studentRouter.use('/performance', performanceRoutes);
 studentRouter.use('/:id/', dashboardRoutes);
 studentRouter.use('/:id/insights', insightsRoutes);
 
-studentRouter.use('/:id/study-plan', studyPlansRoutes)
+studentRouter.use('/:id/study-plans', studyPlansRoutes)
 
 export default studentRouter;

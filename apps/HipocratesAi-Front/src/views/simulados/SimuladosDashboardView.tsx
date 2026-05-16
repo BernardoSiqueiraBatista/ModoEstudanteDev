@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const STUDENT_ID = 'd8cc8dd6-6737-4abd-8a51-8dcd13e58256';
+const STUDENT_ID = 'e1925b44-9694-477c-a496-5e638e4a9e25';
 
 interface PerformanceData {
   taxaAcertos: number;
@@ -24,7 +24,7 @@ export default function SimuladosDashboardView() {
     fetch(`http://localhost:3333/student/performance/${STUDENT_ID}`)
       .then(r => r.ok ? r.json() : null)
       .then(json => { if (json?.data) setPerf(json.data); })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   return (
@@ -192,37 +192,37 @@ export default function SimuladosDashboardView() {
       {/* Simulado rápido */}
       <section className="pb-12">
         <div className="flex justify-center py-8">
-        <div className="relative flex w-full max-w-2xl flex-col items-center space-y-6 overflow-hidden rounded-[3rem] border border-white/60 bg-white/70 p-10 text-center shadow-xl backdrop-blur-xl">
+          <div className="relative flex w-full max-w-2xl flex-col items-center space-y-6 overflow-hidden rounded-[3rem] border border-white/60 bg-white/70 p-10 text-center shadow-xl backdrop-blur-xl">
             <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-blue-600 to-blue-800 shadow-2xl">
-            <span className="material-symbols-outlined text-4xl text-white">
+              <span className="material-symbols-outlined text-4xl text-white">
                 rocket_launch
-            </span>
+              </span>
             </div>
 
             <div>
-            <h4 className="mb-2 text-3xl font-black tracking-tight">
+              <h4 className="mb-2 text-3xl font-black tracking-tight">
                 Área de Simulados Rápidos
-            </h4>
+              </h4>
 
-            <p className="max-w-md text-sm leading-relaxed text-slate-500">
+              <p className="max-w-md text-sm leading-relaxed text-slate-500">
                 Personalize seu treino por especialidade, tempo ou
                 dificuldade.
-            </p>
+              </p>
             </div>
 
             <button
-                onClick={() => navigate("/simulados/rapido")}
-                className="flex items-center justify-center gap-3 rounded-2xl bg-blue-600 px-8 py-4 text-sm font-bold uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:-translate-y-1 active:scale-95"
+              onClick={() => navigate("/simulados/rapido")}
+              className="flex items-center justify-center gap-3 rounded-2xl bg-blue-600 px-8 py-4 text-sm font-bold uppercase tracking-[0.2em] text-white shadow-xl transition-all hover:-translate-y-1 active:scale-95"
             >
-            <span>Ir para Simulados</span>
+              <span>Ir para Simulados</span>
 
-            <span className="material-symbols-outlined text-lg">
+              <span className="material-symbols-outlined text-lg">
                 arrow_forward
-            </span>
+              </span>
             </button>
+          </div>
         </div>
-        </div>
-    </section>
+      </section>
 
     </div>
   );

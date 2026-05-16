@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 
 const API_BASE = 'http://localhost:3333';
-const STUDENT_ID = 'd8cc8dd6-6737-4abd-8a51-8dcd13e58256';
+const STUDENT_ID = 'e1925b44-9694-477c-a496-5e638e4a9e25';
 
 export type DayKey = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
 
@@ -62,7 +62,7 @@ export function useRoutineGenerator() {
 
   const fetchCurrentRoutine = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/student/routine/current?user_id=${STUDENT_ID}`);
+      const res = await fetch(`${API_BASE}/student/${STUDENT_ID}/study-plans`);
       if (!res.ok) return;
       const json = await res.json();
       const data = json?.data ?? json;
@@ -84,12 +84,11 @@ export function useRoutineGenerator() {
     }, 10_000);
 
     try {
-      const res = await fetch(`${API_BASE}/student/routine/generate`, {
+      const res = await fetch(`${API_BASE}/student/${STUDENT_ID}/study-plans`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
         body: JSON.stringify({
-          user_id: STUDENT_ID,
           briefing: params.briefing,
           params: {
             hours_per_day: params.hoursPerDay,

@@ -1,0 +1,212 @@
+.
+├── arvorePastas.txt
+├── .env.example
+├── eslint.config.js
+├── .gitignore
+├── index.html
+├── package.json
+├── postcss.config.js
+├── .prettierrc
+├── src
+│   ├── App.tsx
+│   ├── assets
+│   │   ├── 500a8807-bb4d-4ded-8e87-ae69391c0d9f.png
+│   │   ├── e95d58e0-3e5e-4c89-bd99-e4803e12dba0.png
+│   │   ├── google_calendar_logo_icon_159345.png
+│   │   ├── image.png
+│   │   └── Image.svg
+│   ├── auth
+│   │   └── AuthProvider.tsx
+│   ├── components
+│   │   ├── agenda
+│   │   │   ├── AgendaFilterDropdown.tsx
+│   │   │   ├── AgendaHeader.tsx
+│   │   │   ├── day
+│   │   │   │   ├── AppointmentCard.tsx
+│   │   │   │   ├── CurrentTimeMarker.tsx
+│   │   │   │   ├── DateNavigator.tsx
+│   │   │   │   └── DayAgendaContainer.tsx
+│   │   │   ├── NewAppointmentModal.tsx
+│   │   │   ├── OpenConsultationModal.tsx
+│   │   │   └── week
+│   │   │       ├── Calendarevent.tsx
+│   │   │       ├── WeekCalendarGrid.tsx
+│   │   │       └── WeekCalendarHeader.tsx
+│   │   ├── auth
+│   │   │   ├── AuthDebugCard.tsx
+│   │   │   ├── FooterLink.tsx
+│   │   │   ├── ForgotPassword.tsx
+│   │   │   ├── HeaderAuth.tsx
+│   │   │   ├── LoginForm.tsx
+│   │   │   ├── SecurityInfo.tsx
+│   │   │   ├── SignUpForm.tsx
+│   │   │   ├── SignupVerificationModal.tsx
+│   │   │   └── TestimonialCard.tsx
+│   │   ├── consulta
+│   │   │   ├── active
+│   │   │   │   ├── AlertsSection.tsx
+│   │   │   │   ├── CheckListSection.tsx
+│   │   │   │   ├── clinicalReasoning
+│   │   │   │   │   ├── ClinicalReasoningFooter.tsx
+│   │   │   │   │   ├── ClinicalReasoningHeader.tsx
+│   │   │   │   │   ├── ClinicalReasoningImage.tsx
+│   │   │   │   │   ├── ClinicalReasoningMessageBubble.tsx
+│   │   │   │   │   └── ClinicalReasoningMessageList.tsx
+│   │   │   │   ├── ClinicalReasoningPopUp.tsx
+│   │   │   │   ├── CognitiveSupport.tsx
+│   │   │   │   ├── ConsultationHeader.tsx
+│   │   │   │   ├── FloatingActions.tsx
+│   │   │   │   ├── maximizedClinicalReasoning
+│   │   │   │   │   ├── MaximizedHeader.tsx
+│   │   │   │   │   ├── MaximizedInputArea.tsx
+│   │   │   │   │   ├── MaximizedMessageBubble.tsx
+│   │   │   │   │   └── MaximizedMessageList.tsx
+│   │   │   │   ├── MedicalInsightCard.tsx
+│   │   │   │   ├── MessageBubble.tsx
+│   │   │   │   ├── MessageThread.tsx
+│   │   │   │   └── TranscriptWithFlags.tsx
+│   │   │   ├── closure
+│   │   │   │   ├── ClosureClinicalReasoning.tsx
+│   │   │   │   ├── ClosureDiagnosisItem.tsx
+│   │   │   │   ├── ClosureFooter.tsx
+│   │   │   │   ├── ClosureHeader.tsx
+│   │   │   │   └── ClosureSummarySection.tsx
+│   │   │   └── newConsulta
+│   │   │       ├── ClinicalContext.tsx
+│   │   │       ├── NewConsultationHeader.tsx
+│   │   │       ├── PatientInfoCard.tsx
+│   │   │       ├── PatientSearchInput.tsx
+│   │   │       ├── SecurityFooter.tsx
+│   │   │       └── StartConsultationButton.tsx
+│   │   ├── dashboard
+│   │   │   ├── AgendaTimeline.tsx
+│   │   │   ├── cards
+│   │   │   │   ├── ActivePatientsTrendCard.tsx
+│   │   │   │   ├── AgendaTimelineItem.tsx
+│   │   │   │   ├── AIStatusCard.tsx
+│   │   │   │   ├── InfoCard.tsx
+│   │   │   │   ├── InsightCard.tsx
+│   │   │   │   └── StatCard.tsx
+│   │   │   └── DashboardStats.tsx
+│   │   ├── HeroHeader.tsx
+│   │   ├── patients
+│   │   │   ├── patientList
+│   │   │   │   ├── EditPatientModal.tsx
+│   │   │   │   ├── NewPatientModal.tsx
+│   │   │   │   ├── PatientFormModal.tsx
+│   │   │   │   ├── PatientsAnalytics.tsx
+│   │   │   │   ├── PatientsFilterDropdown.tsx
+│   │   │   │   ├── PatientsFooter.tsx
+│   │   │   │   ├── PatientsHeader.tsx
+│   │   │   │   ├── PatientsInsightsFooter.tsx
+│   │   │   │   ├── PatientsKpiRow.tsx
+│   │   │   │   ├── PatientsTable.tsx
+│   │   │   │   └── Patienttablerow.tsx
+│   │   │   └── patientProfile
+│   │   │       ├── CognitiveSummary.tsx
+│   │   │       ├── FloatingActions.tsx
+│   │   │       ├── hipoteses
+│   │   │       │   └── HipotesesTab.tsx
+│   │   │       ├── historico
+│   │   │       │   ├── HistoricoTab.tsx
+│   │   │       │   ├── TimelineCard.tsx
+│   │   │       │   └── TimeLine.tsx
+│   │   │       ├── PatientProfileHeader.tsx
+│   │   │       └── tratamentos
+│   │   │           └── TratamentosTab.tsx
+│   │   ├── plan
+│   │   │   ├── AIReasoningBanner.tsx
+│   │   │   ├── DailyPanel.tsx
+│   │   │   ├── ErrorBanner.tsx
+│   │   │   ├── FixedEventModal.tsx
+│   │   │   ├── FixedEventPill.tsx
+│   │   │   ├── ParamChipGroup.tsx
+│   │   │   ├── RoutineBlock.tsx
+│   │   │   └── RoutineConfigurator.tsx
+│   │   └── ui
+│   │       ├── Alert.tsx
+│   │       ├── ConfirmationProvider.tsx
+│   │       └── ToastProvider.tsx
+│   ├── data
+│   │   ├── Dates.ts
+│   │   ├── PatientsData.ts
+│   │   ├── PatientsStats.ts
+│   │   └── WeekCalendarData.ts
+│   ├── hooks
+│   │   ├── useAppointments.ts
+│   │   ├── useConsultationStream.ts
+│   │   ├── useConsultations.ts
+│   │   ├── useDashboardStats.ts
+│   │   ├── usePatientClinicalData.ts
+│   │   ├── usePatients.ts
+│   │   ├── useRoutineGenerator.ts
+│   │   └── useWeeklyActivePatientsTrend.ts
+│   ├── layouts
+│   │   ├── AuthLayout.tsx
+│   │   └── MainLayout.tsx
+│   ├── lib
+│   │   ├── audioRecorder.ts
+│   │   ├── flagMatcher.ts
+│   │   ├── http.ts
+│   │   ├── queryClient.ts
+│   │   ├── supabase.ts
+│   │   ├── utils.ts
+│   │   └── wsClient.ts
+│   ├── main.tsx
+│   ├── mappers
+│   │   ├── appointments.ts
+│   │   └── insights.ts
+│   ├── router
+│   │   ├── ProtectedRoute.tsx
+│   │   └── Router.tsx
+│   ├── service
+│   │   ├── appointments.ts
+│   │   ├── consultations.ts
+│   │   ├── dashboard.ts
+│   │   ├── patientClinicalData.ts
+│   │   └── patients.ts
+│   ├── styles
+│   │   ├── animations.css
+│   │   ├── auth.css
+│   │   ├── components.css
+│   │   ├── glass-effects.css
+│   │   ├── index.css
+│   │   ├── theme.css
+│   │   └── utilities.css
+│   ├── types
+│   │   ├── DashBoardTypes.ts
+│   │   └── PatientTypes.ts
+│   └── views
+│       ├── agenda
+│       │   ├── AgendaDayView.tsx
+│       │   ├── AgendaView.tsx
+│       │   └── AgendaWeekView.tsx
+│       ├── auth
+│       │   ├── Cadastro.tsx
+│       │   └── Login.tsx
+│       ├── consulta
+│       │   ├── ActiveConsultationView.tsx
+│       │   ├── ClinicalReasoningMaximizedView.tsx
+│       │   ├── ConsultationClosureView.tsx
+│       │   └── NewConsultationView.tsx
+│       ├── dashboard
+│       │   └── DashboardView.tsx
+│       ├── patient
+│       │   ├── PatientListView.tsx
+│       │   └── PatientProfileView.tsx
+│       ├── plan
+│       │   ├── CalendarioView.tsx
+│       │   └── PlanView.tsx
+│       └── simulados
+│           ├── SimuladosDashboardView.tsx
+│           ├── SimuladosExecutarView.tsx
+│           ├── SimuladosIniciarView.tsx
+│           ├── SimuladosRapidoView.tsx
+│           └── SimuladosResultadoView.tsx
+├── tailwind.config.js
+├── tsconfig.app.json
+├── tsconfig.json
+├── tsconfig.node.json
+└── vite.config.ts
+
+41 directories, 168 files

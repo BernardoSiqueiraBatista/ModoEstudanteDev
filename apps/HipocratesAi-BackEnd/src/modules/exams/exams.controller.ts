@@ -7,14 +7,15 @@ const examsService = new ExamsService();
 export class ExamController {
   public async processExam(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const { studentID, answers } = req.body;
-      
+      const studentID = req.params.id as string;
+      const { answers } = req.body
+
       if (!studentID || !answers || !Array.isArray(answers) || answers.length === 0) {
         throw new AppError('Dados do simulado inválidos ou incompletos.', 400);
       }
 
       const result = await examsService.processExamResults(studentID, answers);
-      
+
       res.status(200).json(result);
 
     } catch (error) {

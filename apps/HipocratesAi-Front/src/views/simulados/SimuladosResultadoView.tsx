@@ -19,6 +19,8 @@ interface LocationState {
   questions: any[]
 }
 
+const STUDENT_ID = 'e1925b44-9694-477c-a496-5e638e4a9e25';
+
 export default function SimuladosResultadoView() {
   const location = useLocation()
   const navigate = useNavigate()
@@ -33,11 +35,10 @@ export default function SimuladosResultadoView() {
 
     async function submitExam() {
       try {
-        const res = await fetch('http://localhost:3333/student/exams', {
+        const res = await fetch(`http://localhost:3333/student/exams/${STUDENT_ID}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            studentID: 'd8cc8dd6-6737-4abd-8a51-8dcd13e58256',
             answers: state.answers,
           }),
           signal: controller.signal,
