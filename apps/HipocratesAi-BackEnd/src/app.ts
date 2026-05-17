@@ -25,7 +25,6 @@ import { consultationsRoutes } from './modules/consultations/consultations.route
 import { patientConsultationsRoutes } from './modules/consultations/patient-consultations.routes';
 import studentRouter from './modules/student/student.routes';
 
-
 import { env } from './config/env';
 
 export const app = express();
@@ -61,7 +60,7 @@ app.get('/health', healthCheckController);
 // ACL in production — not intended to be publicly exposed.
 app.get('/metrics', requireMetricsToken, getMetricsController);
 
-// Rotas students
+// Rotas students (Por enquanto JWT not required, deve ser adicionada autenticação ao migrar para o supabase)
 app.use("/student", studentRouter);
 
 // Protected routes (JWT required)
