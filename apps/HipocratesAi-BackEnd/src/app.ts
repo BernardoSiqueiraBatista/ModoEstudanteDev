@@ -24,6 +24,8 @@ import { storageRoutes } from './modules/storage/storage.routes';
 import { consultationsRoutes } from './modules/consultations/consultations.routes';
 import { patientConsultationsRoutes } from './modules/consultations/patient-consultations.routes';
 import studentRouter from './modules/student/student.routes';
+import { PapersController } from './modules/papers/papers.controller';
+import { startPapersCleanupJob } from './modules/papers/papers.cron';
 
 import { env } from './config/env';
 
@@ -75,6 +77,13 @@ if (env.ENABLE_CONSULTATIONS) {
   app.use('/consultations', authMiddleware, consultationsRoutes);
   app.use('/patients', authMiddleware, patientConsultationsRoutes);
 }
+
+// Rota pública de compartilhamento de papers (sem auth)
+const papersController = new PapersController();
+app.get('/papers/shared/:shareToken', papersController.getSharedPaper);
+
+// Cron job: hard delete de papers excluídos há mais de 30 dias
+startPapersCleanupJob();
 
 // Error handler (must be last)
 app.use(errorMiddleware);

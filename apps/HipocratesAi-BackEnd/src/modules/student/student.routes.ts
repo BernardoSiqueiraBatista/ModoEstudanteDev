@@ -5,6 +5,7 @@ import examsRoutes from '../exams/exams.routes';
 import dashboardRoutes from '../student-dashboard/student-dashboard.routes';
 import insightsRoutes from '../insights/insights.routes';
 import { studyPlansRoutes } from '../study-plans/study-plans.routes';
+import { papersRoutes } from '../papers/papers.routes';
 
 const studentRouter = Router();
 
@@ -16,5 +17,6 @@ studentRouter.use('/:id/', dashboardRoutes);
 studentRouter.use('/:id/insights', insightsRoutes);
 
 studentRouter.use('/:id/study-plan', studyPlansRoutes)
+studentRouter.use('/:id/papers', papersRoutes)
 
 export default studentRouter;

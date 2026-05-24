@@ -1,8 +1,7 @@
 module.exports = {
   preset: 'ts-jest',
   testEnvironment: 'node',
-  // Garante que o Jest procure os testes na pasta correta
-  testMatch: ['/src/modules/**/*.test.ts'],
+  testMatch: ['<rootDir>/src/modules/**/*.test.ts'],
   // Ajuda o TS a resolver módulos caso você use aliases (@/)
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
