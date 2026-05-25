@@ -102,7 +102,7 @@ CREATE INDEX idx_papers_deleted_at ON papers(deleted_at) WHERE deleted_at IS NOT
 
 CREATE TABLE paper_shares (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    paper_id        UUID NOT NULL REFERENCES papers(id) ON DELETE CASCADE,
+    paper_id        UUID NOT NULL UNIQUE REFERENCES papers(id) ON DELETE CASCADE,
     share_token     UUID NOT NULL UNIQUE DEFAULT gen_random_uuid(),
     visibilidade    VARCHAR(20) NOT NULL DEFAULT 'privado',
     expira_em       TIMESTAMPTZ DEFAULT NULL,
