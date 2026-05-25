@@ -421,7 +421,7 @@ Instruções críticas:
           messages: [
             {
               role: 'system',
-              content: 'Você é um gerador rico de conteúdo acadêmico médico. O estudante forneceu um link ou vídeo do YouTube para indexação. Como estamos indexando isso no RAG, gere um resumo didático detalhado e aprofundado (com ~2000 palavras) sobre o assunto sugerido pelo título para servir como fonte no banco vetorial. Escreva em Português do Brasil.',
+              content: 'Você é um gerador de conteúdo acadêmico médico. O estudante forneceu um link ou vídeo do YouTube para indexação. Como estamos indexando isso no RAG, gere um resumo didático detalhado e conciso (com ~350 a 450 palavras) sobre o assunto sugerido pelo título para servir como fonte no banco vetorial. Escreva em Português do Brasil.',
             },
             {
               role: 'user',
