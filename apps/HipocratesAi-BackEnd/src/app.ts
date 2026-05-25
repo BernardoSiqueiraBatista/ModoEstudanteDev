@@ -85,5 +85,9 @@ app.get('/papers/shared/:shareToken', papersController.getSharedPaper);
 // Cron job: hard delete de papers excluídos há mais de 30 dias
 startPapersCleanupJob();
 
+// Inicia o worker em segundo plano do Paperlab (Queue-on-DB)
+import { startPaperlabWorker } from './modules/paperlab/paperlab.worker';
+startPaperlabWorker();
+
 // Error handler (must be last)
 app.use(errorMiddleware);
