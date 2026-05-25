@@ -29,24 +29,12 @@ async function processNextIndexingSource(): Promise<boolean> {
     const chunks = service.splitIntoChunks(rawText);
     logger.info({ sourceId: source.id, chunksCount: chunks.length }, '[WORKER] Texto fatiado com sucesso.');
 
-    // 3. Processamento de embeddings e inserção no Supabase Cloud
+    // 3. Processamento de embeddings e inserção no banco local
     for (let i = 0; i < chunks.length; i++) {
       const chunkText = chunks[i];
       const embedding = await embedText(chunkText);
 
-      const { error: insertError } = await supabase
-        .from('source_chunks')
-        .insert({
-          source_id: source.id,
-          session_id: source.session_id,
-          chunk_text: chunkText,
-          embedding,
-          ordem: i + 1,
-        });
-
-      if (insertError) {
-        throw insertError;
-      }
+      await model.saveChunk(source.id, source.session_id, chunkText, embedding, i + 1);
     }
 
     // 4. Marca a fonte como concluída
@@ -103,16 +91,10 @@ async function processNextPendingMaterial(): Promise<boolean> {
   logger.info({ materialId: material.id, tipo: material.tipo }, '[WORKER] Processando geração de material...');
 
   try {
-    // 1. Busca todos os chunks semânticos da sessão no Supabase para servir como base
-    const { data: chunks, error: rpcError } = await supabase
-      .from('source_chunks')
-      .select('chunk_text')
-      .eq('session_id', material.session_id)
-      .order('ordem', { ascending: true });
+    // 1. Busca todos os chunks semânticos locais da sessão no Postgres para servir como base
+    const chunks = await model.findChunksBySession(material.session_id);
 
-    if (rpcError) throw rpcError;
-
-    const context = (chunks || []).map(c => c.chunk_text).join('\n\n');
+    const context = chunks.map(c => c.chunk_text).join('\n\n');
     if (!context.trim()) {
       throw new Error('Nenhuma fonte ativa e indexada foi encontrada para o RAG.');
     }

@@ -3,7 +3,8 @@ import {
   PaperlabSessionRow,
   PaperlabSourceRow,
   PaperlabMaterialRow,
-  FlashcardRow
+  FlashcardRow,
+  SourceChunkRow
 } from './types/paperlab.types';
 
 export class PaperlabModel {
@@ -324,4 +325,66 @@ export class PaperlabModel {
     const result = await pool.query<PaperlabSourceRow>(query);
     return result.rows[0] ?? null;
   }
+
+  // ===========================================================================
+  // LOCAL CHUNKS (RAG LOCAL)
+  // ===========================================================================
+
+  async ensureChunksTable(): Promise<void> {
+    const query = `
+      CREATE TABLE IF NOT EXISTS paperlab_chunks (
+          id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+          source_id   UUID NOT NULL REFERENCES paperlab_sources(id) ON DELETE CASCADE,
+          session_id  UUID NOT NULL REFERENCES paperlab_sessions(id) ON DELETE CASCADE,
+          chunk_text  TEXT NOT NULL,
+          embedding   JSONB NOT NULL, -- Array de floats salvo como JSONB
+          ordem       INT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_paperlab_chunks_session ON paperlab_chunks(session_id);
+    `;
+    await pool.query(query);
+  }
+
+  async saveChunk(sourceId: string, sessionId: string, chunkText: string, embedding: number[], ordem: number): Promise<void> {
+    await this.ensureChunksTable();
+    const query = `
+      INSERT INTO paperlab_chunks (source_id, session_id, chunk_text, embedding, ordem)
+      VALUES ($1, $2, $3, $4, $5);
+    `;
+    await pool.query(query, [sourceId, sessionId, chunkText, JSON.stringify(embedding), ordem]);
+  }
+
+  async findChunksBySession(sessionId: string): Promise<SourceChunkRow[]> {
+    await this.ensureChunksTable();
+    const query = `
+      SELECT id, source_id, session_id, chunk_text, embedding, ordem
+      FROM paperlab_chunks
+      WHERE session_id = $1
+      ORDER BY ordem ASC;
+    `;
+    const result = await pool.query(query, [sessionId]);
+    return result.rows.map(r => ({
+      ...r,
+      embedding: typeof r.embedding === 'string' ? JSON.parse(r.embedding) : r.embedding
+    }));
+  }
+
+  async deleteChunksBySource(sourceId: string): Promise<void> {
+    await this.ensureChunksTable();
+    const query = `
+      DELETE FROM paperlab_chunks
+      WHERE source_id = $1;
+    `;
+    await pool.query(query, [sourceId]);
+  }
+
+  async deleteChunksBySession(sessionId: string): Promise<void> {
+    await this.ensureChunksTable();
+    const query = `
+      DELETE FROM paperlab_chunks
+      WHERE session_id = $1;
+    `;
+    await pool.query(query, [sessionId]);
+  }
 }
+
