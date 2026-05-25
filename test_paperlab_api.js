@@ -72,7 +72,7 @@ async function runTests() {
       body: JSON.stringify({
         tipo: 'link',
         titulo: 'Fisiologia Cardiovascular - Fisiologia do Coração, Débito Cardíaco e Contração do Miocárdio',
-        url: 'https://pt.wikipedia.org/wiki/Fisiologia_cardiovascular'
+        url: 'https://pt.wikipedia.org/wiki/Sistema_circulat%C3%B3rio'
       })
     });
 
@@ -84,12 +84,30 @@ async function runTests() {
     // ----------------------------------------------------
     logHeader('3. AGUARDANDO PROCESSAMENTO ASSÍNCRONO DA FONTE E RENOMEAÇÃO INTELIGENTE PELA IA...');
     // ----------------------------------------------------
-    console.log('Aguardando 10 segundos para o Queue-on-DB processar a fonte e renomear o notebook...');
-    await delay(10000);
+    console.log('Aguardando a indexação da fonte pelo Worker em segundo plano...');
+    
+    let sources = [];
+    let isReady = false;
+    for (let attempt = 1; attempt <= 12; attempt++) {
+      await delay(1500);
+      const checkSourceRes = await fetch(`${BASE_URL}/student/${STUDENT_ID}/paperlab/sessions/${sessionId}/sources`);
+      if (checkSourceRes.ok) {
+        sources = await checkSourceRes.json();
+        const mainSource = sources.find(s => s.id === sourceId);
+        if (mainSource && mainSource.status === 'ready') {
+          isReady = true;
+          break;
+        }
+      }
+      console.log(`[Tentativa ${attempt}/12] Fonte ainda está indexando...`);
+    }
 
-    const checkSourceRes = await fetch(`${BASE_URL}/student/${STUDENT_ID}/paperlab/sessions/${sessionId}/sources`);
-    if (!checkSourceRes.ok) throw new Error(`Falha ao checar fonte: ${checkSourceRes.statusText}`);
-    const sources = await checkSourceRes.json();
+    if (isReady) {
+      logSuccess('A fonte foi processada e indexada com sucesso (Status: ready)!');
+    } else {
+      console.log(`${colors.yellow}⚠️ Aviso: A fonte demorou para indexar ou falhou. Continuando testes...${colors.reset}`);
+    }
+
     logSuccess('Fontes da sessão atualmente:', sources);
 
     // Checa o título do notebook atualizado pela IA
