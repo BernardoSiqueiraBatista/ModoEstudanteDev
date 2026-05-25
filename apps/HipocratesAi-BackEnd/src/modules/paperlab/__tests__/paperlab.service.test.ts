@@ -22,6 +22,10 @@ const mockCreateFlashcard = jest.fn();
 const mockFindFlashcardsByMaterial = jest.fn();
 const mockFindFlashcardById = jest.fn();
 const mockUpdateFlashcardReview = jest.fn();
+const mockDeleteChunksBySession = jest.fn();
+const mockDeleteChunksBySource = jest.fn();
+const mockFindChunksBySession = jest.fn();
+const mockSaveChunk = jest.fn();
 
 jest.mock('../paperlab.model', () => {
   return {
@@ -46,6 +50,10 @@ jest.mock('../paperlab.model', () => {
       findFlashcardsByMaterial: (...args: any[]) => mockFindFlashcardsByMaterial(...args),
       findFlashcardById: (...args: any[]) => mockFindFlashcardById(...args),
       updateFlashcardReview: (...args: any[]) => mockUpdateFlashcardReview(...args),
+      deleteChunksBySession: (...args: any[]) => mockDeleteChunksBySession(...args),
+      deleteChunksBySource: (...args: any[]) => mockDeleteChunksBySource(...args),
+      findChunksBySession: (...args: any[]) => mockFindChunksBySession(...args),
+      saveChunk: (...args: any[]) => mockSaveChunk(...args),
     })),
   };
 });

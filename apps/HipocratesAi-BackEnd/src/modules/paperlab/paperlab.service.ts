@@ -14,7 +14,8 @@ import {
   PaperlabSourceRow,
   PaperlabMaterialRow,
   FlashcardRow,
-  ChatMessage
+  ChatMessage,
+  SourceChunkRow
 } from './types/paperlab.types';
 
 // Pasta local para salvar os uploads das fontes do Paperlab
@@ -73,15 +74,8 @@ export class PaperlabService {
       }
     }
 
-    // 3. Remove os embeddings do Supabase para toda a sessão de uma vez
-    const { error: supabaseError } = await supabase
-      .from('source_chunks')
-      .delete()
-      .eq('session_id', sessionId);
-
-    if (supabaseError) {
-      logger.error({ err: supabaseError, sessionId }, 'Erro ao remover chunks no Supabase durante deleção de sessão.');
-    }
+    // 3. Remove os chunks locais desta sessão
+    await this.model.deleteChunksBySession(sessionId);
 
     // 4. Deleta a sessão localmente (cascade remove as fontes e materiais)
     const success = await this.model.deleteSession(sessionId);
@@ -149,15 +143,8 @@ export class PaperlabService {
       logger.error({ err, path: source.url_ou_path }, 'Falha ao deletar arquivo local da fonte.');
     }
 
-    // Deleta os embeddings desta fonte no Supabase
-    const { error: supabaseError } = await supabase
-      .from('source_chunks')
-      .delete()
-      .eq('source_id', sourceId);
-
-    if (supabaseError) {
-      logger.error({ err: supabaseError, sourceId }, 'Erro ao deletar chunks da fonte no Supabase.');
-    }
+    // Deleta os chunks locais desta fonte
+    await this.model.deleteChunksBySource(sourceId);
 
     // Deleta a fonte no banco local
     const success = await this.model.deleteSource(sourceId);
@@ -185,25 +172,34 @@ export class PaperlabService {
       throw new AppError('Serviço de busca vetorial temporariamente indisponível.', 503);
     }
 
-    // 2. Busca semântica de similaridade por cosseno no Supabase Cloud (RPC match_chunks)
-    const { data: chunks, error: rpcError } = await supabase.rpc('match_chunks', {
-      query_embedding: queryEmbedding,
-      match_threshold: 0.3,
-      match_count: 5,
-      p_session_id: sessionId,
+    // 2. Busca os chunks locais desta sessão
+    const localChunks = await this.model.findChunksBySession(sessionId);
+
+    // 3. Calcula a similaridade de cosseno em JavaScript para os chunks locais
+    const scoredChunks = localChunks.map(chunk => {
+      const chunkEmbedding = typeof chunk.embedding === 'string'
+        ? JSON.parse(chunk.embedding)
+        : (chunk.embedding as number[]);
+      
+      const similarity = cosineSimilarity(queryEmbedding, chunkEmbedding);
+      return {
+        ...chunk,
+        similarity
+      };
     });
 
-    if (rpcError) {
-      logger.error({ err: rpcError, sessionId }, 'Erro ao rodar busca de chunks por RPC no Supabase.');
-      throw new AppError('Erro interno de processamento vetorial.', 500);
-    }
+    // Filtra pelo threshold (0.3) e ordena decrescente pela similaridade
+    const matchedChunks = scoredChunks
+      .filter(c => c.similarity >= 0.3)
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, 5);
 
-    // 3. Concatena os textos dos chunks como o contexto para a LLM
+    // 4. Concatena os textos dos chunks como o contexto para a LLM
     let context = '';
     const uniqueSourceIds = new Set<string>();
 
-    if (chunks && chunks.length > 0) {
-      context = chunks.map((c: any, index: number) => {
+    if (matchedChunks.length > 0) {
+      context = matchedChunks.map((c: any, index: number) => {
         if (c.source_id) uniqueSourceIds.add(c.source_id);
         return `[Fonte ${index + 1}]: "${c.chunk_text}"`;
       }).join('\n\n');
@@ -458,4 +454,17 @@ Instruções críticas:
 
     return chunks;
   }
+}
+
+function cosineSimilarity(vecA: number[], vecB: number[]): number {
+  let dotProduct = 0.0;
+  let normA = 0.0;
+  let normB = 0.0;
+  for (let i = 0; i < vecA.length; i++) {
+    dotProduct += vecA[i] * vecB[i];
+    normA += vecA[i] * vecA[i];
+    normB += vecB[i] * vecB[i];
+  }
+  if (normA === 0 || normB === 0) return 0;
+  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
 }
