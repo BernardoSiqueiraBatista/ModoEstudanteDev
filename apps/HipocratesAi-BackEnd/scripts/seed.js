@@ -55,6 +55,7 @@ async function runSeed() {
     console.log('👨‍🎓 Criando 10 estudantes sintéticos...');
     const studentIds = [];
     const fixedStudentId = 'e1925b44-9694-477c-a496-5e638e4a9e25';
+    const collaboratorStudentId = 'f1925b44-9694-477c-a496-5e638e4a9e26';
     
     // Insere o estudante de testes fixo
     await client.query(
@@ -63,8 +64,15 @@ async function runSeed() {
     );
     studentIds.push(fixedStudentId);
 
-    // Insere mais 9 estudantes
-    for (let i = 0; i < 9; i++) {
+    // Insere o estudante colaborador de testes fixo
+    await client.query(
+      "INSERT INTO student (id, study_time) VALUES ($1, $2 * INTERVAL '1 second')",
+      [collaboratorStudentId, randomInt(0, 360000)]
+    );
+    studentIds.push(collaboratorStudentId);
+
+    // Insere mais 8 estudantes (totalizando 10)
+    for (let i = 0; i < 8; i++) {
       const sId = uuidv4();
       await client.query(
         "INSERT INTO student (id, study_time) VALUES ($1, $2 * INTERVAL '1 second')",
