@@ -64,9 +64,10 @@ async function runTests() {
     logSuccess('Notebook criado sem título por padrão!', session);
 
     // ----------------------------------------------------
-    logHeader('2. ADICIONAR UMA FONTE DE ESTUDOS AO NOTEBOOK (LINK COM GENERATOR DE BACKUP)');
+    logHeader('2. ADICIONAR MÚLTIPLAS FONTES DE ESTUDOS AO NOTEBOOK (LINK E YOUTUBE)');
     // ----------------------------------------------------
-    const addSourceRes = await fetch(`${BASE_URL}/student/${STUDENT_ID}/paperlab/sessions/${sessionId}/sources`, {
+    // Adiciona a primeira fonte (Link da Wikipedia)
+    const addSourceRes1 = await fetch(`${BASE_URL}/student/${STUDENT_ID}/paperlab/sessions/${sessionId}/sources`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -76,36 +77,54 @@ async function runTests() {
       })
     });
 
-    if (!addSourceRes.ok) throw new Error(`Falha ao adicionar fonte: ${addSourceRes.statusText}`);
-    const source = await addSourceRes.json();
-    sourceId = source.id;
-    logSuccess('Fonte adicionada e enviada para processamento assíncrono (Status: indexing)!', source);
+    if (!addSourceRes1.ok) throw new Error(`Falha ao adicionar primeira fonte: ${addSourceRes1.statusText}`);
+    const source1 = await addSourceRes1.json();
+    const sourceId1 = source1.id;
+    logSuccess('Primeira fonte (Link) adicionada (Status: indexing)!', source1);
+
+    // Adiciona a segunda fonte (Vídeo do YouTube)
+    const addSourceRes2 = await fetch(`${BASE_URL}/student/${STUDENT_ID}/paperlab/sessions/${sessionId}/sources`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        tipo: 'youtube',
+        titulo: 'Fisiologia Cardiovascular - Fisiologia do Coração, Débito Cardíaco e Contração do Miocárdio',
+        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+      })
+    });
+
+    if (!addSourceRes2.ok) throw new Error(`Falha ao adicionar segunda fonte: ${addSourceRes2.statusText}`);
+    const source2 = await addSourceRes2.json();
+    const sourceId2 = source2.id;
+    logSuccess('Segunda fonte (YouTube) adicionada (Status: indexing)!', source2);
 
     // ----------------------------------------------------
-    logHeader('3. AGUARDANDO PROCESSAMENTO ASSÍNCRONO DA FONTE E RENOMEAÇÃO INTELIGENTE PELA IA...');
+    logHeader('3. AGUARDANDO PROCESSAMENTO ASSÍNCRONO DAS MÚLTIPLAS FONTES E RENOMEAÇÃO PELA IA...');
     // ----------------------------------------------------
-    console.log('Aguardando a indexação da fonte pelo Worker em segundo plano...');
+    console.log('Aguardando a indexação das fontes pelo Worker em segundo plano...');
     
     let sources = [];
-    let isReady = false;
-    for (let attempt = 1; attempt <= 12; attempt++) {
-      await delay(1500);
+    let allReady = false;
+    for (let attempt = 1; attempt <= 15; attempt++) {
+      await delay(2000);
       const checkSourceRes = await fetch(`${BASE_URL}/student/${STUDENT_ID}/paperlab/sessions/${sessionId}/sources`);
       if (checkSourceRes.ok) {
         sources = await checkSourceRes.json();
-        const mainSource = sources.find(s => s.id === sourceId);
-        if (mainSource && mainSource.status === 'ready') {
-          isReady = true;
+        const s1 = sources.find(s => s.id === sourceId1);
+        const s2 = sources.find(s => s.id === sourceId2);
+        
+        if (s1 && s1.status === 'ready' && s2 && s2.status === 'ready') {
+          allReady = true;
           break;
         }
       }
-      console.log(`[Tentativa ${attempt}/12] Fonte ainda está indexando...`);
+      console.log(`[Tentativa ${attempt}/15] Fontes ainda estão indexando em segundo plano...`);
     }
 
-    if (isReady) {
-      logSuccess('A fonte foi processada e indexada com sucesso (Status: ready)!');
+    if (allReady) {
+      logSuccess('Todas as múltiplas fontes foram processadas e indexadas com sucesso (Status: ready)!');
     } else {
-      console.log(`${colors.yellow}⚠️ Aviso: A fonte demorou para indexar ou falhou. Continuando testes...${colors.reset}`);
+      console.log(`${colors.yellow}⚠️ Aviso: Uma ou mais fontes demoraram para indexar ou falharam. Continuando...${colors.reset}`);
     }
 
     logSuccess('Fontes da sessão atualmente:', sources);
@@ -122,13 +141,13 @@ async function runTests() {
     }
 
     // ----------------------------------------------------
-    logHeader('4. TESTANDO CHAT UNIVERSAL COM RAG (BUSCA VETORIAL + GPT-4O-MINI)');
+    logHeader('4. TESTANDO CHAT UNIVERSAL COM RAG CONSOLIDADO (MÚLTIPLAS FONTES)');
     // ----------------------------------------------------
     const chatRes = await fetch(`${BASE_URL}/student/${STUDENT_ID}/paperlab/sessions/${sessionId}/chat`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        pergunta: 'Com base nas fontes, qual é a principal função do sistema circulatório e quais são seus componentes?'
+        pergunta: 'Com base nas fontes indexadas, o que é o débito cardíaco e qual é a principal função do sistema circulatório?'
       })
     });
 
