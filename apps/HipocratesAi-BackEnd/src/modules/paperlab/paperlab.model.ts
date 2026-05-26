@@ -452,7 +452,7 @@ export class PaperlabModel {
 
   async findCollaboratorsBySession(sessionId: string): Promise<(SessionCollaboratorRow & { nome: string, email: string })[]> {
     const query = `
-      SELECT c.*, s.name as nome, s.email
+      SELECT c.*, 'Estudante Colaborador' as nome, 'estudante@modoestudante.com' as email
       FROM paperlab_session_collaborators c
       JOIN student s ON s.id = c.id_student
       WHERE c.session_id = $1
