@@ -1,3 +1,4 @@
+import { env } from '../../config/env';
 import { PaperlabModel } from './paperlab.model';
 import { PaperlabService } from './paperlab.service';
 import { supabase } from '../../config/supabase';
@@ -171,28 +172,53 @@ Você DEVE responder com um conteúdo formatado em Markdown contendo:
 3. Formatação clara e profissional em Português do Brasil.
 `;
     } else if (material.tipo === 'mapa_mental') {
-      systemPrompt = `Você é o arquiteto de mapas mentais em ASCII do Hipócrates Paperlab.
-Sua tarefa é gerar um mapa mental lindo em formato de texto ASCII puro que mapeie os conceitos cruciais e suas relações lógicas derivados das fontes carregadas.
+      systemPrompt = `Você é o arquiteto de Mapas Mentais do Hipócrates Paperlab.
+Sua tarefa é analisar as fontes de estudo fornecidas e gerar um Mapa Mental completo
+e hierárquico usando estritamente a sintaxe de Markdown indentado (compatível com Markmap.js).
 
-Regras:
-1. Use caixas, setas (-->), ramificações e recuos para criar um diagrama visualmente impactante no formato de texto.
-2. Adicione breves descrições conceituais abaixo de cada nó importante do mapa.
-3. Escreva estritamente em Português do Brasil.
-`;
+Regras OBRIGATÓRIAS:
+1. Use cabeçalhos Markdown (# , ## , ### , #### ) para definir os níveis hierárquicos.
+2. Use listas com hífens (- ) para sub-itens folha dentro de cada nível.
+3. O nível raiz (# ) deve ser o tema central extraído das fontes.
+4. Gere entre 3 a 6 ramos principais (## ), cada um com 2 a 4 sub-ramos (### ).
+5. Adicione descrições curtas e acadêmicas nos itens folha (máximo 8 palavras).
+6. NÃO use blocos de código, JSON ou ASCII art. Apenas Markdown puro.
+7. Responda APENAS com o Markdown do mapa mental, sem introduções.
+8. Escreva estritamente em Português do Brasil.`;
     }
 
     // 3. Consulta o modelo GPT-4o-mini da OpenAI
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini',
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ],
-      temperature: 0.5,
-    });
+    let contentString = '';
 
-    let contentString = response.choices[0]?.message?.content || '';
-    let finalContent: any = { text: contentString };
+    if (!env.OPENAI_API_KEY || env.OPENAI_API_KEY.startsWith('sk-mock-')) {
+      logger.info({ tipo: material.tipo }, '[WORKER] Detectada chave mockada no ambiente local. Gerando material didático sintético rico...');
+      if (material.tipo === 'flashcards') {
+        contentString = JSON.stringify([
+          { frente: 'Sístole', verso: 'Fase de contração do coração para esvaziamento dos ventrículos.' },
+          { frente: 'Diástole', verso: 'Fase de relaxamento do coração para enchimento dos ventrículos.' },
+          { frente: 'Débito Cardíaco', verso: 'Volume de sangue bombeado por minuto (FC x Volume Sistólico).' },
+          { frente: 'Volume Sistólico', verso: 'Quantidade de sangue ejetada pelo ventrículo esquerdo a cada batimento cardíaco.' }
+        ]);
+      } else if (material.tipo === 'mapa_mental') {
+        contentString = `# Sistema Cardiovascular\n## Coração\n### Anatomia\n- Ventrículo Esquerdo\n- Ventrículo Direito\n- Átrio Esquerdo\n- Átrio Direito\n### Ciclo Cardíaco\n- Sístole (Contração)\n- Diástole (Relaxamento)\n## Vasos Sanguíneos\n- Artérias (Eferentes)\n- Veias (Aferentes)\n- Capilares (Trocas)`;
+      } else {
+        contentString = `### Resumo Sintético: Fisiologia Cardiovascular\n\nO sistema circulatório é composto pelo coração e vasos...`;
+      }
+    } else {
+      const response = await openai.chat.completions.create({
+        model: 'gpt-4o-mini',
+        messages: [
+          { role: 'system', content: systemPrompt },
+          { role: 'user', content: userPrompt }
+        ],
+        temperature: 0.5,
+      });
+
+      contentString = response.choices[0]?.message?.content || '';
+    }
+    let finalContent: any = material.tipo === 'mapa_mental'
+      ? { markdown: contentString }
+      : { text: contentString };
 
     // 4. Se for Flashcard, realiza o parser do JSON e insere na tabela correspondente
     if (material.tipo === 'flashcards') {

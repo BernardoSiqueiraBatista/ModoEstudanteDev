@@ -50,3 +50,30 @@ export interface ChatMessage {
   content: string;
   created_at?: string;
 }
+
+export interface SessionShareRow {
+  id: string;
+  session_id: string;
+  share_token: string;
+  visibilidade: 'link' | 'privado';
+  expira_em: string | null;
+  criado_em: string;
+}
+
+export interface SessionCollaboratorRow {
+  id: string;
+  session_id: string;
+  id_student: string;
+  permissao: 'leitura_chat';
+  criado_em: string;
+}
+
+export interface ChatMessageRow {
+  id: string;
+  session_id: string;
+  id_student: string;
+  role: 'user' | 'assistant';
+  content: string;
+  criado_em: string;
+}
+

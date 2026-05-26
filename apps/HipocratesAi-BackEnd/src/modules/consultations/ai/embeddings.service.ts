@@ -18,6 +18,11 @@ export async function embedText(text: string): Promise<number[]> {
     throw new Error('embedText: empty input');
   }
 
+  if (!env.OPENAI_API_KEY || env.OPENAI_API_KEY.startsWith('sk-mock-')) {
+    logger.debug({ len: input.length }, 'embedText: detectada chave mockada. Retornando vetor sintético determinístico.');
+    return Array.from({ length: 1536 }, (_, i) => Math.sin(input.length + i) * 0.5 + 0.5);
+  }
+
   const cached = embeddingsCache.get(input);
   if (cached) {
     metrics.record('embeddings.cache_hit', 0);

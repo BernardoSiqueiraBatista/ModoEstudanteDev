@@ -22,7 +22,7 @@
         "test:student": "jest ./src/modules/exams ./src/modules/performance ./src/modules/questions",
         "db:up": "docker compose up -d",
         "db:down": "docker compose down",
-        "db:seed": "python3 scripts/students_table_artificial_seed.py",
+        "db:seed": "node scripts/seed.js",
         "db:setup": "pnpm db:up && echo 'Aguardando o banco iniciar...' && sleep 5 && pnpm db:seed",
         "db:reset": "docker compose down -v && pnpm db:setup"
     },
@@ -47,6 +47,7 @@
         "tesseract.js": "^7.0.0",
         "uuid": "^13.0.0",
         "ws": "^8.20.0",
+        "youtube-transcript": "^1.3.1",
         "zod": "^3.23.0"
     },
     "devDependencies": {

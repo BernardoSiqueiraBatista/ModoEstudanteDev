@@ -4,7 +4,10 @@ import {
   PaperlabSourceRow,
   PaperlabMaterialRow,
   FlashcardRow,
-  SourceChunkRow
+  SourceChunkRow,
+  SessionShareRow,
+  SessionCollaboratorRow,
+  ChatMessageRow
 } from './types/paperlab.types';
 
 export class PaperlabModel {
@@ -385,6 +388,166 @@ export class PaperlabModel {
       WHERE session_id = $1;
     `;
     await pool.query(query, [sessionId]);
+  }
+
+  // ===========================================================================
+  // COMPARTILHAMENTO POR LINK PÚBLICO
+  // ===========================================================================
+
+  async createOrUpdateShare(
+    sessionId: string,
+    visibilidade: 'link' | 'privado',
+    expiraEm: Date | null = null
+  ): Promise<SessionShareRow> {
+    const query = `
+      INSERT INTO paperlab_session_shares (session_id, visibilidade, expira_em)
+      VALUES ($1, $2, $3)
+      ON CONFLICT (session_id)
+      DO UPDATE SET visibilidade = EXCLUDED.visibilidade, expira_em = EXCLUDED.expira_em, share_token = gen_random_uuid()
+      RETURNING *;
+    `;
+    const result = await pool.query<SessionShareRow>(query, [sessionId, visibilidade, expiraEm]);
+    return result.rows[0];
+  }
+
+  async revokeShare(sessionId: string): Promise<boolean> {
+    const query = `
+      UPDATE paperlab_session_shares
+      SET visibilidade = 'privado', expira_em = NULL
+      WHERE session_id = $1;
+    `;
+    const result = await pool.query(query, [sessionId]);
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async findByShareToken(shareToken: string): Promise<(PaperlabSessionRow & { visibilidade: string, expira_em: string | null, share_token: string }) | null> {
+    const query = `
+      SELECT s.*, sh.visibilidade, sh.expira_em, sh.share_token
+      FROM paperlab_session_shares sh
+      JOIN paperlab_sessions s ON s.id = sh.session_id
+      WHERE sh.share_token = $1 AND sh.visibilidade = 'link';
+    `;
+    const result = await pool.query<PaperlabSessionRow & { visibilidade: string, expira_em: string | null, share_token: string }>(query, [shareToken]);
+    return result.rows[0] ?? null;
+  }
+
+  // ===========================================================================
+  // COLABORADORES (CONVITE)
+  // ===========================================================================
+
+  async addCollaborator(
+    sessionId: string,
+    studentId: string,
+    permissao: 'leitura_chat' = 'leitura_chat'
+  ): Promise<SessionCollaboratorRow> {
+    const query = `
+      INSERT INTO paperlab_session_collaborators (session_id, id_student, permissao)
+      VALUES ($1, $2, $3)
+      ON CONFLICT (session_id, id_student) DO UPDATE SET permissao = EXCLUDED.permissao
+      RETURNING *;
+    `;
+    const result = await pool.query<SessionCollaboratorRow>(query, [sessionId, studentId, permissao]);
+    return result.rows[0];
+  }
+
+  async findCollaboratorsBySession(sessionId: string): Promise<(SessionCollaboratorRow & { nome: string, email: string })[]> {
+    const query = `
+      SELECT c.*, s.name as nome, s.email
+      FROM paperlab_session_collaborators c
+      JOIN student s ON s.id = c.id_student
+      WHERE c.session_id = $1
+      ORDER BY c.criado_em ASC;
+    `;
+    const result = await pool.query<SessionCollaboratorRow & { nome: string, email: string }>(query, [sessionId]);
+    return result.rows;
+  }
+
+  async removeCollaborator(sessionId: string, collaboratorId: string): Promise<boolean> {
+    const query = `
+      DELETE FROM paperlab_session_collaborators
+      WHERE id = $1 AND session_id = $2;
+    `;
+    const result = await pool.query(query, [collaboratorId, sessionId]);
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async isCollaborator(sessionId: string, studentId: string): Promise<boolean> {
+    const query = `
+      SELECT 1 FROM paperlab_session_collaborators
+      WHERE session_id = $1 AND id_student = $2;
+    `;
+    const result = await pool.query(query, [sessionId, studentId]);
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  async isOwner(sessionId: string, studentId: string): Promise<boolean> {
+    const query = `
+      SELECT 1 FROM paperlab_sessions
+      WHERE id = $1 AND id_student = $2;
+    `;
+    const result = await pool.query(query, [sessionId, studentId]);
+    return (result.rowCount ?? 0) > 0;
+  }
+
+  // ===========================================================================
+  // CHAT (HISTÓRICO E PERSISTÊNCIA)
+  // ===========================================================================
+
+  async saveChatMessage(
+    sessionId: string,
+    studentId: string,
+    role: 'user' | 'assistant',
+    content: string
+  ): Promise<ChatMessageRow> {
+    const query = `
+      INSERT INTO paperlab_chat_messages (session_id, id_student, role, content)
+      VALUES ($1, $2, $3, $4)
+      RETURNING *;
+    `;
+    const result = await pool.query<ChatMessageRow>(query, [sessionId, studentId, role, content]);
+    return result.rows[0];
+  }
+
+  async findRecentChatMessages(sessionId: string, limit: number): Promise<ChatMessageRow[]> {
+    const query = `
+      SELECT * FROM (
+        SELECT * FROM paperlab_chat_messages
+        WHERE session_id = $1
+        ORDER BY criado_em DESC
+        LIMIT $2
+      ) sub
+      ORDER BY criado_em ASC;
+    `;
+    const result = await pool.query<ChatMessageRow>(query, [sessionId, limit]);
+    return result.rows;
+  }
+
+  async findChatMessagesPaginated(
+    sessionId: string,
+    page: number,
+    size: number
+  ): Promise<{ items: ChatMessageRow[]; total: number }> {
+    const offset = (page - 1) * size;
+    
+    const countQuery = `
+      SELECT COUNT(*) as total FROM paperlab_chat_messages
+      WHERE session_id = $1;
+    `;
+    const countResult = await pool.query<{ total: string }>(countQuery, [sessionId]);
+    const total = parseInt(countResult.rows[0]?.total ?? '0', 10);
+    
+    const itemsQuery = `
+      SELECT * FROM paperlab_chat_messages
+      WHERE session_id = $1
+      ORDER BY criado_em DESC
+      LIMIT $2 OFFSET $3;
+    `;
+    const itemsResult = await pool.query<ChatMessageRow>(itemsQuery, [sessionId, size, offset]);
+    
+    return {
+      items: itemsResult.rows,
+      total,
+    };
   }
 }
 

@@ -423,13 +423,122 @@ Se a fonte indexada pertence a um notebook que nasceu sem título (`'Untitled no
 #### 3. Geração Personalizada de Materiais de Estudo
 Seleciona materiais `'pending'`, faz o retrieve de todos os chunks de texto de fontes daquela sessão no Supabase para concatenar o contexto RAG mestre, e envia para a OpenAI GPT-4o-mini formular os materiais didáticos:
 * **Flashcards Personalizados:** O Worker desestrutura a configuração de quantidade de cards (10-15 para menos, 20-30 para padrão, 40-50 para mais) e dificuldade (fácil, médio, difícil). A IA gera o JSON correspondente garantindo que a frente do cartão (pergunta) seja curta (1 a 5 palavras) para favorecer a memorização rápida. O Worker realiza o parser do JSON e grava cada cartão didático individualmente na tabela `flashcards` local, mudando o status para `'ready'`.
-* **Resumo:** A IA gera uma síntese executiva linda, acadêmica e estruturada em Markdown de alta legibilidade.
+* **Resumo:** A IA gera uma síntese executiva completa, didática e estruturada em Markdown de alta legibilidade, facilitando o aprendizado rápido.
 * **Simulado:** Cria um questionário de múltipla escolha ou discursivo com gabarito comentado ao fim em formato Markdown.
-* **Mapa Mental ASCII:** Gera ramificações, caixas e diagramação relacional em arte ASCII puro de alta fidelidade visual.
+* **Mapa Mental Interativo (Formato Markmap.js):** A IA analisa os chunks semânticos indexados e gera um mapa mental completo estruturado hierarquicamente usando a sintaxe Markdown pura (com cabeçalhos `#`, `##`, `###` e listas de sub-itens). Essa sintaxe é 100% compatível com a biblioteca Markmap.js, permitindo ao front-end renderizar uma árvore relacional interativa, expansível, colorida e de alto valor visual para estudos médicos.
+
+#### 4. Transcrição e Ingestão de Vídeos do YouTube
+Quando o estudante cadastra um link do YouTube, o Worker executa os seguintes passos:
+* **Extração de ID via Regex:** Limpa a URL de entrada usando uma expressão regular avançada capaz de identificar o ID único do vídeo de 11 caracteres de qualquer formato de URL (desktop, mobile, short, embed).
+* **Busca de Legendas Automáticas:** Utiliza a biblioteca `youtube-transcript` no backend para coletar as legendas geradas automaticamente pelo YouTube. Une todos os tempos e textos sequenciais da legenda para formar uma transcrição em texto plano rica.
+* **Fallback Inteligente de Ingestão por IA:** Se o vídeo não contiver legendas automáticas habilitadas, estiver restrito geograficamente ou ocorrer erro de requisição, o sistema aciona a OpenAI via GPT-4o-mini passando o título do vídeo e o contexto para gerar um resumo didático médico robusto (~350 a 450 palavras) para alimentar o banco de vetores RAG.
 
 ---
 
-## 📂 4. Nova Estrutura de Pastas do Módulo
+### C. Novas Tabelas de Integração Social e Histórico (PostgreSQL)
+
+Foram implementadas as seguintes tabelas em conformidade com o esquema definitivo `dbSchema.sql` para suportar as novas funcionalidades de colaboração e persistência de diálogos:
+
+#### 1. Tabela `paperlab_session_shares`
+Responsável pelo compartilhamento de notebooks por link público.
+* **`id`**: `UUID` (PRIMARY KEY, valor padrão: `gen_random_uuid()`)
+* **`session_id`**: `UUID` (NOT NULL, **UNIQUE** para UPSERT, FK referenciando `paperlab_sessions(id)` com `ON DELETE CASCADE`)
+* **`share_token`**: `UUID` (NOT NULL, UNIQUE, valor padrão: `gen_random_uuid()`, token de acesso anônimo)
+* **`visibilidade`**: `VARCHAR(20)` (NOT NULL, padrão: `'privado'`, aceita: `'link' | 'privado'`)
+* **`expira_em`**: `TIMESTAMPTZ` (NULL, data de expiração temporal do link)
+* **`criado_em`**: `TIMESTAMPTZ` (NOT NULL, padrão: `NOW()`)
+
+*Índices de Performance:*
+* `idx_session_shares_token`: Busca rápida de notebooks compartilhados por token.
+* `idx_session_shares_session`: Busca de compartilhamento ativo de uma sessão específica.
+
+#### 2. Tabela `paperlab_session_collaborators`
+Responsável pela colaboração entre estudantes (compartilhamento interno por convite).
+* **`id`**: `UUID` (PRIMARY KEY, valor padrão: `gen_random_uuid()`)
+* **`session_id`**: `UUID` (NOT NULL, FK referenciando `paperlab_sessions(id)` com `ON DELETE CASCADE`)
+* **`id_student`**: `UUID` (NOT NULL, FK referenciando `student(id)` com `ON DELETE CASCADE`)
+* **`permissao`**: `VARCHAR(20)` (NOT NULL, padrão: `'leitura_chat'`)
+* **`criado_em`**: `TIMESTAMPTZ` (NOT NULL, padrão: `NOW()`)
+* **Restrição UNIQUE Composta:** `UNIQUE(session_id, id_student)` impede convites duplicados para o mesmo aluno.
+
+*Índices de Performance:*
+* `idx_session_collabs_student`: Busca rápida de notebooks onde um estudante é colaborador.
+* `idx_session_collabs_session`: Otimiza listagem de colaboradores de um notebook específico.
+
+#### 3. Tabela `paperlab_chat_messages`
+Responsável pela persistência e recuperação do histórico conversacional do chat RAG do notebook.
+* **`id`**: `UUID` (PRIMARY KEY, valor padrão: `gen_random_uuid()`)
+* **`session_id`**: `UUID` (NOT NULL, FK referenciando `paperlab_sessions(id)` com `ON DELETE CASCADE`)
+* **`id_student`**: `UUID` (NOT NULL, FK referenciando `student(id)` com `ON DELETE CASCADE`)
+* **`role`**: `VARCHAR(10)` (NOT NULL, aceita: `'user' | 'assistant'`)
+* **`content`**: `TEXT` (NOT NULL, texto da pergunta ou resposta gerada pelo RAG)
+* **`criado_em`**: `TIMESTAMPTZ` (NOT NULL, padrão: `NOW()`)
+
+*Índices de Performance:*
+* `idx_chat_messages_session`: Varredura rápida de mensagens da sessão.
+* `idx_chat_messages_session_time`: Busca paginada ordenada cronologicamente de forma reversa (`session_id`, `criado_em DESC`).
+
+---
+
+## 🚀 4. Novos Endpoints Otimizados (REST)
+
+### A. Compartilhamento Público por Link Seguro
+* **Ativar/Editar Compartilhamento:**
+  * **Método:** `POST`
+  * **Rota:** `/student/:id/paperlab/sessions/:sessionId/share`
+  * **Payload:** `{ "visibilidade": "link", "expira_em": "2026-05-27T10:00:00.000Z" }` (expira_em opcional)
+  * **Retorno (201 Created):** `{ "share_token": "uuid", "url": "/paperlab/shared/uuid", ... }`
+  * **Lógica (UPSERT):** Caso o notebook já possua compartilhamento, atualiza seus dados de forma atômica no banco de dados local.
+* **Revogar Compartilhamento:**
+  * **Método:** `DELETE`
+  * **Rota:** `/student/:id/paperlab/sessions/:sessionId/share`
+  * **Retorno (204 No Content):** Torna o token de compartilhamento instantaneamente inativo, negando acessos futuros.
+
+### B. Rota Pública e Anônima de Acesso Compartilhado
+* **Consumir Notebook Compartilhado:**
+  * **Método:** `GET`
+  * **Rota:** `/paperlab/shared/:shareToken`
+  * **Descrição:** Permite que qualquer pessoa acesse o notebook de forma anônima e segura.
+  * **Lógica de Segurança:** A API retorna metadados básicos, fontes indexadas prontas e materiais didáticos gerados. **Não expõe o histórico do chat privado**, e valida rigorosamente se a visibilidade está ativa (`'link'`) e se o link está dentro do prazo de expiração (retorna `410 Gone` se expirado ou `404` se inexistente).
+
+### C. Gestão de Colaboradores (Compartilhamento entre Alunos)
+* **Convidar Colaborador:**
+  * **Método:** `POST`
+  * **Rota:** `/student/:id/paperlab/sessions/:sessionId/collaborators`
+  * **Payload:** `{ "id_student": "uuid-do-outro-estudante" }`
+  * **Retorno (201 Created):** `{ "id": "uuid", "session_id": "uuid", "id_student": "uuid", "permissao": "leitura_chat" }`
+* **Listar Colaboradores:**
+  * **Método:** `GET`
+  * **Rota:** `/student/:id/paperlab/sessions/:sessionId/collaborators`
+  * **Retorno (200 OK):** Lista de estudantes colaboradores convidados para aquele notebook.
+* **Remover Colaborador:**
+  * **Método:** `DELETE`
+  * **Rota:** `/student/:id/paperlab/sessions/:sessionId/collaborators/:collaboratorId`
+  * **Retorno (204 No Content):** Revoga o acesso do colaborador do notebook de forma imediata.
+
+### D. Histórico de Chat RAG Conversacional Paginado
+* **Buscar Histórico:**
+  * **Método:** `GET`
+  * **Rota:** `/student/:id/paperlab/sessions/:sessionId/chat`
+  * **Query Params:** `page` (padrão: 1), `size` (padrão: 10, máx: 100)
+  * **Retorno (200 OK):** Retorna o array de mensagens persistidas em `paperlab_chat_messages`, ordenadas de forma cronológica reversa, permitindo scroll infinito ou paginação no front-end.
+
+---
+
+## 🧪 5. Validação e Testes de Integração de Ponta a Ponta
+Foi desenvolvido e disponibilizado o script avançado `test_paperlab_api.js` na raiz do workspace, o qual executa de forma sequencial o fluxo de teste completo integrando:
+1. **Criação de Notebook:** Nascimento dinâmico como "Untitled notebook".
+2. **Cadastro de Fontes:** Ingestão de Links e vídeos do YouTube (validando a limpeza de URL via Regex, extração de legendas e fallback via LLM).
+3. **Loop do Worker:** Ingestão assíncrona vetorial local, renomeação inteligente do notebook baseada na primeira fonte indexada.
+4. **Chat Conversacional RAG:** Envio de perguntas e respostas contextualizadas persistidas no histórico conversacional local.
+5. **Geração de Mapa Mental:** Confirmação da sintaxe hierárquica Markdown pura (compatível com Markmap.js).
+6. **Repetição Espaçada (Anki Scheduler):** Geração de flashcards no banco e revisão com agendador cognitivo atualizando o campo `proximo_review_em`.
+7. **Links Públicos e Expiração:** Criação do token, consumo anônimo seguro (/paperlab/shared/:shareToken) e revogação.
+8. **Colaboradores por Convite:** Associação de estudantes com isolamento e tratamento amigável de chaves estrangeiras.
+
+---
+
+## 📂 6. Estrutura de Pastas do Módulo Consolidada
 
 O módulo foi estruturado e acoplado de forma limpa e modular sob o escopo do estudante:
 
@@ -450,6 +559,4 @@ src/modules/paperlab/
 ├── paperlab.routes.ts              # Roteamento Express, mergindo parâmetros e uploads multer
 ├── paperlab.service.ts             # Lógica de OCR local, pdf-parse, embeddings, RAG e Anki
 └── paperlab.worker.ts              # Fila de segundo plano (Queue-on-DB) e LLM prompts
-```
-
 ```

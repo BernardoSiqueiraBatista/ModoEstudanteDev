@@ -26,6 +26,7 @@ import { patientConsultationsRoutes } from './modules/consultations/patient-cons
 import studentRouter from './modules/student/student.routes';
 import { PapersController } from './modules/papers/papers.controller';
 import { startPapersCleanupJob } from './modules/papers/papers.cron';
+import { PaperlabController } from './modules/paperlab/paperlab.controller';
 
 import { env } from './config/env';
 
@@ -81,6 +82,10 @@ if (env.ENABLE_CONSULTATIONS) {
 // Rota pública de compartilhamento de papers (sem auth)
 const papersController = new PapersController();
 app.get('/papers/shared/:shareToken', papersController.getSharedPaper);
+
+// Rota pública de compartilhamento de notebooks do Paperlab (sem auth)
+const paperlabController = new PaperlabController();
+app.get('/paperlab/shared/:shareToken', paperlabController.getSharedSession);
 
 // Cron job: hard delete de papers excluídos há mais de 30 dias
 startPapersCleanupJob();
