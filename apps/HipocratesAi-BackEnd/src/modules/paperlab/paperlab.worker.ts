@@ -139,7 +139,7 @@ Sua tarefa é analisar as fontes de estudo fornecidas e extrair os conceitos mai
 Você DEVE responder EXCLUSIVAMENTE com um JSON Array válido de flashcards contendo os campos "frente" e "verso", seguindo este formato exato:
 [
   {
-    "frente": "Pergunta ou conceito a ser revisado (extremamente curto, preferencialmente de 1 a 5 palavras para memorização rápida)",
+    "frente": "Pergunta ou conceito/afirmação a ser revisado (extremamente curto, de 1 a 5 palavras)",
     "verso": "Resposta curta, direta e didática"
   }
 ]
@@ -147,8 +147,9 @@ Você DEVE responder EXCLUSIVAMENTE com um JSON Array válido de flashcards cont
 Critérios:
 1. ${quantidadeTexto}
 2. ${dificuldadeTexto}
-3. Não adicione nenhuma introdução, marcações de markdown do tipo \`\`\`json ou texto explicativo extra. Responda apenas com o JSON cru.
-4. Escreva os flashcards estritamente em Português do Brasil.
+3. Variedade de Formato: Misture o estilo dos flashcards! Crie tanto perguntas diretas com ponto de interrogação (ex: "O que é sístole?") quanto termos conceituais objetivos (ex: "Sístole"). Mantenha a frente sempre muito curta (máximo 5 palavras) para memorização rápida.
+4. Não adicione nenhuma introdução, marcações de markdown do tipo \`\`\`json ou texto explicativo extra. Responda apenas com o JSON cru.
+5. Escreva os flashcards estritamente em Português do Brasil.
 `;
     } else if (material.tipo === 'resumo') {
       systemPrompt = `Você é o gerador oficial de Resumos Executivos do Hipócrates Paperlab.
