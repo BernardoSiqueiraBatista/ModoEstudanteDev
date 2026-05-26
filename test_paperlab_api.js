@@ -105,7 +105,7 @@ async function runTests() {
     
     let sources = [];
     let allReady = false;
-    for (let attempt = 1; attempt <= 15; attempt++) {
+    for (let attempt = 1; attempt <= 25; attempt++) {
       await delay(2000);
       const checkSourceRes = await fetch(`${BASE_URL}/student/${STUDENT_ID}/paperlab/sessions/${sessionId}/sources`);
       if (checkSourceRes.ok) {
@@ -118,7 +118,7 @@ async function runTests() {
           break;
         }
       }
-      console.log(`[Tentativa ${attempt}/15] Fontes ainda estão indexando em segundo plano...`);
+      console.log(`[Tentativa ${attempt}/25] Fontes ainda estão indexando em segundo plano...`);
     }
 
     if (allReady) {
