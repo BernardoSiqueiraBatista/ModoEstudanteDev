@@ -71,7 +71,7 @@ async function runTests() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         tipo: 'link',
-        titulo: 'Fisiologia Cardiovascular - Fisiologia do Coração, Débito Cardíaco e Contração do Miocárdio',
+        titulo: 'Sistema Circulatório - Wikipédia, a enciclopédia livre',
         url: 'https://pt.wikipedia.org/wiki/Sistema_circulat%C3%B3rio'
       })
     });
@@ -128,7 +128,7 @@ async function runTests() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        pergunta: 'Com base nas fontes, o que é o débito cardíaco e quais fatores o influenciam?'
+        pergunta: 'Com base nas fontes, qual é a principal função do sistema circulatório e quais são seus componentes?'
       })
     });
 
