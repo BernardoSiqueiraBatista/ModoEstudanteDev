@@ -440,6 +440,12 @@ export class PaperlabModel {
     studentId: string,
     permissao: 'leitura_chat' = 'leitura_chat'
   ): Promise<SessionCollaboratorRow> {
+    // Solução pontual de resiliência: Garante a existência do estudante no banco antes do convite
+    await pool.query(
+      `INSERT INTO student (id, study_time) VALUES ($1, '0 seconds'::INTERVAL) ON CONFLICT (id) DO NOTHING;`,
+      [studentId]
+    );
+
     const query = `
       INSERT INTO paperlab_session_collaborators (session_id, id_student, permissao)
       VALUES ($1, $2, $3)
