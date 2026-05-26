@@ -11,6 +11,12 @@ import SimuladosResultado from '../views/simulados/SimuladosResultadoView';
 import SimuladosRapido from '../views/simulados/SimuladosRapidoView';
 import SimuladosIniciar from '../views/simulados/SimuladosIniciarView';
 import SimuladosExecutar from '../views/simulados/SimuladosExecutarView';
+import CentralEstudos from '../views/simulados/CentralEstudosView';
+import Summary from '../views/simulados/SummaryView';
+import MyPapers from '../views/paper/MyPapersView';
+import PlanosEstudo from '../views/paper/PlanosEstudoView';
+import Flashcard from '../views/flashcard/GeraFlashcardView';
+import LabEstudos from '../views/paper/LabEstudosView'
 
 import { useLocation } from 'react-router-dom';
 
@@ -20,8 +26,6 @@ const PLACEHOLDER_LABELS: Record<string, string> = {
   '/financas': 'Finanças',
   '/questoes': 'Questões',
   '/consultas-simuladas': 'Consultas Simuladas',
-  '/flashcards': 'Flashcards',
-  '/paper': 'Paper',
 };
 
 function ComingSoon({ label }: { label: string }) {
@@ -70,6 +74,12 @@ export default function MainLayout() {
         {location.pathname.startsWith('/pacientes/') && location.pathname !== '/pacientes' && (
           <PatientProfileView />
         )}
+        {location.pathname === '/central-de-estudos' && <CentralEstudos />}
+        {location.pathname === '/planos-estudo' && <PlanosEstudo />}
+        {location.pathname === '/summary' && <Summary />}
+        {location.pathname === '/paper' && <MyPapers />}
+        {location.pathname.startsWith('/paper/') && <LabEstudos />}
+        {location.pathname === '/flashcards' && <Flashcard />}
         {location.pathname === '/simulados' && <SimuladosDashboard />}
         {location.pathname.startsWith('/simulados/rapido') && (
           <SimuladosRapido />

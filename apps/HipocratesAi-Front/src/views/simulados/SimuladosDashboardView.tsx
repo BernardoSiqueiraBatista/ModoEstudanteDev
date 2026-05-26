@@ -7,7 +7,7 @@ export default function SimuladosDashboardView() {
 
       {/* Header */}
       <section className="space-y-1">
-        <h2 className="text-3xl font-bold tracking-tight text-on-surface">7
+        <h2 className="text-3xl font-bold tracking-tight text-on-surface">
           Desempenho e Simulados
         </h2>
         <p className="text-on-surface-variant max-w-2xl">

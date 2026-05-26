@@ -85,6 +85,51 @@ export default function RouterView() {
         />
 
         <Route
+        path="/central-de-estudos"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+        path="/summary"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+        path="/paper"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+        path="/planos-estudo"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+        path="/flashcards"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
         path="/simulados"
           element={
             <ProtectedRoute>

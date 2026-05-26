@@ -34,17 +34,21 @@ const navItems: NavItem[] = [
   },
   {
     name: 'Estudante',
-    href: '/questoes',
+    href: '/central-de-estudos',
     match: (p) =>
-      p.startsWith('/questoes') ||
+      p.startsWith('/central-de-estudos') ||
+      p.startsWith('/simulados') ||
       p.startsWith('/consultas-simuladas') ||
       p.startsWith('/flashcards') ||
-      p.startsWith('/paper'),
+      p.startsWith('/paper') ||
+      p.startsWith('/planos-estudo'),
     subItems: [
-      { name: 'Questões', href: '/questoes' },
+      { name: 'Central de Estudos', href: '/central-de-estudos' },
+      { name: 'Simulados', href: '/simulados' },
       { name: 'Consultas Simuladas', href: '/consultas-simuladas' },
       { name: 'Flashcards', href: '/flashcards' },
       { name: 'Paper', href: '/paper' },
+      { name: 'Planos de Estudo', href: '/planos-estudo' },
     ],
   },
   { name: 'Relatórios', href: '/relatorios' },
