@@ -118,7 +118,6 @@ export default function HeroHeader() {
     setPinnedGroup((prev) => (prev === name ? null : name));
   };
 
-  // Fecha pinned ao clicar fora da nav
   useEffect(() => {
     if (!pinnedGroup) return;
     const onDocMouseDown = (e: MouseEvent) => {
@@ -130,7 +129,6 @@ export default function HeroHeader() {
     return () => document.removeEventListener('mousedown', onDocMouseDown);
   }, [pinnedGroup]);
 
-  // ESC fecha qualquer dropdown
   useEffect(() => {
     if (!pinnedGroup && !hoveredGroup) return;
     const onKey = (e: KeyboardEvent) => {
@@ -166,8 +164,6 @@ export default function HeroHeader() {
     setMobileExpanded(null);
   }, [location.pathname]);
 
-  // O pill agora segue o item top-level ativo (grupo ou folha) — o sub-row foi
-  // substituído pelo dropdown vertical.
   const pillTarget = useMemo<NavItem | undefined>(() => {
     for (const item of navItems) {
       if (matchesItem(item, location.pathname)) return item;
@@ -229,7 +225,7 @@ export default function HeroHeader() {
         {/* Liquid glass capsule */}
         <div
           aria-hidden="true"
-          className="absolute inset-0 rounded-[28px] bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_10px_40px_rgba(15,23,42,0.18),inset_0_1px_0_rgba(255,255,255,0.55)] ring-1 ring-white/40 dark:ring-white/10 pointer-events-none"
+          className="absolute inset-0 rounded-[28px] bg-white/40 backdrop-blur-2xl backdrop-saturate-150 shadow-[0_10px_40px_rgba(15,23,42,0.18),inset_0_1px_0_rgba(255,255,255,0.55)] ring-1 ring-white/40 pointer-events-none"
           style={{
             opacity: scrolled ? 1 : 0,
             backgroundImage:
@@ -242,7 +238,7 @@ export default function HeroHeader() {
           {/* Sliding pill */}
           <div
             aria-hidden="true"
-            className="absolute rounded-full bg-white/70 dark:bg-white/15 shadow-sm ring-1 ring-white/60 dark:ring-white/10 pointer-events-none"
+            className="absolute rounded-full bg-white/70 shadow-sm ring-1 ring-white/60 pointer-events-none"
             style={{
               top: pill.top,
               left: pill.left,
@@ -271,7 +267,7 @@ export default function HeroHeader() {
                 src={logoUrl}
                 alt="Hipocrates"
                 decoding="async"
-                className="h-20 sm:h-24 md:h-28 w-auto object-contain select-none dark:brightness-0 dark:invert drop-shadow-[0_2px_8px_rgba(15,23,42,0.12)]"
+                className="h-20 sm:h-24 md:h-28 w-auto object-contain select-none drop-shadow-[0_2px_8px_rgba(15,23,42,0.12)]"
                 draggable={false}
               />
             </Link>
@@ -307,8 +303,8 @@ export default function HeroHeader() {
                         aria-haspopup="menu"
                         className={`relative z-10 inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-colors duration-200 ${
                           groupActive || groupOpen
-                            ? 'text-slate-900 dark:text-white'
-                            : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                            ? 'text-slate-900'
+                            : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
                         {item.name}
@@ -327,15 +323,15 @@ export default function HeroHeader() {
                         onClick={handleNavClick}
                         className={`relative z-10 inline-flex items-center gap-1 px-3.5 py-1.5 rounded-full text-[13px] font-medium transition-colors duration-200 ${
                           leafActive
-                            ? 'text-slate-900 dark:text-white'
-                            : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white'
+                            ? 'text-slate-900'
+                            : 'text-slate-600 hover:text-slate-900'
                         }`}
                       >
                         {item.name}
                       </Link>
                     )}
 
-                    {/* Dropdown vertical (lista ordenada) */}
+                    {/* Dropdown vertical */}
                     {item.subItems && (
                       <div
                         role="menu"
@@ -347,7 +343,7 @@ export default function HeroHeader() {
                         onMouseLeave={scheduleClose}
                       >
                         <div
-                          className="min-w-[200px] rounded-2xl bg-white/85 dark:bg-slate-900/85 backdrop-blur-2xl backdrop-saturate-150 ring-1 ring-white/50 dark:ring-white/10 shadow-[0_12px_40px_rgba(15,23,42,0.18),inset_0_1px_0_rgba(255,255,255,0.55)] overflow-hidden"
+                          className="min-w-[200px] rounded-2xl bg-white/85 backdrop-blur-2xl backdrop-saturate-150 ring-1 ring-white/50 shadow-[0_12px_40px_rgba(15,23,42,0.18),inset_0_1px_0_rgba(255,255,255,0.55)] overflow-hidden"
                           style={{
                             opacity: groupOpen ? 1 : 0,
                             transform: groupOpen
@@ -371,8 +367,8 @@ export default function HeroHeader() {
                                     onClick={handleNavClick}
                                     className={`flex items-center gap-2.5 px-4 py-2 text-[13px] font-medium transition-colors duration-150 ${
                                       subActive
-                                        ? 'text-slate-900 dark:text-white bg-white/70 dark:bg-white/10'
-                                        : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/5'
+                                        ? 'text-slate-900 bg-white/70'
+                                        : 'text-slate-600 hover:text-slate-900 hover:bg-white/50'
                                     }`}
                                     style={{
                                       opacity: groupOpen ? 1 : 0,
@@ -386,7 +382,7 @@ export default function HeroHeader() {
                                     {subActive && (
                                       <span
                                         aria-hidden
-                                        className="ml-auto material-icon text-[14px] text-slate-500 dark:text-slate-400"
+                                        className="ml-auto material-icon text-[14px] text-slate-500"
                                       >
                                         check
                                       </span>
@@ -413,7 +409,7 @@ export default function HeroHeader() {
             >
               <button
                 type="button"
-                className="relative size-9 flex items-center justify-center rounded-full text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/10 transition-colors"
+                className="relative size-9 flex items-center justify-center rounded-full text-slate-600 hover:text-slate-900 hover:bg-white/40 transition-colors"
                 aria-label="Notificações"
               >
                 <span className="material-icon text-[20px]">notifications</span>
@@ -423,7 +419,7 @@ export default function HeroHeader() {
                 <button
                   type="button"
                   onClick={() => setProfileOpen((s) => !s)}
-                  className="size-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 dark:from-slate-200 dark:to-white text-white dark:text-slate-900 text-[13px] font-semibold flex items-center justify-center shadow-md ring-1 ring-white/40 dark:ring-white/20 hover:scale-105 transition-transform"
+                  className="size-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 text-white text-[13px] font-semibold flex items-center justify-center shadow-md ring-1 ring-white/40 hover:scale-105 transition-transform"
                   aria-label="Perfil"
                   aria-expanded={profileOpen}
                 >
@@ -432,22 +428,22 @@ export default function HeroHeader() {
 
                 {profileOpen && (
                   <div
-                    className="absolute right-0 top-12 min-w-[200px] rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl ring-1 ring-white/50 dark:ring-white/10 shadow-[0_8px_32px_rgba(15,23,42,0.15)] overflow-hidden"
+                    className="absolute right-0 top-12 min-w-[200px] rounded-2xl bg-white/80 backdrop-blur-2xl ring-1 ring-white/50 shadow-[0_8px_32px_rgba(15,23,42,0.15)] overflow-hidden"
                     onMouseLeave={() => setProfileOpen(false)}
                   >
-                    <div className="px-4 py-3 border-b border-slate-200/60 dark:border-white/10">
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                    <div className="px-4 py-3 border-b border-slate-200/60">
+                      <p className="text-sm font-semibold text-slate-900 truncate">
                         {displayName}
                       </p>
                       {doctor?.email && (
-                        <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                        <p className="text-xs text-slate-500 truncate">
                           {doctor.email}
                         </p>
                       )}
                     </div>
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-200 hover:bg-white/60 dark:hover:bg-white/5 transition-colors"
+                      className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-white/60 transition-colors"
                     >
                       Sair
                     </button>
@@ -457,7 +453,7 @@ export default function HeroHeader() {
 
               <button
                 type="button"
-                className="md:hidden size-9 flex items-center justify-center rounded-full text-slate-600 dark:text-slate-300 hover:bg-white/40 dark:hover:bg-white/10 transition-colors"
+                className="md:hidden size-9 flex items-center justify-center rounded-full text-slate-600 hover:bg-white/40 transition-colors"
                 onClick={() => setMenuOpen((s) => !s)}
                 aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
                 aria-expanded={menuOpen}
@@ -471,7 +467,7 @@ export default function HeroHeader() {
         {/* Mobile menu */}
         {menuOpen && (
           <div className="md:hidden px-3 pb-3 relative">
-            <ul className="flex flex-col gap-1 pt-2 border-t border-white/30 dark:border-white/10">
+            <ul className="flex flex-col gap-1 pt-2 border-t border-white/30">
               {navItems.map((item) => {
                 const active = matchesItem(item, location.pathname);
                 const expanded =
@@ -492,8 +488,8 @@ export default function HeroHeader() {
                         aria-expanded={expanded}
                         className={`flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                           active || expanded
-                            ? 'text-slate-900 dark:text-white bg-white/60 dark:bg-white/10'
-                            : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/5'
+                            ? 'text-slate-900 bg-white/60'
+                            : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
                         }`}
                       >
                         <span>{item.name}</span>
@@ -512,8 +508,8 @@ export default function HeroHeader() {
                         onClick={handleNavClick}
                         className={`block px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
                           active
-                            ? 'text-slate-900 dark:text-white bg-white/60 dark:bg-white/10'
-                            : 'text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/40 dark:hover:bg-white/5'
+                            ? 'text-slate-900 bg-white/60'
+                            : 'text-slate-600 hover:text-slate-900 hover:bg-white/40'
                         }`}
                       >
                         {item.name}
@@ -539,8 +535,8 @@ export default function HeroHeader() {
                                   onClick={handleNavClick}
                                   className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[13px] transition-colors ${
                                     subActive
-                                      ? 'text-slate-900 dark:text-white bg-white/50 dark:bg-white/10'
-                                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/30'
+                                      ? 'text-slate-900 bg-white/50'
+                                      : 'text-slate-500 hover:text-slate-900 hover:bg-white/30'
                                   }`}
                                   style={{
                                     opacity: expanded ? 1 : 0,

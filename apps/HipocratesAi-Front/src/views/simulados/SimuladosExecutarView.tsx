@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 interface Alternativa {
-  ordem: number
+  id_answer: number
   texto: string
 }
 
@@ -19,6 +19,7 @@ interface LocationState {
 }
 
 const LEVEL_LABEL: Record<string, string> = { '1': 'Fácil', '2': 'Médio', '3': 'Difícil' }
+const LEVEL_SECONDS: Record<string, number> = { '1': 30 * 60, '2': 45 * 60, '3': 60 * 60 }
 const LETRA = ['A', 'B', 'C', 'D', 'E']
 
 export default function ExecutarSimulado() {
@@ -30,7 +31,7 @@ export default function ExecutarSimulado() {
   const nivel = state?.nivel ?? '2'
   const especialidade = state?.especialidade ?? 'Geral'
 
-  const totalSeconds = Math.floor(questions.length * 1.5 * 60)
+  const totalSeconds = LEVEL_SECONDS[nivel] ?? 45 * 60
 
   const [currentIndex, setCurrentIndex] = useState(0)
   const [answers, setAnswers] = useState<Record<string, number>>({})
@@ -47,12 +48,11 @@ export default function ExecutarSimulado() {
 
     const formattedAnswers = questions.map((q) => ({
       question_id: q.id_questao,
-      // ✅ usa a ref, que sempre tem o valor mais recente
       id_answer: answersRef.current[q.id_questao] ?? null,
     }))
 
     navigate('/simulados/resultado', {
-      state: { answers: formattedAnswers, questions },
+      state: { answers: formattedAnswers, questions, timeSpentSeconds: totalSeconds - timeLeft },
     })
   }
 
@@ -80,12 +80,10 @@ export default function ExecutarSimulado() {
 
   const current = questions[currentIndex]
 
-const handleAnswer = (ordem: number) => {
-  console.log('clicou:', current.id_questao, '→ ordem:', ordem, typeof ordem)
-  const updated = { ...answersRef.current, [current.id_questao]: ordem }
+const handleAnswer = (id_answer: number) => {
+  const updated = { ...answersRef.current, [current.id_questao]: id_answer }
   answersRef.current = updated
   setAnswers(updated)
-  console.log('answers após update:', answersRef.current)
 }
 
   const toggleMarked = () => {
@@ -142,7 +140,7 @@ const handleAnswer = (ordem: number) => {
           {/* Finalizar */}
           <button
             onClick={() => setShowConfirm(true)}
-            className="bg-gradient-to-r from-primary to-primary/80 text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-md hover:opacity-90 transition-all flex items-center gap-2"
+            className="bg-blue-600 text-white px-6 py-2.5 rounded-full font-bold text-sm shadow-md hover:opacity-90 transition-all flex items-center gap-2"
           >
             Finalizar Simulado
             <span className="material-symbols-outlined text-sm">done_all</span>
@@ -192,11 +190,11 @@ const handleAnswer = (ordem: number) => {
           {/* Alternatives */}
           <div className="w-full max-w-4xl mx-auto grid grid-cols-1 gap-4 mb-10">
             {current.alternativas.map((alt, i) => {
-              const selected = answers[current.id_questao] === alt.ordem
+              const selected = answers[current.id_questao] === alt.id_answer
               return (
                 <button
-                  key={alt.ordem}
-                  onClick={() => handleAnswer(alt.ordem)}
+                  key={alt.id_answer}
+                  onClick={() => handleAnswer(alt.id_answer)}
                   className={`w-full text-left p-6 rounded-2xl border-2 transition-all flex items-center gap-6 shadow-sm active:scale-[0.99] ${
                     selected
                       ? 'bg-white border-primary ring-4 ring-primary/5 shadow-md'
@@ -263,7 +261,7 @@ const handleAnswer = (ordem: number) => {
               ) : (
                 <button
                   onClick={() => setShowConfirm(true)}
-                  className="flex items-center gap-2 bg-gradient-to-r from-primary to-blue-700 text-white font-bold px-10 py-2.5 rounded-full hover:opacity-90 shadow-lg transition-all active:scale-95"
+                  className="flex items-center gap-2 bg-primary text-white font-bold px-10 py-2.5 rounded-full hover:opacity-90 shadow-lg transition-all active:scale-95"
                 >
                   Finalizar
                   <span className="material-symbols-outlined">done_all</span>
@@ -363,7 +361,7 @@ const handleAnswer = (ordem: number) => {
             <div className="w-full flex flex-col gap-3 mt-4">
               <button
                 onClick={handleFinalize}
-                className="w-full py-4 rounded-full bg-gradient-to-r from-primary to-blue-700 text-white font-bold shadow-lg hover:opacity-90 active:scale-95 transition-all"
+                className="w-full py-4 rounded-full bg-primary text-white font-bold shadow-lg hover:opacity-90 active:scale-95 transition-all"
               >
                 Sim, finalizar agora
               </button>

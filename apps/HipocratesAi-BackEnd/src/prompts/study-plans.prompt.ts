@@ -18,7 +18,7 @@ export const getStudyPlanPrompt = (params: {
   duracao: string;
   horas_por_dia: number;
   dias_semana: string[];
-  horarios_bloqueados?: { dia: string; inicio: string; fim: string }[];
+  horarios_bloqueados?: { dia: string; inicio: string; fim: string; label?: string }[];
   insights_performance?: string;
 }): string => {
   const agora = new Date();

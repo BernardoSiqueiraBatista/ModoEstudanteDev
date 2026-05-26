@@ -100,4 +100,54 @@ export class StudentDashboardService {
       percentual: totalDist > 0 ? Math.round((parseInt(d.total_resolvidas, 10) / totalDist) * 100) : 0
     }));
   }
+
+  async getFocusAreas(studentId: string): Promise<{ areas: IFocusArea[] }> {
+    const rows = await this.model.getFocusAreasBySubject(studentId);
+
+    const mapped = rows.map((r, idx) => {
+      const taxa = parseFloat(r.taxa_erro);
+      const nome = SUBJECT_NAME_MAP[Number(r.subject_id)] ?? `Área ${r.subject_id}`;
+      const deficiente = taxa > 50;
+      return {
+        nome,
+        prioridade: idx + 1,
+        deficiente,
+        justificativa: deficiente
+          ? `${taxa.toFixed(0)}% de erros nessa área (${r.erros} de ${r.total} questões)`
+          : undefined,
+      };
+    });
+
+    // Adiciona áreas de alta prioridade sem dados ainda
+    const comDados = new Set(rows.map(r => Number(r.subject_id)));
+    const extras: IFocusArea[] = [];
+    Object.entries(SUBJECT_NAME_MAP).forEach(([id, nome]) => {
+      if (!comDados.has(Number(id)) && extras.length < 3) {
+        extras.push({ nome, prioridade: mapped.length + extras.length + 1, deficiente: false });
+      }
+    });
+
+    return { areas: [...mapped, ...extras] };
+  }
 }
+
+export interface IFocusArea {
+  nome: string;
+  prioridade: number;
+  deficiente: boolean;
+  justificativa?: string;
+}
+
+const SUBJECT_NAME_MAP: Record<number, string> = {
+  0: 'Cardiologia',
+  1: 'Neurologia',
+  2: 'Nefrologia',
+  3: 'Pneumologia',
+  4: 'Gastroenterologia',
+  5: 'Endocrinologia',
+  6: 'Hematologia',
+  7: 'Infectologia',
+  8: 'Reumatologia',
+  9: 'Dermatologia',
+  10: 'Ortopedia',
+};

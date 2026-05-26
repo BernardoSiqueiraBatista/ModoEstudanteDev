@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
+const STUDENT_ID = 'e1925b44-9694-477c-a496-5e638e4a9e25'
+
 interface AnswerDetail {
-  questionID: string
+  question_id: string
   correct: boolean
   correctAnswer?: number
 }
@@ -15,8 +17,9 @@ interface ExamResult {
 }
 
 interface LocationState {
-  answers: { questionID: string; id_answer: number | null }[]
+  answers: { question_id: string; id_answer: number | null }[]
   questions: any[]
+  timeSpentSeconds: number
 }
 
 export default function SimuladosResultadoView() {
@@ -33,13 +36,10 @@ export default function SimuladosResultadoView() {
 
     async function submitExam() {
       try {
-        const res = await fetch('http://localhost:3333/student/exams', {
+        const res = await fetch(`http://localhost:3333/student/exams/${STUDENT_ID}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            studentID: 'd8cc8dd6-6737-4abd-8a51-8dcd13e58256',
-            answers: state.answers,
-          }),
+          body: JSON.stringify({ answers: state.answers, time_spent_seconds: state.timeSpentSeconds ?? 0 }),
           signal: controller.signal,
         })
         if (!res.ok) throw new Error(`Erro ${res.status}`)

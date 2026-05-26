@@ -13,7 +13,7 @@ export class ExamsService {
     this.model = new ExamsModel();
   }
 
-  public async processExamResults(studentId: string, answers: IExamAnswer[]) {
+  public async processExamResults(studentId: string, answers: IExamAnswer[], timeSpentSeconds: number = 0) {
     const studentExists = await this.model.checkStudentExists(studentId);
     if (!studentExists) {
       throw new AppError(`Estudante com ID ${studentId} não encontrado.`, 404);
@@ -50,7 +50,7 @@ export class ExamsService {
     }));
 
     // 5. Persistência
-    await this.model.savePerformance(studentId, performanceData);
+    await this.model.savePerformance(studentId, performanceData, timeSpentSeconds);
 
     return {
       totalNumberQuestions: answers.length,

@@ -20,7 +20,7 @@ CREATE INDEX idx_alternative_question ON alternative(id_question);
 
 
 CREATE TABLE student (                         -- Trocar gen_random_uuid pela referência do user id quando integrar com o banco geral no supabase
-    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(), --REFERENCES User(id) ON DELETE CASCADE,
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(), --REFERENCES User(id) ON DELETE CASCADE, fk para user(id)
     study_time        INTERVAL NOT NULL DEFAULT INTERVAL '0'
 );
 
@@ -80,3 +80,147 @@ CREATE TABLE study_plan_blocks (
 );
 CREATE INDEX idx_spb_plan ON study_plan_blocks(id_plan);
 CREATE INDEX idx_spb_date ON study_plan_blocks(data);
+
+
+-- Task 5/6: soft delete + rate-limit de regeneração
+ALTER TABLE study_plans ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP;
+ALTER TABLE study_plans ADD COLUMN IF NOT EXISTS ultima_regeneracao TIMESTAMP;
+
+
+-- Task 6: compartilhamento de planos (token opaco, sem expor user_id)
+CREATE TABLE IF NOT EXISTS study_plan_shares (
+    id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    plan_id       UUID        NOT NULL REFERENCES study_plans(id) ON DELETE CASCADE,
+    share_token   UUID        NOT NULL UNIQUE DEFAULT gen_random_uuid(),
+    visibilidade  VARCHAR(20) NOT NULL DEFAULT 'link',
+    expira_em     TIMESTAMP,
+    criado_em     TIMESTAMP   NOT NULL DEFAULT NOW()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_sps_plan ON study_plan_shares(plan_id);
+
+
+-- Task 5: uploads de referência vinculados a um ciclo de plano
+CREATE TABLE IF NOT EXISTS study_plan_uploads (
+    id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    student_id    UUID        NOT NULL REFERENCES student(id) ON DELETE CASCADE,
+    original_name TEXT        NOT NULL,
+    tipo          VARCHAR(20) NOT NULL DEFAULT 'pdf',
+    criado_em     TIMESTAMP   NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_spu_student ON study_plan_uploads(student_id);
+
+
+-- =============================================================================
+-- Task 3 — Hipócrates Paper
+-- =============================================================================
+
+CREATE TABLE papers (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id_student          UUID NOT NULL REFERENCES student(id) ON DELETE CASCADE,
+    titulo              TEXT NOT NULL,
+    conteudo            TEXT NOT NULL,
+    conteudo_tipo       VARCHAR(20) NOT NULL DEFAULT 'markdown',
+    tags                JSONB NOT NULL DEFAULT '[]',
+    fonte_paperlab_id   UUID DEFAULT NULL,
+    status              VARCHAR(20) NOT NULL DEFAULT 'rascunho',
+    deleted_at          TIMESTAMPTZ DEFAULT NULL,
+    criado_em           TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    atualizado_em       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_papers_student ON papers(id_student);
+CREATE INDEX idx_papers_student_active ON papers(id_student) WHERE deleted_at IS NULL;
+CREATE INDEX idx_papers_deleted_at ON papers(deleted_at) WHERE deleted_at IS NOT NULL;
+
+
+CREATE TABLE paper_shares (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    paper_id        UUID NOT NULL UNIQUE REFERENCES papers(id) ON DELETE CASCADE,
+    share_token     UUID NOT NULL UNIQUE DEFAULT gen_random_uuid(),
+    visibilidade    VARCHAR(20) NOT NULL DEFAULT 'privado',
+    expira_em       TIMESTAMPTZ DEFAULT NULL,
+    criado_em       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX idx_paper_shares_token ON paper_shares(share_token);
+CREATE INDEX idx_paper_shares_paper ON paper_shares(paper_id);
+
+
+-- =============================================================================
+-- Task 4 — Hipócrates Paperlab
+-- =============================================================================
+
+CREATE TABLE paperlab_sessions (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id_student  UUID NOT NULL REFERENCES student(id) ON DELETE CASCADE,
+    titulo      TEXT NOT NULL,
+    criado_em   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE paperlab_sources (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id  UUID NOT NULL REFERENCES paperlab_sessions(id) ON DELETE CASCADE,
+    tipo        VARCHAR(20) NOT NULL, -- 'pdf' | 'docx' | 'image' | 'youtube' | 'link'
+    url_ou_path TEXT NOT NULL,
+    titulo      TEXT NOT NULL,
+    status      VARCHAR(20) NOT NULL DEFAULT 'indexing', -- 'indexing' | 'ready' | 'error'
+    criado_em   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE paperlab_materials (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id  UUID NOT NULL REFERENCES paperlab_sessions(id) ON DELETE CASCADE,
+    tipo        VARCHAR(20) NOT NULL, -- 'flashcards' | 'resumo' | 'simulado' | 'mapa_mental'
+    prompt      TEXT NOT NULL,
+    conteudo    JSONB NOT NULL DEFAULT '{}',
+    status      VARCHAR(20) NOT NULL DEFAULT 'pending', -- 'pending' | 'ready' | 'error'
+    criado_em   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE flashcards (
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    material_id       UUID NOT NULL REFERENCES paperlab_materials(id) ON DELETE CASCADE,
+    frente            TEXT NOT NULL,
+    verso             TEXT NOT NULL,
+    ultimo_review     TIMESTAMPTZ DEFAULT NULL,
+    proximo_review_em TIMESTAMPTZ DEFAULT NULL,
+    acertos           INT NOT NULL DEFAULT 0,
+    erros             INT NOT NULL DEFAULT 0
+);
+
+CREATE TABLE paperlab_session_shares (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id  UUID NOT NULL UNIQUE REFERENCES paperlab_sessions(id) ON DELETE CASCADE,
+    share_token UUID NOT NULL UNIQUE DEFAULT gen_random_uuid(),
+    visibilidade VARCHAR(20) NOT NULL DEFAULT 'privado', -- 'link' | 'privado'
+    expira_em   TIMESTAMPTZ DEFAULT NULL,
+    criado_em   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE paperlab_session_collaborators (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id  UUID NOT NULL REFERENCES paperlab_sessions(id) ON DELETE CASCADE,
+    id_student  UUID NOT NULL REFERENCES student(id) ON DELETE CASCADE,
+    permissao   VARCHAR(20) NOT NULL DEFAULT 'leitura_chat',
+    criado_em   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    UNIQUE(session_id, id_student)
+);
+
+CREATE TABLE paperlab_chat_messages (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    session_id  UUID NOT NULL REFERENCES paperlab_sessions(id) ON DELETE CASCADE,
+    id_student  UUID NOT NULL REFERENCES student(id) ON DELETE CASCADE,
+    role        VARCHAR(10) NOT NULL, -- 'user' | 'assistant'
+    content     TEXT NOT NULL,
+    criado_em   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_paperlab_sessions_student      ON paperlab_sessions(id_student);
+CREATE INDEX idx_paperlab_sources_session       ON paperlab_sources(session_id);
+CREATE INDEX idx_paperlab_materials_session     ON paperlab_materials(session_id);
+CREATE INDEX idx_flashcards_material            ON flashcards(material_id);
+CREATE INDEX idx_flashcards_review              ON flashcards(proximo_review_em);
+CREATE INDEX idx_session_shares_token           ON paperlab_session_shares(share_token);
+CREATE INDEX idx_session_shares_session         ON paperlab_session_shares(session_id);
+CREATE INDEX idx_session_collabs_student        ON paperlab_session_collaborators(id_student);
+CREATE INDEX idx_session_collabs_session        ON paperlab_session_collaborators(session_id);
+CREATE INDEX idx_chat_messages_session          ON paperlab_chat_messages(session_id);
+CREATE INDEX idx_chat_messages_session_time     ON paperlab_chat_messages(session_id, criado_em DESC);

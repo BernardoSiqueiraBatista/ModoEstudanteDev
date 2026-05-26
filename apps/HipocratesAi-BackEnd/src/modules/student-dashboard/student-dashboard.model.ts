@@ -78,7 +78,7 @@ export class StudentDashboardModel {
 
   async getStudyDistribution(studentId: string): Promise<IRawStudyDistribution[]> {
     const query = `
-      SELECT 
+      SELECT
         'Tema ' || q.question_subject AS area,
         COUNT(p.id)::TEXT AS total_resolvidas
       FROM performance p
@@ -88,6 +88,27 @@ export class StudentDashboardModel {
       ORDER BY COUNT(p.id) DESC;
     `;
     const result = await pool.query<IRawStudyDistribution>(query, [studentId]);
+    return result.rows;
+  }
+
+  async getFocusAreasBySubject(studentId: string): Promise<{ subject_id: number; total: string; erros: string; taxa_erro: string }[]> {
+    const result = await pool.query(
+      `SELECT
+         q.question_subject                                                       AS subject_id,
+         COUNT(p.id)::TEXT                                                        AS total,
+         COUNT(p.id) FILTER (WHERE p.correct_answer = FALSE)::TEXT               AS erros,
+         ROUND(
+           COUNT(p.id) FILTER (WHERE p.correct_answer = FALSE)::numeric
+           / NULLIF(COUNT(p.id), 0) * 100, 1
+         )::TEXT                                                                  AS taxa_erro
+       FROM performance p
+       JOIN question q ON p.id_question = q.id
+       WHERE p.id_student = $1
+       GROUP BY q.question_subject
+       HAVING COUNT(p.id) >= 3
+       ORDER BY taxa_erro DESC, total DESC`,
+      [studentId]
+    );
     return result.rows;
   }
 }

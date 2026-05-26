@@ -59,15 +59,6 @@ function toAppointments(week: Record<DayKey, RoutineBlock[]>): Apontamento[] {
   return out;
 }
 
-// Sample events for empty state
-const SAMPLE: Apontamento[] = [
-  { dayIndex:0, patient:STUB_PATIENT, title:'Cardiologia: Arritmias',      startTime:'08:00', endTime:'10:00', type:'consulta',    description:'Estudo teórico', top:timeToTop('08:00'), height:160 },
-  { dayIndex:1, patient:STUB_PATIENT, title:'Questões — Clínica Médica',   startTime:'09:00', endTime:'11:00', type:'urgencia',    description:'Questões',       top:timeToTop('09:00'), height:160 },
-  { dayIndex:2, patient:STUB_PATIENT, title:'Revisão: Nefrologia',         startTime:'08:00', endTime:'09:30', type:'compromisso', description:'Revisão',        top:timeToTop('08:00'), height:120 },
-  { dayIndex:3, patient:STUB_PATIENT, title:'Pediatria: Desenvolvimento',  startTime:'10:00', endTime:'12:00', type:'consulta',    description:'Estudo teórico', top:timeToTop('10:00'), height:160 },
-  { dayIndex:4, patient:STUB_PATIENT, title:'Simulado Nacional',           startTime:'08:00', endTime:'11:00', type:'urgencia',    description:'Questões',       top:timeToTop('08:00'), height:240 },
-  { dayIndex:5, patient:STUB_PATIENT, title:'Flashcards da Semana',        startTime:'09:00', endTime:'10:30', type:'video',       description:'Revisão',        top:timeToTop('09:00'), height:120 },
-];
 
 function getWeekLabel(): string {
   const today = new Date();
@@ -154,7 +145,7 @@ export default function CalendarioView() {
   const todayIndex = weekDays.findIndex(d => d.isToday);
 
   const events = useMemo(() => {
-    if (!routine) return SAMPLE;
+    if (!routine) return [];
     return toAppointments(routine.week);
   }, [routine]);
 
@@ -184,10 +175,6 @@ export default function CalendarioView() {
           >
             <span className="material-symbols-outlined text-[18px]">arrow_back</span>
             Voltar ao Plano
-          </button>
-          <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-light rounded-full text-sm font-semibold text-on-surface hover:bg-surface-light transition-all active:scale-[0.98]">
-            <span className="material-symbols-outlined text-[18px]">sync</span>
-            Sincronizar Google Agenda
           </button>
         </div>
       </header>

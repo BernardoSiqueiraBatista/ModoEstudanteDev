@@ -162,6 +162,19 @@ export default function PlanView() {
         <AIReasoningBanner text={routine.ai_reasoning} />
       )}
 
+      {/* Conflict warning */}
+      {routine?.hasConflicts && !error && (
+        <div className="flex items-start gap-3 px-5 py-4 bg-amber-50 border border-amber-200 rounded-2xl">
+          <span className="material-symbols-outlined text-amber-500 text-xl shrink-0 mt-0.5">warning</span>
+          <div>
+            <p className="text-sm font-bold text-amber-800">Rotina com horários quebrados</p>
+            <p className="text-sm text-amber-700 mt-0.5">
+              A IA gerou blocos que conflitam com seus compromissos fixos. Revise os horários ou regenere o plano.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Error banner */}
       {error && <ErrorBanner onRetry={() => setError(null)} />}
 
@@ -178,51 +191,6 @@ export default function PlanView() {
       {/* Routine configurator */}
       <RoutineConfigurator loading={loading} onGenerate={generate} />
 
-      {/* Configuração de plano */}
-      <section>
-        <div className="flex items-center gap-3 mb-8">
-          <span className="material-symbols-outlined text-on-surface-variant">settings_suggest</span>
-          <h2 className="text-2xl font-bold tracking-tight text-on-surface">Configuração de Plano</h2>
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 bg-surface-container-low border-2 border-dashed border-outline-variant rounded-[2.5rem] p-12 flex flex-col items-center justify-center text-center space-y-4 hover:bg-surface-container-high transition-colors group cursor-pointer">
-            <div className="w-16 h-16 bg-white rounded-full shadow flex items-center justify-center group-hover:scale-110 transition-transform">
-              <span className="material-symbols-outlined text-primary text-3xl">upload_file</span>
-            </div>
-            <div>
-              <h4 className="text-lg font-bold text-on-surface">Importar Cronograma Externo</h4>
-              <p className="text-on-surface-variant text-sm">
-                Arraste seu PDF de residência ou calendário MedCurso para sincronizar
-              </p>
-            </div>
-          </div>
-          <div className="liquid-glass rounded-[2.5rem] p-8 space-y-6">
-            <h4 className="text-[0.6875rem] font-bold uppercase tracking-widest text-on-surface-variant">
-              Nível de Atuação
-            </h4>
-            <div className="space-y-3">
-              {(['Residente', 'Especialista', 'Acadêmico'] as const).map((level, i) => (
-                <button
-                  key={level}
-                  className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${
-                    i === 0
-                      ? 'bg-primary text-on-primary font-semibold'
-                      : 'bg-surface-container hover:bg-surface-container-high text-on-surface-variant font-medium'
-                  }`}
-                >
-                  <span>{level}</span>
-                  <span className="material-symbols-outlined" style={i === 0 ? { fontVariationSettings: "'FILL' 1" } : undefined}>
-                    {i === 0 ? 'check_circle' : 'radio_button_unchecked'}
-                  </span>
-                </button>
-              ))}
-            </div>
-            <button className="w-full py-4 bg-primary-container text-on-primary-container rounded-2xl font-bold text-sm tracking-wide uppercase hover:opacity-90 transition-opacity">
-              Salvar Configurações
-            </button>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 const NIVEL_MAP: Record<string, string> = { 'Fácil': '1', 'Médio': '2', 'Difícil': '3' }
 const NIVEL_LABEL: Record<string, string> = { '1': 'Fácil', '2': 'Médio', '3': 'Difícil' }
+const NIVEL_MINUTES: Record<string, number> = { '1': 30, '2': 45, '3': 60 }
 
 const specialties = [
   { icon: 'cardiology',  title: 'Cardiologia', description: 'Foco em ECG, Insuficiência Cardíaca e Valvopatias.' },
@@ -34,8 +35,7 @@ export default function SimuladoRapido() {
   const navigate = useNavigate()
   const [intensidade, setIntensidade] = useState('Fácil')
   const [questoes, setQuestoes] = useState('50')
-  const [aiInput, setAiInput] = useState('')
-  const [modal, setModal] = useState<ModalConfig | null>(null)
+const [modal, setModal] = useState<ModalConfig | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -160,45 +160,6 @@ export default function SimuladoRapido() {
             </div>
           </section>
 
-          {/* Gerador AI */}
-          <section className="mt-20">
-            <div className="liquid-glass p-12 rounded-[3rem] space-y-8 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-80 h-80 bg-secondary/5 blur-[100px] -mr-32 -mt-32 rounded-full pointer-events-none" />
-              <div className="flex items-center gap-5">
-                <div className="size-12 rounded-2xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
-                  <span className="material-symbols-outlined text-2xl">psychology</span>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-primary font-display">Gerador AI Hipócrates</h3>
-                  <p className="text-xs text-slate-400 font-medium mt-1">Descreva o caso clínico ou tema específico para gerar um simulado personalizado.</p>
-                </div>
-              </div>
-              <div className="relative group">
-                <input
-                  className="w-full bg-white border border-slate-100 rounded-[2rem] py-8 px-10 pr-40 focus:ring-4 focus:ring-secondary/10 focus:border-secondary/20 text-sm font-medium placeholder:text-slate-300 transition-all shadow-sm outline-none"
-                  placeholder="Ex: 'Paciente de 45 anos com dor precordial súbita e irradiação para dorso...'"
-                  type="text"
-                  value={aiInput}
-                  onChange={(e) => setAiInput(e.target.value)}
-                />
-                <button className="absolute right-4 top-1/2 -translate-y-1/2 px-10 py-4 bg-primary text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest shadow-xl shadow-primary/20 hover:opacity-90 transition-all active:scale-95">
-                  Gerar
-                </button>
-              </div>
-              <div className="flex items-center gap-5">
-                <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Sugestões:</span>
-                <div className="flex gap-3 flex-wrap">
-                  {['Trauma Abdominal', 'Emergências Obstétricas', 'Drogas Vasoativas'].map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setAiInput(s)}
-                      className="text-[10px] font-bold text-primary px-5 py-2 rounded-xl bg-slate-50 border border-slate-100 hover:bg-white hover:shadow-sm transition-all uppercase tracking-widest"
-                    >{s}</button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
         </div>
         <div className="h-20" />
       </main>
@@ -229,9 +190,9 @@ export default function SimuladoRapido() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-3 w-full mb-8">
               {[
-                { value: modal.questoes,                              label: 'Questões' },
-                { value: `${Math.floor(Number(modal.questoes) * 1.5)}`, label: 'Minutos'  },
-                { value: NIVEL_LABEL[modal.nivel] ?? modal.nivel,    label: 'Nível'    },
+                { value: modal.questoes,                               label: 'Questões' },
+                { value: `${NIVEL_MINUTES[modal.nivel] ?? 45}`,        label: 'Minutos'  },
+                { value: NIVEL_LABEL[modal.nivel] ?? modal.nivel,      label: 'Nível'    },
               ].map((s) => (
                 <div key={s.label} className="bg-slate-50 border border-slate-100 p-4 rounded-2xl flex flex-col items-center gap-1">
                   <span className="text-primary font-bold text-lg">{s.value}</span>

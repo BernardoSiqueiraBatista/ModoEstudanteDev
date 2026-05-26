@@ -112,14 +112,120 @@ export class StudyPlansModel {
     await pool.query(query, [planId, studentId]);
   }
 
+  async softDeletePlan(planId: string, studentId: string): Promise<boolean> {
+    const result = await pool.query(
+      `UPDATE study_plans SET deleted_at = NOW() WHERE id = $1 AND id_student = $2 AND deleted_at IS NULL`,
+      [planId, studentId]
+    );
+    return (result.rowCount ?? 0) > 0;
+  }
+
   async updateBlockStatus(blockId: string, status: string): Promise<IStudyPlanBlock | null> {
     const query = `
-      UPDATE study_plan_blocks 
-      SET status = $1 
+      UPDATE study_plan_blocks
+      SET status = $1
       WHERE id = $2
       RETURNING *;
     `;
     const result = await pool.query<IStudyPlanBlock>(query, [status, blockId]);
     return result.rows[0] || null;
+  }
+
+  async listPlansFiltered(studentId: string): Promise<IStudyPlan[]> {
+    const result = await pool.query<IStudyPlan>(
+      `SELECT * FROM study_plans WHERE id_student = $1 AND deleted_at IS NULL ORDER BY criado_em DESC`,
+      [studentId]
+    );
+    return result.rows;
+  }
+
+  async getPlanByIdAndStudent(planId: string, studentId: string): Promise<IStudyPlan | null> {
+    const result = await pool.query<IStudyPlan>(
+      `SELECT * FROM study_plans WHERE id = $1 AND id_student = $2 AND deleted_at IS NULL`,
+      [planId, studentId]
+    );
+    return result.rows[0] ?? null;
+  }
+
+  async updatePlan(planId: string, studentId: string, data: Partial<IStudyPlan>): Promise<IStudyPlan | null> {
+    const result = await pool.query<IStudyPlan>(
+      `UPDATE study_plans
+       SET titulo        = COALESCE($3, titulo),
+           areas_foco    = COALESCE($4, areas_foco),
+           duracao       = COALESCE($5, duracao),
+           parametros    = COALESCE($6, parametros),
+           briefing_texto= COALESCE($7, briefing_texto),
+           atualizado_em = NOW()
+       WHERE id = $1 AND id_student = $2 AND deleted_at IS NULL
+       RETURNING *`,
+      [
+        planId,
+        studentId,
+        data.titulo ?? null,
+        data.areas_foco ? JSON.stringify(data.areas_foco) : null,
+        data.duracao ?? null,
+        data.parametros ? JSON.stringify(data.parametros) : null,
+        data.briefing_texto ?? null,
+      ]
+    );
+    return result.rows[0] ?? null;
+  }
+
+  async getPlanSummary(planId: string): Promise<Record<string, unknown> | null> {
+    const result = await pool.query(
+      `SELECT * FROM study_plans WHERE id = $1 AND deleted_at IS NULL`,
+      [planId]
+    );
+    if (result.rows.length === 0) return null;
+    const p = result.rows[0];
+    const params = p.parametros ?? {};
+    return {
+      plan_id: p.id,
+      areas_foco: p.areas_foco ?? [],
+      duracao: p.duracao,
+      horas_dia: params.horas_por_dia ?? params.horas_dia ?? 0,
+      dias_disponiveis: params.dias_semana ?? params.dias_disponiveis ?? [],
+      compromissos_fixos: params.compromissos_fixos ?? params.horarios_bloqueados ?? [],
+      briefing_preview: p.briefing_texto ? String(p.briefing_texto).substring(0, 200) : '',
+      render_mode: 'popup_no_blue',
+    };
+  }
+
+  async createOrUpdateShare(planId: string): Promise<{ share_token: string }> {
+    const result = await pool.query<{ share_token: string }>(
+      `INSERT INTO study_plan_shares (plan_id, share_token, visibilidade)
+       VALUES ($1, gen_random_uuid(), 'link')
+       ON CONFLICT (plan_id) DO UPDATE SET share_token = gen_random_uuid()
+       RETURNING share_token`,
+      [planId]
+    );
+    return result.rows[0];
+  }
+
+  async saveUploadRef(studentId: string, originalName: string, tipo: string): Promise<{ id: string }> {
+    const result = await pool.query<{ id: string }>(
+      `INSERT INTO study_plan_uploads (student_id, original_name, tipo) VALUES ($1, $2, $3) RETURNING id`,
+      [studentId, originalName, tipo]
+    );
+    return result.rows[0];
+  }
+
+  async getLastRegenerateTime(planId: string): Promise<Date | null> {
+    const result = await pool.query<{ ultima_regeneracao: Date | null }>(
+      `SELECT ultima_regeneracao FROM study_plans WHERE id = $1`,
+      [planId]
+    );
+    return result.rows[0]?.ultima_regeneracao ?? null;
+  }
+
+  async setLastRegenerateTime(planId: string): Promise<void> {
+    await pool.query(
+      `UPDATE study_plans SET ultima_regeneracao = NOW(), atualizado_em = NOW() WHERE id = $1`,
+      [planId]
+    );
+  }
+
+  async deleteBlocksByPlan(planId: string): Promise<void> {
+    await pool.query(`DELETE FROM study_plan_blocks WHERE id_plan = $1`, [planId]);
   }
 }

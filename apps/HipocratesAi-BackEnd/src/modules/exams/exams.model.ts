@@ -34,27 +34,33 @@ export class ExamsModel {
   }
 
 
-  public async savePerformance(studentId: string, results: { questionId: string, isCorrect: boolean }[]): Promise<void> {
+  public async savePerformance(studentId: string, results: { questionId: string, isCorrect: boolean }[], timeSpentSeconds: number = 0): Promise<void> {
     const client = await pool.connect();
     try {
       await client.query('BEGIN');
 
-      const query = `
+      const insertQuery = `
         INSERT INTO performance (id_student, id_question, correct_answer)
         VALUES ($1, $2, $3)
-        ON CONFLICT (id_student, id_question) 
-        DO UPDATE SET correct_answer = EXCLUDED.correct_answer;
+        ON CONFLICT (id_student, id_question) DO UPDATE SET correct_answer = EXCLUDED.correct_answer
       `;
-
       for (const res of results) {
-        await client.query(query, [studentId, res.questionId, res.isCorrect]);
+        await client.query(insertQuery, [studentId, res.questionId, res.isCorrect]);
       }
+
+      if (timeSpentSeconds > 0) {
+        await client.query(
+          `UPDATE student SET study_time = study_time + make_interval(secs => $1) WHERE id = $2`,
+          [timeSpentSeconds, studentId]
+        );
+      }
+
       await client.query('COMMIT');
-    
+
     } catch (error) {
       await client.query('ROLLBACK');
       throw error;
-    
+
     } finally {
       client.release();
     }

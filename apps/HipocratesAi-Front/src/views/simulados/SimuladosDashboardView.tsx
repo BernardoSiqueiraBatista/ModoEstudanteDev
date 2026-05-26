@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
-const STUDENT_ID = 'd8cc8dd6-6737-4abd-8a51-8dcd13e58256';
+const STUDENT_ID = 'e1925b44-9694-477c-a496-5e638e4a9e25';
 
 interface PerformanceData {
   taxaAcertos: number;
@@ -18,6 +18,7 @@ function formatStudyTime(seconds: number): string {
 
 export default function SimuladosDashboardView() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [perf, setPerf] = useState<PerformanceData | null>(null);
 
   useEffect(() => {
@@ -25,14 +26,14 @@ export default function SimuladosDashboardView() {
       .then(r => r.ok ? r.json() : null)
       .then(json => { if (json?.data) setPerf(json.data); })
       .catch(() => {});
-  }, []);
+  }, [location.key]);
 
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-12">
 
       {/* Header */}
       <section className="space-y-1">
-        <h2 className="text-3xl font-bold tracking-tight text-on-surface">7
+        <h2 className="text-3xl font-bold tracking-tight text-on-surface">
           Desempenho e Simulados
         </h2>
         <p className="text-on-surface-variant max-w-2xl">
@@ -118,76 +119,6 @@ export default function SimuladosDashboardView() {
         </div>
 
       </section>
-
-      {/* Grid principal */}
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-
-        {/* Análise Cognitiva */}
-        <section className="lg:col-span-3 space-y-6">
-          <div className="flex justify-between items-end">
-            <h3 className="text-xl font-bold">Análise Cognitiva</h3>
-            <span className="text-[10px] font-bold text-primary cursor-pointer">
-              Ver Detalhes
-            </span>
-          </div>
-
-          <div className="bg-surface-container-low rounded-3xl p-8 space-y-6">
-
-            {[
-              { nome: "Cardiologia", valor: 88 },
-              { nome: "Neurologia", valor: 74 },
-              { nome: "Endocrinologia", valor: 62 },
-              { nome: "Gastroenterologia", valor: 68 },
-              { nome: "Nefrologia", valor: 54 },
-            ].map((item) => (
-              <div key={item.nome} className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>{item.nome}</span>
-                  <span className="font-bold">{item.valor}%</span>
-                </div>
-
-                <div className="h-2 bg-white rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full"
-                    style={{ width: `${item.valor}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-
-            <div className="pt-4 border-t">
-              <div className="flex gap-3 p-4 rounded-xl bg-white">
-                <span className="material-symbols-outlined text-primary">
-                  psychology
-                </span>
-                <p className="text-sm text-gray-600">
-                  Seu desempenho em Nefrologia caiu. Recomendamos foco em distúrbios hidroeletrolíticos.
-                </p>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        {/* Agenda */}
-        <section className="lg:col-span-2 space-y-6">
-          <h3 className="text-xl font-bold">Agenda Sugerida</h3>
-
-          {[
-            { hora: "14:00", titulo: "Distúrbios Ácido-Base" },
-            { hora: "17:30", titulo: "Diabetes Tipo 2" },
-            { hora: "09:00", titulo: "Revisão Clínica" },
-          ].map((item, i) => (
-            <div key={i} className="p-5 bg-white rounded-2xl shadow">
-              <div className="flex justify-between">
-                <span className="font-bold">{item.hora}</span>
-              </div>
-              <h4 className="font-semibold mt-2">{item.titulo}</h4>
-            </div>
-          ))}
-        </section>
-
-      </div>
 
       {/* Simulado rápido */}
       <section className="pb-12">
