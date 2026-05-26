@@ -164,8 +164,8 @@ async function runTests() {
       body: JSON.stringify({
         tipo: 'flashcards',
         prompt: 'Crie flashcards de revisão rápida sobre ciclo cardíaco, sístole e diástole.',
-        numeroCards: 'menos', // Gerará entre 10 a 15 cards conforme solicitado
-        dificuldade: 'facil'  // Foco fácil
+        numeroCards: 'padrao', // Gerará entre 10 a 15 cards conforme solicitado: menos, padrao, mais
+        dificuldade: 'medio'  // Dificuldade dos cards: facíl, medio, dificil
       })
     });
 
