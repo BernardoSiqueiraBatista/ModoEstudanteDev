@@ -186,6 +186,7 @@ CREATE TABLE flashcards (
     erros             INT NOT NULL DEFAULT 0
 );
 
+-- Compartilhamento por LINK PÚBLICO
 CREATE TABLE paperlab_session_shares (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_id  UUID NOT NULL UNIQUE REFERENCES paperlab_sessions(id) ON DELETE CASCADE,
@@ -195,6 +196,7 @@ CREATE TABLE paperlab_session_shares (
     criado_em   TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Compartilhamento por CONVITE entre estudantes
 CREATE TABLE paperlab_session_collaborators (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_id  UUID NOT NULL REFERENCES paperlab_sessions(id) ON DELETE CASCADE,
@@ -204,6 +206,7 @@ CREATE TABLE paperlab_session_collaborators (
     UNIQUE(session_id, id_student)
 );
 
+-- Histórico de Chat persistido
 CREATE TABLE paperlab_chat_messages (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     session_id  UUID NOT NULL REFERENCES paperlab_sessions(id) ON DELETE CASCADE,

@@ -24,6 +24,9 @@ import { storageRoutes } from './modules/storage/storage.routes';
 import { consultationsRoutes } from './modules/consultations/consultations.routes';
 import { patientConsultationsRoutes } from './modules/consultations/patient-consultations.routes';
 import studentRouter from './modules/student/student.routes';
+import { PapersController } from './modules/papers/papers.controller';
+import { startPapersCleanupJob } from './modules/papers/papers.cron';
+import { PaperlabController } from './modules/paperlab/paperlab.controller';
 
 import { env } from './config/env';
 
@@ -75,6 +78,21 @@ if (env.ENABLE_CONSULTATIONS) {
   app.use('/consultations', authMiddleware, consultationsRoutes);
   app.use('/patients', authMiddleware, patientConsultationsRoutes);
 }
+
+// Rota pública de compartilhamento de papers (sem auth)
+const papersController = new PapersController();
+app.get('/papers/shared/:shareToken', papersController.getSharedPaper);
+
+// Rota pública de compartilhamento de notebooks do Paperlab (sem auth)
+const paperlabController = new PaperlabController();
+app.get('/paperlab/shared/:shareToken', paperlabController.getSharedSession);
+
+// Cron job: hard delete de papers excluídos há mais de 30 dias
+startPapersCleanupJob();
+
+// Inicia o worker em segundo plano do Paperlab (Queue-on-DB)
+import { startPaperlabWorker } from './modules/paperlab/paperlab.worker';
+startPaperlabWorker();
 
 // Error handler (must be last)
 app.use(errorMiddleware);

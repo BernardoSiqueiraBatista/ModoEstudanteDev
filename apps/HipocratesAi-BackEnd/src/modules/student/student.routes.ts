@@ -6,6 +6,8 @@ import dashboardRoutes from '../student-dashboard/student-dashboard.routes';
 import insightsRoutes from '../insights/insights.routes';
 import { studyPlansRoutes } from '../study-plans/study-plans.routes';
 import { studyPlansV1Router } from '../study-plans/study-plans-v1.routes';
+import { papersRoutes } from '../papers/papers.routes';
+import { paperlabRoutes } from '../paperlab/paperlab.routes';
 
 const studentRouter = Router();
 
@@ -16,14 +18,16 @@ studentRouter.use('/performance', performanceRoutes);
 studentRouter.use('/:id/', dashboardRoutes);
 studentRouter.use('/:id/insights', insightsRoutes);
 studentRouter.use('/:id/study-plan', studyPlansRoutes);
+studentRouter.use('/:id/papers', papersRoutes);
+studentRouter.use('/:id/paperlab', paperlabRoutes);
 
 // Rotas v1 — Task 1 (summary), Task 2 (dashboard/insights já existem via legadas),
 // Task 5 (focus-areas, uploads, criação com novo formato, regenerate),
 // Task 6 (gestão completa de planos)
 const v1Router = Router();
-v1Router.use('/students/:id', dashboardRoutes);   // Task 2: GET /student/v1/students/:id/dashboard|focus-areas
-v1Router.use('/students/:id/insights', insightsRoutes); // Task 2: GET|POST /student/v1/students/:id/insights[/regenerate]
-v1Router.use('/study-plans', studyPlansV1Router);  // Tasks 1/5/6
+v1Router.use('/students/:id', dashboardRoutes);
+v1Router.use('/students/:id/insights', insightsRoutes);
+v1Router.use('/study-plans', studyPlansV1Router);
 
 studentRouter.use('/v1', v1Router);
 

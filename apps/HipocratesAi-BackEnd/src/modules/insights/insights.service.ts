@@ -7,7 +7,7 @@ import { logger } from '../../shared/logger/logger';
 import { getInsightsPrompt } from '../../prompts/insights.prompt';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || 'sk-mock-key-value-for-testing-purposes-only',
 });
 
 const InsightItemSchema = z.object({
