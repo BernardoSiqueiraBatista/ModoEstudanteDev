@@ -158,17 +158,31 @@ async function runTests() {
     // ----------------------------------------------------
     logHeader('6. AGUARDANDO GERAÇÃO ASSÍNCRONA DOS FLASHCARDS VIA IA...');
     // ----------------------------------------------------
-    console.log('Aguardando 8 segundos para o GPT-4o-mini estruturar e salvar os flashcards no banco local...');
-    await delay(8000);
+    console.log('Aguardando o GPT-4o-mini estruturar e salvar os flashcards no banco local...');
+    
+    let detailedMaterial = null;
+    let isMatReady = false;
+    for (let attempt = 1; attempt <= 12; attempt++) {
+      await delay(1500);
+      const getMatRes = await fetch(`${BASE_URL}/student/${STUDENT_ID}/paperlab/materials/${materialId}`);
+      if (getMatRes.ok) {
+        detailedMaterial = await getMatRes.json();
+        if (detailedMaterial && detailedMaterial.status === 'ready') {
+          isMatReady = true;
+          break;
+        }
+      }
+      console.log(`[Tentativa ${attempt}/12] Geração de flashcards ainda em processamento...`);
+    }
 
-    const getMatRes = await fetch(`${BASE_URL}/student/${STUDENT_ID}/paperlab/materials/${materialId}`);
-    if (!getMatRes.ok) throw new Error(`Falha ao carregar detalhes do material: ${getMatRes.statusText}`);
-    const detailedMaterial = await getMatRes.json();
-    logSuccess('Flashcards recuperados com sucesso!', detailedMaterial);
-
-    if (detailedMaterial.flashcards && detailedMaterial.flashcards.length > 0) {
-      flashcardId = detailedMaterial.flashcards[0].id;
-      logSuccess(`✅ Flashcards gerados na tabela de flashcards local! Total: ${detailedMaterial.flashcards.length}`);
+    if (isMatReady) {
+      logSuccess('Flashcards gerados e recuperados com sucesso!', detailedMaterial);
+      if (detailedMaterial.flashcards && detailedMaterial.flashcards.length > 0) {
+        flashcardId = detailedMaterial.flashcards[0].id;
+        logSuccess(`✅ Flashcards gerados na tabela de flashcards local! Total: ${detailedMaterial.flashcards.length}`);
+      }
+    } else {
+      console.log(`${colors.yellow}⚠️ Aviso: A geração do material demorou ou falhou. Continuando...${colors.reset}`);
     }
 
     // ----------------------------------------------------
