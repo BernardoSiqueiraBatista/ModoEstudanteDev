@@ -147,7 +147,7 @@ async function runTests() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        pergunta: 'Com base nas fontes indexadas, o que é o débito cardíaco e qual é a principal função do sistema circulatório?'
+        pergunta: 'De acordo com o vídeo da fonte, qual é a principal função do sistema circulatório e quais são seus componentes?'
       })
     });
 
