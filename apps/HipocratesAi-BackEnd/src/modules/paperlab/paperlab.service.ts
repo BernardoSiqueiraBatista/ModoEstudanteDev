@@ -385,7 +385,11 @@ Instruções críticas:
   // HELPERS INTERNOS DE PROCESSAMENTO DE ARQUIVOS (PDF & OCR)
   // ===========================================================================
 
-  async extractTextFromLocalFile(tipo: 'pdf' | 'docx' | 'image' | 'youtube' | 'link', filePath: string): Promise<string> {
+  async extractTextFromLocalFile(
+    tipo: 'pdf' | 'docx' | 'image' | 'youtube' | 'link',
+    filePath: string,
+    titulo?: string
+  ): Promise<string> {
     if (tipo === 'pdf') {
       const dataBuffer = fs.readFileSync(filePath);
       // @ts-ignore
@@ -414,18 +418,18 @@ Instruções críticas:
 
     if (tipo === 'youtube' || tipo === 'link') {
       // Raspagem/Simulação rica de conteúdo da aula caso offline ou sem transcrição
-      logger.info({ url: filePath }, 'Extraindo base de conhecimento RAG para Link/YouTube...');
+      logger.info({ url: filePath, titulo }, 'Extraindo base de conhecimento RAG para Link/YouTube...');
       try {
         const response = await openai.chat.completions.create({
           model: 'gpt-4o-mini',
           messages: [
             {
               role: 'system',
-              content: 'Você é um gerador de conteúdo acadêmico médico. O estudante forneceu um link ou vídeo do YouTube para indexação. Como estamos indexando isso no RAG, gere um resumo didático detalhado e conciso (com ~350 a 450 palavras) sobre o assunto sugerido pelo título para servir como fonte no banco vetorial. Escreva em Português do Brasil.',
+              content: 'Você é um gerador de conteúdo acadêmico médico. O estudante forneceu um link ou vídeo do YouTube para indexação. Como estamos indexando isso no RAG e não podemos ler o vídeo/link em tempo real, use o título e o contexto fornecidos para gerar um resumo didático detalhado, robusto e conciso (com ~350 a 450 palavras) sobre esse tema médico para servir como fonte no banco vetorial. Escreva em Português do Brasil.',
             },
             {
               role: 'user',
-              content: `Título da Aula/Link: "${filePath}"`
+              content: `Título da Aula/Documento: "${titulo || 'Sem título'}"\nURL/Link: "${filePath}"`
             }
           ],
           temperature: 0.5,
@@ -433,7 +437,7 @@ Instruções críticas:
         return response.choices[0]?.message?.content || `Conteúdo gerado a partir de ${filePath}`;
       } catch (err) {
         logger.error({ err }, 'Erro ao gerar fallback de conteúdo de link via OpenAI.');
-        return `Conteúdo e notas de estudo baseados na aula: ${filePath}`;
+        return `Conteúdo e notas de estudo baseados na aula: ${titulo || filePath}`;
       }
     }
 
