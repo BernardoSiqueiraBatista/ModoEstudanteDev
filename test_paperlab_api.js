@@ -89,7 +89,7 @@ async function runTests() {
       body: JSON.stringify({
         tipo: 'youtube',
         titulo: 'Fisiologia Cardiovascular - Fisiologia do Coração, Débito Cardíaco e Contração do Miocárdio',
-        url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        url: 'https://www.youtube.com/watch?v=m7H0V16P5bU'
       })
     });
 
