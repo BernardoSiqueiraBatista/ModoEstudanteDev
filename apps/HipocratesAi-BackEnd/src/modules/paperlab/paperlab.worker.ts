@@ -19,7 +19,7 @@ async function processNextIndexingSource(): Promise<boolean> {
 
   try {
     // 1. Extrai o texto da fonte (PDF, Imagem OCR, DOCX ou fallback link)
-    const rawText = await service.extractTextFromLocalFile(source.tipo, source.url_ou_path);
+    const rawText = await service.extractTextFromLocalFile(source.tipo, source.url_ou_path, source.titulo);
     
     if (!rawText.trim()) {
       throw new Error('A extração não retornou nenhum texto legível da fonte.');
