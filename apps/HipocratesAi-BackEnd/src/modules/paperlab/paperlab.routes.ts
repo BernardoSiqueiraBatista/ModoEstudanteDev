@@ -48,4 +48,22 @@ paperlabRoutes.delete('/materials/:materialId', controller.deleteMaterial);
 // =============================================================================
 paperlabRoutes.post('/materials/:materialId/review', controller.reviewFlashcard);
 
+// =============================================================================
+// COMPARTILHAMENTO POR LINK PÚBLICO
+// =============================================================================
+paperlabRoutes.post('/sessions/:sessionId/share', controller.shareSession);
+paperlabRoutes.delete('/sessions/:sessionId/share', controller.unshareSession);
+
+// =============================================================================
+// COLABORADORES (CONVITE ENTRE ESTUDANTES)
+// =============================================================================
+paperlabRoutes.post('/sessions/:sessionId/collaborators', controller.addCollaborator);
+paperlabRoutes.get('/sessions/:sessionId/collaborators', controller.listCollaborators);
+paperlabRoutes.delete('/sessions/:sessionId/collaborators/:collaboratorId', controller.removeCollaborator);
+
+// =============================================================================
+// HISTÓRICO DE CHAT
+// =============================================================================
+paperlabRoutes.get('/sessions/:sessionId/chat', controller.getChatHistory);
+
 export { paperlabRoutes };

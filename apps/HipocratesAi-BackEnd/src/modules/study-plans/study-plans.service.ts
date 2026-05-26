@@ -7,7 +7,7 @@ import { InsightsModel } from '../insights/insights.model';
 import { getStudyPlanPrompt, StudyPlanGenerationSchema } from '../../prompts/study-plans.prompt';
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY || 'sk-mock-key-value-for-testing-purposes-only',
 });
 
 export class StudyPlansService {
