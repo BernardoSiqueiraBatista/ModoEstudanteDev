@@ -169,6 +169,7 @@ export default function RoutineConfigurator({ loading, onGenerate }: RoutineConf
         <FixedEventModal
           onAdd={(ev) => setFixedEvents((prev) => [...prev, ev])}
           onClose={() => setShowModal(false)}
+          existingEvents={fixedEvents}
         />
       )}
     </section>

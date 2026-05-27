@@ -1,11 +1,13 @@
-import { useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import WeekCalendarHeader from '../../components/agenda/week/WeekCalendarHeader';
 import WeekCalendarGrid from '../../components/agenda/week/WeekCalendarGrid';
-import { useRoutineGenerator, type DayKey, type RoutineBlock } from '../../hooks/useRoutineGenerator';
+import { useRoutineGenerator, type DayKey, type RoutineBlock, type FixedEvent } from '../../hooks/useRoutineGenerator';
 import { weekDays } from '../../data/WeekCalendarData';
 import type { Apontamento, Patient } from '../../types/PatientTypes';
 import type { EventType } from '../../components/agenda/week/Calendarevent';
+import FixedEventModal from '../../components/plan/FixedEventModal';
+import FixedEventPill from '../../components/plan/FixedEventPill';
 
 // ─── Geometry ────────────────────────────────────────────────────────────────
 const CALENDAR_START = '06:00';
@@ -51,7 +53,7 @@ function toAppointments(week: Record<DayKey, RoutineBlock[]>): Apontamento[] {
         type: TYPE_MAP[b.type] ?? 'consulta',
         description: DESC_MAP[b.type] ?? 'Estudo',
         top: timeToTop(start),
-        height: Math.max(40, Math.round(b.duration_min * PX_PER_MIN)),
+        height: Math.min(240, Math.max(40, Math.round(b.duration_min * PX_PER_MIN))),
       });
       cursor = addMins(end, 15);
     });
@@ -135,12 +137,48 @@ function GoalCard({ hours, goal }: { hours:number; goal:number }) {
   );
 }
 
+const FIXED_EVENTS_KEY = 'routine_fixed_events';
+
+function loadStoredFixedEvents(): FixedEvent[] {
+  try {
+    const raw = localStorage.getItem(FIXED_EVENTS_KEY);
+    return raw ? (JSON.parse(raw) as FixedEvent[]) : [];
+  } catch {
+    return [];
+  }
+}
+
 // ─── Main ────────────────────────────────────────────────────────────────────
 export default function CalendarioView() {
   const navigate  = useNavigate();
-  const { routine, loading, fetchCurrentRoutine } = useRoutineGenerator();
+  const location  = useLocation();
+  const planId    = (location.state as { planId?: string } | null)?.planId;
+  const { routine, loading, fetchCurrentRoutine, fetchPlanById } = useRoutineGenerator();
 
-  useEffect(() => { fetchCurrentRoutine(); }, [fetchCurrentRoutine]);
+  const [fixedEvents, setFixedEvents] = useState<FixedEvent[]>(loadStoredFixedEvents);
+  const [showFixedModal, setShowFixedModal] = useState(false);
+
+  useEffect(() => {
+    if (planId) {
+      fetchPlanById(planId);
+    } else {
+      fetchCurrentRoutine();
+    }
+  }, [planId, fetchCurrentRoutine, fetchPlanById]);
+
+  function handleAddFixed(ev: FixedEvent) {
+    const updated = [...fixedEvents, ev];
+    setFixedEvents(updated);
+    localStorage.setItem(FIXED_EVENTS_KEY, JSON.stringify(updated));
+    if (planId) fetchPlanById(planId); else fetchCurrentRoutine();
+  }
+
+  function handleRemoveFixed(idx: number) {
+    const updated = fixedEvents.filter((_, i) => i !== idx);
+    setFixedEvents(updated);
+    localStorage.setItem(FIXED_EVENTS_KEY, JSON.stringify(updated));
+    if (planId) fetchPlanById(planId); else fetchCurrentRoutine();
+  }
 
   const todayIndex = weekDays.findIndex(d => d.isToday);
 
@@ -162,13 +200,25 @@ export default function CalendarioView() {
   return (
     <div className="flex flex-col pb-16">
 
-      {/* Header */}
-      <header className="flex items-start justify-between px-10 py-6 border-b border-light bg-white">
+      {/* Page title row */}
+      <div className="flex items-start justify-between px-10 py-6">
         <div>
           <h1 className="text-4xl font-bold tracking-tight text-title">Calendário de Estudos</h1>
           <p className="text-sm text-subtitle mt-1 font-medium">{getWeekLabel()}</p>
         </div>
         <div className="flex items-center gap-3 mt-1">
+          <button
+            onClick={() => setShowFixedModal(true)}
+            className="flex items-center gap-2 px-5 py-2.5 bg-white border border-light rounded-full text-sm font-semibold text-on-surface hover:bg-surface-light transition-all active:scale-[0.98]"
+          >
+            <span className="material-symbols-outlined text-[18px]">event_busy</span>
+            Compromissos fixos
+            {fixedEvents.length > 0 && (
+              <span className="bg-primary text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                {fixedEvents.length}
+              </span>
+            )}
+          </button>
           <button
             onClick={() => navigate('/plan')}
             className="flex items-center gap-2 px-5 py-2.5 bg-white border border-light rounded-full text-sm font-semibold text-on-surface hover:bg-surface-light transition-all active:scale-[0.98]"
@@ -177,7 +227,16 @@ export default function CalendarioView() {
             Voltar ao Plano
           </button>
         </div>
-      </header>
+      </div>
+
+      {/* Fixed events pills */}
+      {fixedEvents.length > 0 && (
+        <div className="px-10 pb-2 flex flex-wrap gap-2">
+          {fixedEvents.map((ev, idx) => (
+            <FixedEventPill key={idx} event={ev} onRemove={() => handleRemoveFixed(idx)} />
+          ))}
+        </div>
+      )}
 
       {/* Info bar */}
       {!routine && !loading && (
@@ -241,6 +300,14 @@ export default function CalendarioView() {
         <StudyChart events={events} />
         <GoalCard hours={Math.round(totalHours)} goal={routine ? 30 : 20} />
       </div>
+
+      {showFixedModal && (
+        <FixedEventModal
+          onAdd={handleAddFixed}
+          onClose={() => setShowFixedModal(false)}
+          existingEvents={fixedEvents}
+        />
+      )}
 
     </div>
   );

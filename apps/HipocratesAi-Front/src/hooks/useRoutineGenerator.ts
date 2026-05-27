@@ -174,16 +174,30 @@ export function useRoutineGenerator() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const fetchPlanById = useCallback(async (planId: string) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/student/v1/study-plans/${planId}`);
+      if (!res.ok) return;
+      const { plan, blocks } = await res.json();
+      setRoutine(planToRoutine(plan, blocks, loadFixedEvents()));
+    } catch {
+      // silent
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const fetchCurrentRoutine = useCallback(async () => {
     try {
-      const listRes = await fetch(`${API_BASE}/student/${STUDENT_ID}/study-plan`);
+      const listRes = await fetch(`${API_BASE}/student/v1/study-plans?student_id=${STUDENT_ID}`);
       if (!listRes.ok) return;
 
-      const plans: any[] = await listRes.json();
-      if (!plans.length) return;
+      const { planos } = await listRes.json();
+      if (!planos?.length) return;
 
-      const latestPlanId = plans[0].id;
-      const detailRes = await fetch(`${API_BASE}/student/${STUDENT_ID}/study-plan/${latestPlanId}`);
+      const latestPlanId = planos[0].id;
+      const detailRes = await fetch(`${API_BASE}/student/v1/study-plans/${latestPlanId}`);
       if (!detailRes.ok) return;
 
       const { plan, blocks } = await detailRes.json();
@@ -247,5 +261,5 @@ export function useRoutineGenerator() {
     }
   }, []);
 
-  return { routine, loading, error, generate, fetchCurrentRoutine, setError };
+  return { routine, loading, error, generate, fetchCurrentRoutine, fetchPlanById, setError };
 }

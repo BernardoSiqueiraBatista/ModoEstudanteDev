@@ -71,7 +71,7 @@ const [modal, setModal] = useState<ModalConfig | null>(null)
       className="bg-surface text-on-surface font-body selection:bg-secondary/20"
       style={{ backgroundImage: 'radial-gradient(at 0% 0%, rgba(0,209,255,0.03) 0px, transparent 40%), radial-gradient(at 100% 100%, rgba(26,54,93,0.02) 0px, transparent 40%)' }}
     >
-      <main className="pl-64 min-h-screen">
+      <main className="min-h-screen">
         <div className="px-10 py-4 max-w-7xl mx-auto space-y-12">
 
           {/* Header & Filtros */}

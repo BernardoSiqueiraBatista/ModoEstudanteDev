@@ -51,7 +51,7 @@ export default function ExecutarSimulado() {
       id_answer: answersRef.current[q.id_questao] ?? null,
     }))
 
-    navigate('/simulados/resultado', {
+    navigate('/summary', {
       state: { answers: formattedAnswers, questions, timeSpentSeconds: totalSeconds - timeLeft },
     })
   }
