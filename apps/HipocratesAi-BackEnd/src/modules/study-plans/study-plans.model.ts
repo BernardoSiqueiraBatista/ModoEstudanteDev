@@ -179,13 +179,29 @@ export class StudyPlansModel {
     if (result.rows.length === 0) return null;
     const p = result.rows[0];
     const params = p.parametros ?? {};
+
+    // Task 4: Ler compromissos fixos da tabela dedicada, com fallback ao JSON para planos antigos
+    const fcResult = await pool.query(
+      `SELECT dia, inicio, fim, label, tipo FROM study_plan_fixed_commitments WHERE id_plan = $1 ORDER BY dia, inicio`,
+      [planId]
+    );
+    const compromissos = fcResult.rows.length > 0
+      ? fcResult.rows.map((r: any) => ({
+          dia: r.dia,
+          inicio: typeof r.inicio === 'string' ? r.inicio.substring(0, 5) : r.inicio,
+          fim: typeof r.fim === 'string' ? r.fim.substring(0, 5) : r.fim,
+          label: r.label,
+          tipo: r.tipo,
+        }))
+      : params.compromissos_fixos ?? params.horarios_bloqueados ?? [];
+
     return {
       plan_id: p.id,
       areas_foco: p.areas_foco ?? [],
       duracao: p.duracao,
       horas_dia: params.horas_por_dia ?? params.horas_dia ?? 0,
       dias_disponiveis: params.dias_semana ?? params.dias_disponiveis ?? [],
-      compromissos_fixos: params.compromissos_fixos ?? params.horarios_bloqueados ?? [],
+      compromissos_fixos: compromissos,
       briefing_preview: p.briefing_texto ? String(p.briefing_texto).substring(0, 200) : '',
       render_mode: 'popup_no_blue',
     };

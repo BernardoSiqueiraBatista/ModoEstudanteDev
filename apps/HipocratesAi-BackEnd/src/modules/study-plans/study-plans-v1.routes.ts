@@ -1,8 +1,10 @@
 import { Router } from 'express';
 import { StudyPlansV1Controller } from './study-plans-v1.controller';
+import { FixedCommitmentsController } from '../fixed-commitments/fixed-commitments.controller';
 
 const studyPlansV1Router = Router();
 const ctrl = new StudyPlansV1Controller();
+const fcCtrl = new FixedCommitmentsController();
 
 // Task 5: upload de arquivos do ciclo
 studyPlansV1Router.post('/uploads', ...ctrl.uploadFile);
@@ -15,6 +17,12 @@ studyPlansV1Router.get('/', ctrl.listPlans);
 
 // Task 1: resumo do plano para pop-up 4/4
 studyPlansV1Router.get('/:id/summary', ctrl.getSummary);
+
+// Task 4: CRUD compromissos fixos / horários bloqueados
+studyPlansV1Router.get('/:id/fixed-commitments', fcCtrl.listCommitments);
+studyPlansV1Router.post('/:id/fixed-commitments', fcCtrl.createCommitment);
+studyPlansV1Router.patch('/:id/fixed-commitments/:cid', fcCtrl.updateCommitment);
+studyPlansV1Router.delete('/:id/fixed-commitments/:cid', fcCtrl.deleteCommitment);
 
 // Task 5: regenerar cronograma (rate limit 6h)
 studyPlansV1Router.post('/:id/regenerate', ctrl.regeneratePlan);
