@@ -4,6 +4,7 @@ import { AppError } from '../../shared/errors/AppError';
 import { logger } from '../../shared/logger/logger';
 import { StudyPlansModel, IStudyPlan, IStudyPlanBlock } from './study-plans.model';
 import { InsightsModel } from '../insights/insights.model';
+import { FixedCommitmentsModel } from '../fixed-commitments/fixed-commitments.model';
 import { getStudyPlanPrompt, StudyPlanGenerationSchema } from '../../prompts/study-plans.prompt';
 
 const openai = new OpenAI({
@@ -13,10 +14,12 @@ const openai = new OpenAI({
 export class StudyPlansService {
   private model: StudyPlansModel;
   private insightsModel: InsightsModel;
+  private fixedCommitmentsModel: FixedCommitmentsModel;
 
   constructor() {
     this.model = new StudyPlansModel();
     this.insightsModel = new InsightsModel();
+    this.fixedCommitmentsModel = new FixedCommitmentsModel();
   }
 
   async generateStudyPlan(studentId: string, data: {
@@ -197,7 +200,7 @@ export class StudyPlansService {
       ? [...new Set(data.compromissos_fixos.map(c => c.dia))]
       : ['seg', 'ter', 'qua', 'qui', 'sex'];
 
-    return this.generateStudyPlan(studentId, {
+    const result = await this.generateStudyPlan(studentId, {
       titulo,
       categoria: data.categoria ?? 'geral',
       areas_foco: data.areas_foco,
@@ -208,6 +211,13 @@ export class StudyPlansService {
       briefing: data.instrucoes,
       considerar_insights: data.considerar_performance ?? false,
     });
+
+    // Task 4: Salvar compromissos fixos na tabela dedicada
+    if (data.compromissos_fixos && data.compromissos_fixos.length > 0) {
+      await this.fixedCommitmentsModel.createBatch(result.plan.id, data.compromissos_fixos);
+    }
+
+    return result;
   }
 
   async regeneratePlan(planId: string, studentId: string): Promise<{ plan: IStudyPlan; blocks: IStudyPlanBlock[] }> {
@@ -230,7 +240,16 @@ export class StudyPlansService {
     const briefing = plan.briefing_texto ?? (plan.areas_foco ?? []).join(', ');
     const horas = (params.horas_por_dia ?? params.horas_dia ?? 4) as number;
     const dias = (params.dias_semana ?? params.dias_disponiveis ?? ['seg', 'ter', 'qua', 'qui', 'sex']) as string[];
-    const bloqueados = (params.horarios_bloqueados ?? params.compromissos_fixos ?? []) as { dia: string; inicio: string; fim: string }[];
+
+    // Task 4: Ler compromissos fixos da tabela dedicada, com fallback ao JSON para planos antigos
+    const commitments = await this.fixedCommitmentsModel.listByPlan(planId);
+    const bloqueados: { dia: string; inicio: string; fim: string }[] = commitments.length > 0
+      ? commitments.map(c => ({
+          dia: c.dia,
+          inicio: typeof c.inicio === 'string' ? c.inicio.substring(0, 5) : c.inicio,
+          fim: typeof c.fim === 'string' ? c.fim.substring(0, 5) : c.fim,
+        }))
+      : (params.horarios_bloqueados ?? params.compromissos_fixos ?? []) as { dia: string; inicio: string; fim: string }[];
 
     let insightsText = '';
     const lastInsight = await this.insightsModel.getLastInsight(studentId);
