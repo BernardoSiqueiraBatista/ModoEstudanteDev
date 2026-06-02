@@ -218,7 +218,7 @@ async function runTests() {
       logHeader('10. LIMPAR BANCO (DELETAR PLANO DE ESTUDOS TEMPORÁRIO)');
       // ----------------------------------------------------
       try {
-        const cleanupRes = await fetch(`${BASE_URL}/student/v1/study-plans/${tempPlanId}`, {
+        const cleanupRes = await fetch(`${BASE_URL}/student/v1/study-plans/${tempPlanId}?student_id=${STUDENT_ID}`, {
           method: 'DELETE'
         });
         if (cleanupRes.ok) {
