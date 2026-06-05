@@ -4,7 +4,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { logger } from '../../../shared/logger/logger';
 import { authenticateWsRequest } from '../../consultations/ws/auth-ws';
 import { attachDeepgramToSocket } from '../../../shared/deepgram/deepgram-streamer';
-import pool from '../../../config/dbSchema';
+import { pool } from '../../../config/postgres_local';
 
 const wss = new WebSocketServer({ noServer: true });
 
