@@ -169,6 +169,89 @@ export function generateOpenApiSpec(): OpenAPIObject {
     responses: { 200: { description: 'Resultados' } },
   });
 
+  // Cases (Task 7)
+  registry.registerPath({
+    method: 'get',
+    path: '/student/v1/cases/{id}/intro',
+    description: 'Retorna resumo do caso clínico para a pop-up de início',
+    request: { params: z.object({ id: z.string().uuid() }) },
+    responses: {
+      200: { description: 'Resumo do caso com checklist OSCE e recursos habilitados' },
+      404: { description: 'Caso não encontrado' },
+    },
+  });
+  registry.registerPath({
+    method: 'post',
+    path: '/student/v1/cases/{id}/attempts',
+    description: 'Inicia uma tentativa de simulação (modo HM ou OSCE)',
+    request: {
+      params: z.object({ id: z.string().uuid() }),
+      body: {
+        content: {
+          'application/json': {
+            schema: z.object({
+              modo: z.enum(['hm', 'osce']),
+              student_id: z.string().uuid(),
+            }),
+          },
+        },
+      },
+    },
+    responses: {
+      201: { description: 'Tentativa criada com attempt_id e dados da sessão' },
+      404: { description: 'Caso não encontrado' },
+      422: { description: 'Dados inválidos' },
+    },
+  });
+  registry.registerPath({
+    method: 'post',
+    path: '/student/v1/cases/attempts/{aid}/events',
+    description: '(OSCE) Registra evento de acerto/erro durante a simulação',
+    request: {
+      params: z.object({ aid: z.string().uuid() }),
+      body: {
+        content: {
+          'application/json': {
+            schema: z.object({
+              tipo: z.enum(['procedimento_correto', 'erro', 'omissao']),
+              ref: z.string(),
+              pontos: z.number().int(),
+              timestamp: z.string().datetime().optional(),
+            }),
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: 'Pontuação acumulada e notificação toast' },
+      404: { description: 'Tentativa não encontrada' },
+      422: { description: 'Modo inválido ou tentativa finalizada' },
+    },
+  });
+  registry.registerPath({
+    method: 'post',
+    path: '/student/v1/cases/attempts/{aid}/finish',
+    description: 'Finaliza a tentativa e retorna pontuação consolidada + feedback LLM',
+    request: {
+      params: z.object({ aid: z.string().uuid() }),
+      body: {
+        content: {
+          'application/json': {
+            schema: z.object({
+              student_id: z.string().uuid(),
+            }),
+          },
+        },
+      },
+    },
+    responses: {
+      200: { description: 'Pontuação final, acertos, erros, tempo e feedback' },
+      404: { description: 'Tentativa não encontrada' },
+      403: { description: 'Sem permissão para finalizar' },
+      422: { description: 'Tentativa já finalizada' },
+    },
+  });
+
   const generator = new OpenApiGeneratorV3(registry.definitions);
 
   return generator.generateDocument({

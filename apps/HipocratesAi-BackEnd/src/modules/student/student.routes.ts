@@ -8,6 +8,7 @@ import { studyPlansRoutes } from '../study-plans/study-plans.routes';
 import { studyPlansV1Router } from '../study-plans/study-plans-v1.routes';
 import { papersRoutes } from '../papers/papers.routes';
 import { paperlabRoutes } from '../paperlab/paperlab.routes';
+import { casesRouter } from '../cases/cases.routes';
 
 const studentRouter = Router();
 
@@ -28,6 +29,7 @@ const v1Router = Router();
 v1Router.use('/students/:id', dashboardRoutes);
 v1Router.use('/students/:id/insights', insightsRoutes);
 v1Router.use('/study-plans', studyPlansV1Router);
+v1Router.use('/cases', casesRouter); // Task 7: Hipócrates Cases
 
 studentRouter.use('/v1', v1Router);
 
