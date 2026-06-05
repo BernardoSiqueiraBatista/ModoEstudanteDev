@@ -94,6 +94,24 @@ export default function RouterView() {
         />
 
         <Route
+        path="/cases"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+        path="/osce"
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
         path="/summary"
           element={
             <ProtectedRoute>
