@@ -66,16 +66,6 @@ export default function WeekCalendarGrid({
               isToday ? 'bg-primary/[0.01]' : ''
             } ${isWeekend ? 'bg-slate-50/30' : ''}`}
           >
-            {/* Current Time Marker */}
-            {isToday && propCurrentTimePosition && (
-              <div
-                className="absolute left-0 right-0 border-t-2 border-primary border-dashed z-10 flex items-center"
-                style={{ top: `${propCurrentTimePosition}px` }}
-              >
-                <div className="size-2 rounded-full bg-primary -ml-1"></div>
-              </div>
-            )}
-
             {/* Events */}
             {dayEvents.map((event, index) => (
               <CalendarEvent

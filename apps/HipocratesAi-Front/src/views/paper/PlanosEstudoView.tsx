@@ -497,7 +497,6 @@ export default function StudyPlansPage() {
         </div>
       )}
 
-      {/* MODAL CRIAÇÃO */}
       <SetupPlanoModal open={openModal} onClose={handleModalClose} />
     </div>
   );

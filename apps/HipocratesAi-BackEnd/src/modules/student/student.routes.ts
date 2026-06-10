@@ -8,6 +8,7 @@ import { studyPlansRoutes } from '../study-plans/study-plans.routes';
 import { studyPlansV1Router } from '../study-plans/study-plans-v1.routes';
 import { papersRoutes } from '../papers/papers.routes';
 import { paperlabRoutes } from '../paperlab/paperlab.routes';
+import { casesRouter } from '../cases/cases.routes';
 
 const studentRouter = Router();
 
@@ -21,13 +22,12 @@ studentRouter.use('/:id/study-plan', studyPlansRoutes);
 studentRouter.use('/:id/papers', papersRoutes);
 studentRouter.use('/:id/paperlab', paperlabRoutes);
 
-// Rotas v1 — Task 1 (summary), Task 2 (dashboard/insights já existem via legadas),
-// Task 5 (focus-areas, uploads, criação com novo formato, regenerate),
-// Task 6 (gestão completa de planos)
+// Rotas v1
 const v1Router = Router();
 v1Router.use('/students/:id', dashboardRoutes);
 v1Router.use('/students/:id/insights', insightsRoutes);
 v1Router.use('/study-plans', studyPlansV1Router);
+v1Router.use('/cases', casesRouter); // Tasks 6 e 7 (Contrato 4)
 
 studentRouter.use('/v1', v1Router);
 

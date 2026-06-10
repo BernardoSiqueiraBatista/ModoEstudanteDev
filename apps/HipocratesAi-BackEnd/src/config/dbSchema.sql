@@ -227,3 +227,93 @@ CREATE INDEX idx_session_collabs_student        ON paperlab_session_collaborator
 CREATE INDEX idx_session_collabs_session        ON paperlab_session_collaborators(session_id);
 CREATE INDEX idx_chat_messages_session          ON paperlab_chat_messages(session_id);
 CREATE INDEX idx_chat_messages_session_time     ON paperlab_chat_messages(session_id, criado_em DESC);
+
+
+-- =============================================================================
+-- Tasks 4, 6 e 7 (Contrato 4) — Fixed Commitments + Hipócrates Cases
+-- =============================================================================
+
+-- Task 4: tabela dedicada para compromissos fixos / horários bloqueados
+CREATE TABLE IF NOT EXISTS study_plan_fixed_commitments (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id_plan         UUID NOT NULL REFERENCES study_plans(id) ON DELETE CASCADE,
+    dia             VARCHAR(3) NOT NULL CHECK (dia IN ('seg','ter','qua','qui','sex','sab','dom')),
+    inicio          TIME NOT NULL,
+    fim             TIME NOT NULL,
+    label           TEXT,
+    tipo            VARCHAR(30) NOT NULL DEFAULT 'compromisso_fixo',
+    criado_em       TIMESTAMP NOT NULL DEFAULT NOW(),
+    atualizado_em   TIMESTAMP NOT NULL DEFAULT NOW(),
+    CONSTRAINT chk_fim_gt_inicio CHECK (fim > inicio)
+);
+CREATE INDEX IF NOT EXISTS idx_fixed_commitments_plan     ON study_plan_fixed_commitments(id_plan);
+CREATE INDEX IF NOT EXISTS idx_fixed_commitments_plan_dia ON study_plan_fixed_commitments(id_plan, dia);
+
+-- Tasks 6 e 7: catálogo de casos clínicos com payload rico
+CREATE TABLE IF NOT EXISTS cases (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    titulo              TEXT NOT NULL,
+    descricao           TEXT NOT NULL,
+    especialidade       VARCHAR(100) NOT NULL,
+    dificuldade         VARCHAR(20) NOT NULL DEFAULT 'media' CHECK (dificuldade IN ('facil', 'media', 'dificil')),
+    payload_mock        JSONB NOT NULL DEFAULT '{}',
+    tempo_estimado_min  INT DEFAULT 20,
+    criado_em           TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_cases_especialidade ON cases(especialidade);
+CREATE INDEX IF NOT EXISTS idx_cases_dificuldade   ON cases(dificuldade);
+
+CREATE TABLE IF NOT EXISTS case_attempts (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id         UUID NOT NULL REFERENCES student(id) ON DELETE CASCADE,
+    case_id         UUID NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+    modo            VARCHAR(10) NOT NULL CHECK (modo IN ('hm', 'osce')),
+    pontuacao       INT,
+    acertos         INT DEFAULT 0,
+    erros           INT DEFAULT 0,
+    tempo_segundos  INT,
+    status          VARCHAR(20) NOT NULL DEFAULT 'em_andamento' CHECK (status IN ('em_andamento', 'finalizado', 'abandonado')),
+    iniciado_em     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    finalizado_em   TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS idx_case_attempts_user   ON case_attempts(user_id);
+CREATE INDEX IF NOT EXISTS idx_case_attempts_case   ON case_attempts(case_id);
+CREATE INDEX IF NOT EXISTS idx_case_attempts_status ON case_attempts(status);
+
+-- Task 7: eventos OSCE persistidos para auditoria e feedback
+CREATE TABLE IF NOT EXISTS case_attempt_events (
+    id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    attempt_id  UUID NOT NULL REFERENCES case_attempts(id) ON DELETE CASCADE,
+    tipo        VARCHAR(50) NOT NULL CHECK (tipo IN ('procedimento_correto', 'erro', 'omissao')),
+    ref         VARCHAR(200) NOT NULL,
+    pontos      INT NOT NULL DEFAULT 0,
+    timestamp   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    criado_em   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_case_events_attempt      ON case_attempt_events(attempt_id);
+CREATE INDEX IF NOT EXISTS idx_case_events_attempt_time ON case_attempt_events(attempt_id, criado_em DESC);
+
+-- Task 7 HM: histórico de chat por tentativa
+CREATE TABLE IF NOT EXISTS case_messages (
+    id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    attempt_id  UUID        NOT NULL REFERENCES case_attempts(id) ON DELETE CASCADE,
+    student_id  UUID        NOT NULL REFERENCES student(id) ON DELETE CASCADE,
+    role        VARCHAR(10) NOT NULL CHECK (role IN ('user', 'assistant', 'hint')),
+    content     TEXT        NOT NULL,
+    criado_em   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS idx_case_messages_attempt ON case_messages(attempt_id);
+CREATE INDEX IF NOT EXISTS idx_case_messages_time    ON case_messages(attempt_id, criado_em ASC);
+
+-- Task 7 (Contrato 4) — Chat de simulação HM por tentativa
+CREATE TABLE IF NOT EXISTS case_messages (
+    id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+    attempt_id  UUID        NOT NULL REFERENCES case_attempts(id) ON DELETE CASCADE,
+    student_id  UUID        NOT NULL REFERENCES student(id) ON DELETE CASCADE,
+    role        VARCHAR(10) NOT NULL CHECK (role IN ('user', 'assistant', 'hint')),
+    content     TEXT        NOT NULL,
+    criado_em   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_case_messages_attempt ON case_messages(attempt_id);
+CREATE INDEX IF NOT EXISTS idx_case_messages_time    ON case_messages(attempt_id, criado_em ASC);

@@ -40,6 +40,34 @@ const STUB_PATIENT: Patient = {
 const TYPE_MAP: Record<string, EventType>    = { study:'consulta', questions:'urgencia', revision:'compromisso', fixed:'video' };
 const DESC_MAP: Record<string, string>       = { study:'Estudo teórico', questions:'Questões', revision:'Revisão', fixed:'Compromisso fixo' };
 
+const FIXED_DAY_INDEX: Record<string, number> = {
+  'Segunda': 0, 'Terça': 1, 'Quarta': 2, 'Quinta': 3,
+  'Sexta': 4, 'Sábado': 5, 'Domingo': 6,
+};
+
+function fixedToAppointments(fixedEvents: FixedEvent[]): Apontamento[] {
+  const out: Apontamento[] = [];
+  for (const ev of fixedEvents) {
+    for (const day of ev.days) {
+      const dayIndex = FIXED_DAY_INDEX[day] ?? -1;
+      if (dayIndex < 0) continue;
+      const duration = parseMins(ev.endTime) - parseMins(ev.startTime);
+      out.push({
+        dayIndex,
+        patient: STUB_PATIENT,
+        title: ev.name,
+        startTime: ev.startTime,
+        endTime: ev.endTime,
+        type: 'video' as EventType,
+        description: 'Compromisso fixo',
+        top: timeToTop(ev.startTime),
+        height: Math.max(40, Math.round(duration * PX_PER_MIN)),
+      });
+    }
+  }
+  return out;
+}
+
 function toAppointments(week: Record<DayKey, RoutineBlock[]>): Apontamento[] {
   const out: Apontamento[] = [];
   DAY_ORDER.forEach((day, dayIndex) => {
@@ -183,9 +211,9 @@ export default function CalendarioView() {
   const todayIndex = weekDays.findIndex(d => d.isToday);
 
   const events = useMemo(() => {
-    if (!routine) return [];
-    return toAppointments(routine.week);
-  }, [routine]);
+    const blocks = routine ? toAppointments(routine.week) : [];
+    return [...blocks, ...fixedToAppointments(fixedEvents)];
+  }, [routine, fixedEvents]);
 
   const currentTimePos = useMemo(() => {
     const now = new Date();

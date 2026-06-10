@@ -18,6 +18,9 @@ import PlanosEstudo from '../views/paper/PlanosEstudoView';
 import CalendarioView from '../views/plan/CalendarioView';
 import Flashcard from '../views/flashcard/GeraFlashcardView';
 import LabEstudos from '../views/paper/LabEstudosView';
+import DashboardCases from '../views/cases/DashboardCasesView';
+import OsceCaseView from '../views/cases/OsceCaseView';
+import HMCaseView from '../views/cases/HMCaseView';
 
 import { useLocation } from 'react-router-dom';
 
@@ -98,6 +101,9 @@ export default function MainLayout() {
         {location.pathname === '/paper' && <MyPapers />}
         {location.pathname.startsWith('/paper/') && <LabEstudos />}
         {location.pathname === '/flashcards' && <Flashcard />}
+        {location.pathname === '/cases' && <DashboardCases />}
+        {location.pathname === '/osce' && <OsceCaseView />}
+        {location.pathname === '/hm' && <HMCaseView />}
         {location.pathname === '/simulados' && <SimuladosDashboard />}
         {location.pathname.startsWith('/simulados/rapido') && (
           <SimuladosRapido />

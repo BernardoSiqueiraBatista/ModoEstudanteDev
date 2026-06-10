@@ -46,7 +46,7 @@ const navItems: NavItem[] = [
       { name: 'Plano', href: '/plan' },
       { name: 'Simulados', href: '/simulados' },
       { name: 'Questões', href: '/questoes' },
-      { name: 'Consultas Simuladas', href: '/consultas-simuladas' },
+      { name: 'Cases', href: '/cases' },
       { name: 'Flashcards', href: '/flashcards' },
       { name: 'Paper', href: '/paper' },
     ],

@@ -193,6 +193,144 @@ async function runSeed() {
       }
     }
 
+    // 6. Injetar Casos Clínicos (Tasks 6 e 7)
+    console.log('🏥 Criando casos clínicos mock...');
+    const caseSeed = [
+      {
+        titulo: 'Dor torácica em paciente hipertenso',
+        descricao: 'Paciente de 45 anos, hipertenso e diabético, com dor torácica em aperto há 2 horas irradiando para o braço esquerdo.',
+        especialidade: 'Cardiologia',
+        dificuldade: 'media',
+        tempo_estimado_min: 20,
+        payload_mock: {
+          paciente: { nome: 'Carlos Mendes', idade: 45, sexo: 'M', antecedentes: ['HAS', 'DM tipo 2', 'Tabagismo'], medicamentos: ['Losartana 50mg', 'Metformina 850mg', 'AAS 100mg'], alergias: ['Dipirona'] },
+          queixa_principal: 'Dor torácica em aperto há 2 horas irradiando para braço esquerdo',
+          contexto_resumido: 'Homem de 45 anos, hipertenso e diabético, com dor torácica típica sugestiva de SCA.',
+          recursos_habilitados: { suporte_cognitivo: true, chatbot_ia: true, dicas: true },
+          checklist_osce: [
+            { criterio: 'Anamnese', itens: [{ ref: 'historico_dor', descricao: 'Investigou características da dor (OPQRST)', pontos: 15 }, { ref: 'fatores_risco', descricao: 'Identificou fatores de risco cardiovascular', pontos: 10 }] },
+            { criterio: 'Conduta', itens: [{ ref: 'ecg_10min', descricao: 'Solicitou ECG em < 10 minutos', pontos: 20 }, { ref: 'troponina', descricao: 'Solicitou troponina', pontos: 15 }] }
+          ]
+        }
+      },
+      {
+        titulo: 'Crise asmática grave',
+        descricao: 'Paciente de 22 anos com broncoespasmo grave, uso de musculatura acessória e SpO2 88%.',
+        especialidade: 'Pneumologia',
+        dificuldade: 'media',
+        tempo_estimado_min: 15,
+        payload_mock: {
+          paciente: { nome: 'Ana Lima', idade: 22, sexo: 'F', antecedentes: ['Asma desde infância'], medicamentos: ['Salbutamol SOS'], alergias: [] },
+          queixa_principal: 'Falta de ar intensa após contato com alérgenos',
+          contexto_resumido: 'Jovem asmática em crise grave, saturando 88%, uso de musculatura acessória.',
+          recursos_habilitados: { suporte_cognitivo: true, chatbot_ia: true, dicas: true },
+          checklist_osce: [
+            { criterio: 'Avaliação', itens: [{ ref: 'avaliacao_gravidade', descricao: 'Classificou gravidade da crise', pontos: 15 }, { ref: 'sat_o2', descricao: 'Verificou saturação de oxigênio', pontos: 10 }] },
+            { criterio: 'Conduta', itens: [{ ref: 'broncodilatador', descricao: 'Administrou broncodilatador inalatório', pontos: 20 }, { ref: 'corticoide', descricao: 'Prescreveu corticoide sistêmico', pontos: 15 }] }
+          ]
+        }
+      },
+      {
+        titulo: 'AVC isquêmico agudo',
+        descricao: 'Paciente de 72 anos com hemiplegia súbita e afasia. Janela terapêutica para trombólise aberta.',
+        especialidade: 'Neurologia',
+        dificuldade: 'dificil',
+        tempo_estimado_min: 25,
+        payload_mock: {
+          paciente: { nome: 'Roberto Nunes', idade: 72, sexo: 'M', antecedentes: ['Fibrilação atrial'], medicamentos: [], alergias: [] },
+          queixa_principal: 'Fraqueza no lado direito e dificuldade para falar — início há 90 min',
+          contexto_resumido: 'Idoso com FA, sem anticoagulação, AVC isquêmico agudo dentro da janela de trombólise.',
+          recursos_habilitados: { suporte_cognitivo: true, chatbot_ia: true, dicas: false },
+          checklist_osce: [
+            { criterio: 'Avaliação', itens: [{ ref: 'escala_nihss', descricao: 'Aplicou escala NIHSS', pontos: 20 }, { ref: 'tempo_onset', descricao: 'Confirmou tempo de início dos sintomas', pontos: 15 }] },
+            { criterio: 'Conduta', itens: [{ ref: 'tc_sem_contraste', descricao: 'Solicitou TC sem contraste urgente', pontos: 20 }, { ref: 'rtpa', descricao: 'Indicou trombólise com rt-PA', pontos: 25 }] }
+          ]
+        }
+      },
+      {
+        titulo: 'Cetoacidose diabética',
+        descricao: 'DM1 com glicemia 450 mg/dL, vômitos, dor abdominal e respiração de Kussmaul.',
+        especialidade: 'Endocrinologia',
+        dificuldade: 'dificil',
+        tempo_estimado_min: 20,
+        payload_mock: {
+          paciente: { nome: 'Lucas Pereira', idade: 19, sexo: 'M', antecedentes: ['DM tipo 1 desde 12 anos'], medicamentos: ['Insulina NPH (uso irregular)'], alergias: [] },
+          queixa_principal: 'Dor abdominal, vômitos e mal-estar há 12 horas',
+          contexto_resumido: 'Jovem DM1 com uso irregular de insulina, quadro de CAD instalado.',
+          recursos_habilitados: { suporte_cognitivo: true, chatbot_ia: true, dicas: true },
+          checklist_osce: [
+            { criterio: 'Diagnóstico', itens: [{ ref: 'gasometria', descricao: 'Solicitou gasometria arterial', pontos: 15 }, { ref: 'cetonas', descricao: 'Solicitou cetonas séricas/urinárias', pontos: 15 }] },
+            { criterio: 'Tratamento', itens: [{ ref: 'hidratacao_sv', descricao: 'Iniciou hidratação com soro fisiológico', pontos: 20 }, { ref: 'insulina_iv', descricao: 'Prescreveu insulina IV em bomba', pontos: 20 }] }
+          ]
+        }
+      },
+      {
+        titulo: 'Pneumonia adquirida na comunidade',
+        descricao: 'Paciente com febre, tosse produtiva e dispneia. Radiografia com consolidação lobar.',
+        especialidade: 'Pneumologia',
+        dificuldade: 'facil',
+        tempo_estimado_min: 15,
+        payload_mock: {
+          paciente: { nome: 'Pedro Costa', idade: 45, sexo: 'M', antecedentes: [], medicamentos: [], alergias: [] },
+          queixa_principal: 'Febre e tosse produtiva há 5 dias com piora da dispneia',
+          contexto_resumido: 'Adulto jovem sem comorbidades com síndrome pneumônica clássica e consolidação lobar.',
+          recursos_habilitados: { suporte_cognitivo: true, chatbot_ia: true, dicas: true },
+          checklist_osce: [
+            { criterio: 'Diagnóstico', itens: [{ ref: 'rx_torax', descricao: 'Solicitou radiografia de tórax', pontos: 15 }, { ref: 'psa_curb65', descricao: 'Calculou escore CURB-65', pontos: 10 }] },
+            { criterio: 'Tratamento', itens: [{ ref: 'antibiotico', descricao: 'Prescreveu antibiótico adequado', pontos: 20 }] }
+          ]
+        }
+      }
+    ];
+
+    const caseIds = [];
+    for (const c of caseSeed) {
+      const cId = uuidv4();
+      caseIds.push(cId);
+      await client.query(
+        `INSERT INTO cases (id, titulo, descricao, especialidade, dificuldade, tempo_estimado_min, payload_mock) VALUES ($1,$2,$3,$4,$5,$6,$7)`,
+        [cId, c.titulo, c.descricao, c.especialidade, c.dificuldade, c.tempo_estimado_min, JSON.stringify(c.payload_mock)]
+      );
+    }
+    console.log(`✅ ${caseIds.length} casos clínicos criados.`);
+
+    // 7. Injetar tentativas e eventos OSCE para popular métricas do dashboard
+    console.log('📋 Gerando tentativas e eventos de casos...');
+    const modos = ['hm', 'osce'];
+    for (const sId of studentIds.slice(0, 5)) {
+      const numAttempts = randomInt(2, 4);
+      const chosenCases = randomSample(caseIds, numAttempts);
+      for (const cId of chosenCases) {
+        const aId = uuidv4();
+        const modo = modos[randomInt(0, 1)];
+        const acertos = randomInt(2, 6);
+        const erros = randomInt(0, 3);
+        const pontuacao = modo === 'osce' ? randomInt(40, 95) : 0;
+        const tempo = randomInt(600, 1800);
+        const iniciadoEm = new Date(Date.now() - randomInt(1, 30) * 24 * 3600 * 1000);
+        const finalizadoEm = new Date(iniciadoEm.getTime() + tempo * 1000);
+        await client.query(
+          `INSERT INTO case_attempts (id, user_id, case_id, modo, pontuacao, acertos, erros, tempo_segundos, status, iniciado_em, finalizado_em) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'finalizado',$9,$10)`,
+          [aId, sId, cId, modo, pontuacao, acertos, erros, tempo, iniciadoEm, finalizadoEm]
+        );
+        if (modo === 'osce') {
+            for (let k = 0; k < acertos; k++) {
+            await client.query(
+              `INSERT INTO case_attempt_events (attempt_id, tipo, ref, pontos) VALUES ($1,'procedimento_correto',$2,$3)`,
+              [aId, `procedimento_${k + 1}`, randomInt(10, 20)]
+            );
+          }
+          for (let k = 0; k < erros; k++) {
+            await client.query(
+              `INSERT INTO case_attempt_events (attempt_id, tipo, ref, pontos) VALUES ($1,'erro',$2,$3)`,
+              [aId, `erro_${k + 1}`, -randomInt(5, 10)]
+            );
+          }
+        }
+      }
+    }
+    console.log('✅ Tentativas e eventos de casos gerados.');
+
     console.log('✅ Seed finalizado com sucesso absoluto! Banco de dados local 100% pronto para testes.');
   } catch (err) {
     console.error('❌ Erro crítico ao rodar o seed do banco:', err.message);

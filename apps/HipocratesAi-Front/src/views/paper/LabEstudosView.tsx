@@ -23,6 +23,20 @@ interface SessionState {
   titulo: string;
 }
 
+type QuickAction = {
+  id: string;
+  icon: string;
+  label: string;
+};
+
+const QUICK_ACTIONS: QuickAction[] = [
+  { id: 'mapa', icon: 'hub', label: 'Gerar Mapa Mental' },
+  { id: 'flashcards', icon: 'style', label: 'Criar Flashcards' },
+  { id: 'resumo', icon: 'summarize', label: 'Resumir Conteúdo' },
+  { id: 'condutas', icon: 'list_alt', label: 'Extrair Condutas' },
+  { id: 'questoes', icon: 'quiz', label: 'Gerar Lista de Questões' },
+];
+
 export default function LabEstudosView() {
   const { id } = useParams<{ id: string }>();
   const location = useLocation();
@@ -35,6 +49,10 @@ export default function LabEstudosView() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Quick Action Popup States
+  const [activeAction, setActiveAction] = useState<QuickAction | null>(null);
+  const [actionDetails, setActionDetails] = useState('');
 
   // Source adding
   const [showAddSource, setShowAddSource] = useState(false);
@@ -53,7 +71,7 @@ export default function LabEstudosView() {
       .catch(() => {});
   }, [id]);
 
-  async function handleAddSource() {
+async function handleAddSource() {
     if (!id) return;
     setAddingSource(true);
     try {
@@ -81,7 +99,6 @@ export default function LabEstudosView() {
       setShowAddSource(false);
       loadSources();
     } catch {
-      // silent — keep form open
     } finally {
       setAddingSource(false);
     }
@@ -126,8 +143,8 @@ export default function LabEstudosView() {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  async function handleSend() {
-    const text = message.trim();
+  // Função centralizada para enviar mensagens (usada pelo input e pelo popup)
+  async function sendMessage(text: string) {
     if (!text || sending || !id) return;
 
     setMessages(prev => [...prev, { id: Date.now(), role: 'user', content: text }]);
@@ -151,28 +168,98 @@ export default function LabEstudosView() {
     }
   }
 
+  function handleSend() {
+    sendMessage(message.trim());
+  }
+
+  function handleExecuteQuickAction() {
+    if (!activeAction) return;
+    
+    // Constrói o prompt mesclando a ação com as instruções adicionais (se houverem)
+    const basePrompt = `Por favor, ${activeAction.label.toLowerCase()} com base nas fontes deste notebook.`;
+    const finalPrompt = actionDetails.trim() 
+      ? `${basePrompt} Instruções adicionais: ${actionDetails.trim()}`
+      : basePrompt;
+
+    sendMessage(finalPrompt);
+    
+    // Fecha e limpa o popup
+    setActiveAction(null);
+    setActionDetails('');
+  }
+
   const displayName = doctor?.full_name ?? 'Dr.';
 
   return (
     <div className="flex flex-col bg-[#f7f9fc] text-slate-800" style={{ minHeight: 'calc(100vh - 96px)' }}>
+      
+      {/* POPUP DE AÇÃO RÁPIDA */}
+      {activeAction && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-sm px-4">
+          {/* Backdrop (clicar fora para fechar) */}
+          <div className="absolute inset-0 z-0 cursor-pointer" onClick={() => setActiveAction(null)} />
+          
+          <div className="relative z-10 w-full max-w-md bg-white rounded-3xl shadow-[0_32px_64px_rgba(0,0,0,0.15)] p-6 flex flex-col gap-4 animate-in fade-in zoom-in duration-200">
+            
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 shadow-sm">
+                <span className="material-symbols-outlined text-[24px]">{activeAction.icon}</span>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 tracking-tight">{activeAction.label}</h3>
+                <p className="text-xs text-slate-500 font-medium">Configure os detalhes da sua requisição</p>
+              </div>
+            </div>
+            
+            <div className="mt-2">
+              <label className="text-xs font-bold text-slate-700 uppercase tracking-widest mb-2 block">
+                Instruções adicionais (Opcional)
+              </label>
+              <textarea 
+                value={actionDetails}
+                onChange={(e) => setActionDetails(e.target.value)}
+                placeholder="Ex: Focar apenas no capítulo 3, extrair posologias, usar formato de tabela..."
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl p-4 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all resize-none h-28 placeholder:text-slate-400"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3 mt-4 pt-5 border-t border-slate-100">
+              <button 
+                onClick={() => setActiveAction(null)}
+                className="px-5 py-2.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition-colors uppercase tracking-wider"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={handleExecuteQuickAction}
+                className="px-6 py-2.5 bg-blue-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl hover:bg-blue-700 hover:-translate-y-0.5 transition-all shadow-sm flex items-center gap-2"
+              >
+                <span>Executar</span>
+                <span className="material-symbols-outlined text-[16px]">send</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* PAGE TITLE */}
       <div className="px-6 py-4 border-b border-slate-200/60 bg-white/70 backdrop-blur-xl flex items-center gap-4">
-        <span className="text-sm font-black tracking-tight text-primary">Plantão Lab</span>
+        <span className="text-sm font-black tracking-tight text-blue-600">Plantão Lab</span>
         <div className="h-4 w-px bg-slate-200" />
         <h1 className="font-semibold tracking-tight text-slate-900 truncate max-w-sm text-sm">{sessionTitle}</h1>
       </div>
 
       {/* LAYOUT */}
       <div className="flex flex-1 overflow-hidden" style={{ height: 'calc(100vh - 96px - 57px)' }}>
-        {/* SIDEBAR */}
+        {/* SIDEBAR ESQUERDA (FONTES) */}
         <aside className="w-64 border-r border-slate-200/60 bg-slate-50/80 backdrop-blur-2xl px-4 py-6 flex flex-col">
           <div className="mb-6 flex items-center gap-3 px-2">
             <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white shadow-sm">
-              <span className="material-symbols-outlined text-primary">person</span>
+              <span className="material-symbols-outlined text-blue-600">person</span>
             </div>
             <div>
               <p className="text-sm font-bold text-slate-800">{displayName}</p>
-              <p className="text-xs font-medium text-primary">Estudante</p>
+              <p className="text-xs font-medium text-blue-600">Estudante</p>
             </div>
           </div>
 
@@ -184,9 +271,9 @@ export default function LabEstudosView() {
               </p>
               <button
                 onClick={() => setShowAddSource(v => !v)}
-                className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+                className="w-6 h-6 rounded-full bg-blue-600/10 flex items-center justify-center hover:bg-blue-600/20 transition-colors"
               >
-                <span className="material-symbols-outlined text-primary text-[14px]">
+                <span className="material-symbols-outlined text-bg-blue-600 text-[14px]">
                   {showAddSource ? 'close' : 'add'}
                 </span>
               </button>
@@ -199,13 +286,13 @@ export default function LabEstudosView() {
                 <div className="flex gap-1 p-1 bg-slate-100 rounded-xl">
                   <button
                     onClick={() => setAddMode('url')}
-                    className={`flex-1 text-[11px] font-bold py-1.5 rounded-lg transition-all ${addMode === 'url' ? 'bg-white text-primary shadow-sm' : 'text-slate-500'}`}
+                    className={`flex-1 text-[11px] font-bold py-1.5 rounded-lg transition-all ${addMode === 'url' ? 'bg-white text-[#006e2a] shadow-sm' : 'text-slate-500'}`}
                   >
                     URL
                   </button>
                   <button
                     onClick={() => setAddMode('file')}
-                    className={`flex-1 text-[11px] font-bold py-1.5 rounded-lg transition-all ${addMode === 'file' ? 'bg-white text-primary shadow-sm' : 'text-slate-500'}`}
+                    className={`flex-1 text-[11px] font-bold py-1.5 rounded-lg transition-all ${addMode === 'file' ? 'bg-white text-[#006e2a] shadow-sm' : 'text-slate-500'}`}
                   >
                     Arquivo
                   </button>
@@ -217,12 +304,12 @@ export default function LabEstudosView() {
                     value={urlInput}
                     onChange={e => setUrlInput(e.target.value)}
                     placeholder="Cole uma URL ou link do YouTube..."
-                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-primary transition-colors"
+                    className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs outline-none focus:border-[#006e2a] transition-colors"
                   />
                 ) : (
                   <button
                     onClick={() => fileRef.current?.click()}
-                    className="w-full rounded-xl border border-dashed border-slate-300 bg-slate-50 py-3 text-xs text-slate-500 hover:border-primary hover:text-primary transition-colors"
+                    className="w-full rounded-xl border border-dashed border-slate-300 bg-slate-50 py-3 text-xs text-slate-500 hover:border-[#006e2a] hover:text-[#006e2a] transition-colors"
                   >
                     {fileInput ? fileInput.name : 'Selecionar PDF, DOCX ou imagem'}
                   </button>
@@ -232,7 +319,7 @@ export default function LabEstudosView() {
                 <button
                   onClick={handleAddSource}
                   disabled={addingSource || (addMode === 'url' ? !urlInput.trim() : !fileInput)}
-                  className="w-full py-2 rounded-xl bg-primary text-white text-[11px] font-bold disabled:opacity-40 transition-all hover:bg-primary/90"
+                  className="w-full py-2 rounded-xl bg-[#006e2a] text-white text-[11px] font-bold disabled:opacity-40 transition-all hover:bg-[#006e2a]/90"
                 >
                   {addingSource ? 'Adicionando...' : 'Adicionar fonte'}
                 </button>
@@ -258,7 +345,7 @@ export default function LabEstudosView() {
                       <span className="ml-auto w-2 h-2 rounded-full bg-yellow-400 animate-pulse shrink-0" title="Indexando..." />
                     )}
                     {s.status === 'ready' && (
-                      <span className="ml-auto w-2 h-2 rounded-full bg-green-400 shrink-0" title="Pronto" />
+                      <span className="ml-auto w-2 h-2 rounded-full bg-blue-600 shrink-0" title="Pronto" />
                     )}
                     {s.status === 'error' && (
                       <span className="ml-auto w-2 h-2 rounded-full bg-red-400 shrink-0" title="Erro" />
@@ -283,8 +370,8 @@ export default function LabEstudosView() {
               msg.role === 'ai' ? (
                 <div key={msg.id} className="flex max-w-[90%] flex-col gap-2">
                   <div className="mb-1 flex items-center gap-2 opacity-60">
-                    <span className="material-symbols-outlined text-[16px] text-primary">auto_awesome</span>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.2em]">IA DO LABORATÓRIO</span>
+                    <span className="material-symbols-outlined text-[16px] text-blue-600">auto_awesome</span>
+                    <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-600">IA DO LABORATÓRIO</span>
                   </div>
                   <div className="rounded-[2rem] rounded-tl-sm border border-white/40 bg-white/70 p-6 backdrop-blur-xl shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
                     <p className="text-[15px] leading-relaxed text-slate-800 whitespace-pre-wrap">{msg.content}</p>
@@ -302,9 +389,9 @@ export default function LabEstudosView() {
               <div className="flex max-w-[90%] flex-col gap-2">
                 <div className="rounded-[2rem] rounded-tl-sm border border-white/40 bg-white/70 p-6">
                   <div className="flex gap-2 items-center">
-                    <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '300ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-[#006e2a] animate-bounce" style={{ animationDelay: '0ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-[#006e2a] animate-bounce" style={{ animationDelay: '150ms' }} />
+                    <div className="w-2 h-2 rounded-full bg-[#006e2a] animate-bounce" style={{ animationDelay: '300ms' }} />
                   </div>
                 </div>
               </div>
@@ -312,7 +399,7 @@ export default function LabEstudosView() {
             <div ref={bottomRef} />
           </div>
 
-          {/* INPUT */}
+          {/* INPUT CHAT */}
           <div className="p-8">
             <div className="mx-auto flex max-w-3xl items-center rounded-[2rem] border border-white/60 bg-white/70 px-4 py-3 backdrop-blur-xl shadow-[0_20px_60px_rgba(0,0,0,0.06)]">
               <input
@@ -326,7 +413,7 @@ export default function LabEstudosView() {
               <button
                 onClick={handleSend}
                 disabled={!message.trim() || sending}
-                className="ml-1 flex h-11 w-11 items-center justify-center rounded-full bg-primary text-white shadow-lg shadow-primary/25 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="ml-1 flex h-11 w-11 items-center justify-center rounded-full bg-blue-600 text-white shadow-lg shadow-[#006e2a]/25 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <span className="material-symbols-outlined">send</span>
               </button>
@@ -334,33 +421,27 @@ export default function LabEstudosView() {
           </div>
         </section>
 
-        {/* RIGHT PANEL */}
+        {/* RIGHT PANEL (AÇÕES RÁPIDAS) */}
         <aside className="w-[280px] overflow-hidden border-l border-slate-200/60 bg-slate-50/50 flex flex-col">
           <div className="flex items-center justify-between p-6">
             <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500">
               Ações Rápidas
             </h2>
-            <span className="material-symbols-outlined text-primary/40">auto_fix_high</span>
+            <span className="material-symbols-outlined text-blue-600/60">auto_fix_high</span>
           </div>
 
           <div className="flex-1 overflow-y-auto px-5 pb-6 space-y-2">
-            {[
-              ['hub', 'Gerar Mapa Mental'],
-              ['style', 'Criar Flashcards'],
-              ['summarize', 'Resumir Conteúdo'],
-              ['list_alt', 'Extrair Condutas'],
-              ['quiz', 'Gerar Lista de Questões'],
-            ].map(([icon, label]) => (
+            {QUICK_ACTIONS.map((action) => (
               <button
-                key={label}
-                onClick={() => setMessage(`Por favor, ${label.toLowerCase()} com base nas fontes deste notebook.`)}
-                className="group flex w-full items-center gap-4 rounded-2xl border border-slate-100 bg-white p-4 text-left transition-all hover:border-primary hover:bg-primary"
+                key={action.id}
+                onClick={() => setActiveAction(action)}
+                className="group flex w-full items-center gap-4 rounded-2xl border border-slate-100 bg-white p-4 text-left transition-all hover:border-bg-blue-600 hover:bg-blue-600"
               >
-                <span className="material-symbols-outlined text-primary transition-colors group-hover:text-white">
-                  {icon}
+                <span className="material-symbols-outlined text-blue-600 transition-colors group-hover:text-white">
+                  {action.icon}
                 </span>
                 <span className="text-[13px] font-semibold text-slate-700 transition-colors group-hover:text-white">
-                  {label}
+                  {action.label}
                 </span>
               </button>
             ))}

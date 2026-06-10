@@ -157,4 +157,23 @@ export class StudyPlansV1Controller {
       } catch (e) { next(e); }
     },
   ];
+
+  // Task 5 — Visualização Diária
+  getDailyView = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const studentId = String(req.query.student_id ?? '');
+      const date = String(req.query.date ?? '');
+      if (!studentId) return res.status(400).json({ erro: 'student_id é obrigatório', codigo: 400 });
+      if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date))
+        return res.status(400).json({ erro: 'date é obrigatório no formato YYYY-MM-DD', codigo: 400 });
+
+      const typesRaw = req.query.types ? String(req.query.types) : undefined;
+      const types = typesRaw ? typesRaw.split(',').map(t => t.trim()).filter(Boolean) : undefined;
+      const search = req.query.search ? String(req.query.search) : undefined;
+
+      const result = await this.service.getDailyBlocks(studentId, date, types, search);
+      return res.status(200).json(result);
+    } catch (e) { next(e); }
+  };
+
 }

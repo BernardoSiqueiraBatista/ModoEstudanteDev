@@ -228,4 +228,57 @@ export class StudyPlansModel {
   async deleteBlocksByPlan(planId: string): Promise<void> {
     await pool.query(`DELETE FROM study_plan_blocks WHERE id_plan = $1`, [planId]);
   }
+
+  async getDailyBlocks(
+    studentId: string,
+    date: string,
+    types?: string[],
+    search?: string
+  ): Promise<{ blocks: IStudyPlanBlock[]; fixed_commitments: Record<string, unknown>[] }> {
+    const blockTypes = types?.filter(t => t !== 'compromisso_fixo');
+    const includeFixed = !types || types.length === 0 || types.includes('compromisso_fixo');
+
+    const conditions: string[] = ['sp.id_student = $1', 'sp.deleted_at IS NULL', 'spb.data = $2'];
+    const params: unknown[] = [studentId, date];
+    let idx = 3;
+
+    if (blockTypes && blockTypes.length > 0) {
+      conditions.push(`spb.tipo = ANY($${idx})`);
+      params.push(blockTypes);
+      idx++;
+    }
+    if (search?.trim()) {
+      conditions.push(`spb.titulo ILIKE $${idx}`);
+      params.push(`%${search.trim()}%`);
+      idx++;
+    }
+
+    const blocksResult = await pool.query<IStudyPlanBlock>(
+      `SELECT spb.* FROM study_plan_blocks spb
+       JOIN study_plans sp ON sp.id = spb.id_plan
+       WHERE ${conditions.join(' AND ')}
+       ORDER BY spb.hora_inicio ASC`,
+      params
+    );
+
+    // Fixed commitments from dedicated table, filtered by day of week
+    let fixed_commitments: Record<string, unknown>[] = [];
+    if (includeFixed) {
+      // EXTRACT(DOW) → 0=Sun,1=Mon,...,6=Sat mapped to seg/ter/qua/qui/sex/sab/dom
+      const fcResult = await pool.query(
+        `SELECT fc.id, fc.dia, fc.inicio, fc.fim, fc.label, fc.tipo, fc.id_plan
+         FROM study_plan_fixed_commitments fc
+         JOIN study_plans sp ON sp.id = fc.id_plan
+         WHERE sp.id_student = $1
+           AND sp.deleted_at IS NULL
+           AND fc.dia = (ARRAY['dom','seg','ter','qua','qui','sex','sab'])[EXTRACT(DOW FROM $2::date)::int + 1]
+           ${search?.trim() ? `AND (fc.label ILIKE $${idx})` : ''}
+         ORDER BY fc.inicio ASC`,
+        search?.trim() ? [studentId, date, `%${search.trim()}%`] : [studentId, date]
+      );
+      fixed_commitments = fcResult.rows;
+    }
+
+    return { blocks: blocksResult.rows, fixed_commitments };
+  }
 }
